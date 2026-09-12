@@ -1,0 +1,5 @@
+FROM cassandra:5.0.9@sha256:da9dad3aaf67c4e5126c6aafa769460d75f27c1716951c48896ff5c4e97d2af3
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends iptables && rm -rf /var/lib/apt/lists/*
+# Disable asynchronous catch-up to preserve controlled divergent histories.
+RUN sed -i 's/^hinted_handoff_enabled:.*/hinted_handoff_enabled: false/' /etc/cassandra/cassandra.yaml

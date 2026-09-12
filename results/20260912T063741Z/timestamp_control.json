@@ -1,0 +1,51 @@
+[
+  {
+    "node": "n1",
+    "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+    "params": [
+      1789195634888063,
+      1,
+      "20260912T063741Z:timestamp"
+    ],
+    "cl": "ALL",
+    "start_ns": 1789195635233412252,
+    "status": "ok",
+    "value": null,
+    "coordinator": "172.19.0.2:9042",
+    "end_ns": 1789195635250971836,
+    "latency_ms": 17.55975
+  },
+  {
+    "node": "n2",
+    "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+    "params": [
+      1789195634888013,
+      2,
+      "20260912T063741Z:timestamp"
+    ],
+    "cl": "ALL",
+    "start_ns": 1789195635433774044,
+    "status": "ok",
+    "value": null,
+    "coordinator": "172.19.0.4:9042",
+    "end_ns": 1789195635467402294,
+    "latency_ms": 33.6285
+  },
+  {
+    "node": "n3",
+    "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+    "params": [
+      "20260912T063741Z:timestamp"
+    ],
+    "cl": "ALL",
+    "start_ns": 1789195635682130961,
+    "status": "ok",
+    "value": {
+      "a": 1,
+      "b": 0
+    },
+    "coordinator": "172.19.0.5:9042",
+    "end_ns": 1789195635708229586,
+    "latency_ms": 26.098791
+  }
+]

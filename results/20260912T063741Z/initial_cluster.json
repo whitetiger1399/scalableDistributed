@@ -1,0 +1,89 @@
+{
+  "nodetool": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  91.03 KiB   16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  119.79 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  118.21 KiB  16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1",
+  "schema": [
+    {
+      "node": "n1",
+      "query": "CREATE KEYSPACE IF NOT EXISTS lab WITH replication = {'class':'NetworkTopologyStrategy','dc1':3}",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063344138960,
+      "status": "ok",
+      "value": null,
+      "coordinator": "172.19.0.2:9042",
+      "end_ns": 1789195063374537210,
+      "latency_ms": 30.398416
+    },
+    {
+      "node": "n1",
+      "query": "CREATE TABLE IF NOT EXISTS lab.blocking (k text PRIMARY KEY, a int, b int) WITH read_repair='BLOCKING' AND speculative_retry='NONE'",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063374539376,
+      "status": "ok",
+      "value": null,
+      "coordinator": "172.19.0.2:9042",
+      "end_ns": 1789195063375185001,
+      "latency_ms": 0.645834
+    },
+    {
+      "node": "n1",
+      "query": "CREATE TABLE IF NOT EXISTS lab.no_repair (k text PRIMARY KEY, a int, b int) WITH read_repair='NONE' AND speculative_retry='NONE'",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063375186751,
+      "status": "ok",
+      "value": null,
+      "coordinator": "172.19.0.2:9042",
+      "end_ns": 1789195063375717585,
+      "latency_ms": 0.530959
+    },
+    {
+      "node": "n1",
+      "query": "SELECT release_version, data_center, rack FROM system.local",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063375720001,
+      "status": "ok",
+      "value": {
+        "release_version": "5.0.9",
+        "data_center": "dc1",
+        "rack": "rack1"
+      },
+      "coordinator": "172.19.0.2:9042",
+      "end_ns": 1789195063377824710,
+      "latency_ms": 2.104875
+    },
+    {
+      "node": "n2",
+      "query": "SELECT release_version, data_center, rack FROM system.local",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063377826751,
+      "status": "ok",
+      "value": {
+        "release_version": "5.0.9",
+        "data_center": "dc1",
+        "rack": "rack1"
+      },
+      "coordinator": "172.19.0.4:9042",
+      "end_ns": 1789195063415672418,
+      "latency_ms": 37.845875
+    },
+    {
+      "node": "n3",
+      "query": "SELECT release_version, data_center, rack FROM system.local",
+      "params": [],
+      "cl": "ALL",
+      "start_ns": 1789195063415675001,
+      "status": "ok",
+      "value": {
+        "release_version": "5.0.9",
+        "data_center": "dc1",
+        "rack": "rack1"
+      },
+      "coordinator": "172.19.0.5:9042",
+      "end_ns": 1789195063451970418,
+      "latency_ms": 36.295584
+    }
+  ]
+}
