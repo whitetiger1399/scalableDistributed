@@ -13,9 +13,10 @@ class HistoryChecks(unittest.TestCase):
     def test_regression(self):
         self.assertEqual(classify('MR',[ok(1),ok(1),ok(0)]),'violation')
     def test_dependency_witness(self):
-        for model in ('MW','WFR'):
-            self.assertEqual(classify(model,[ok(1),ok(0,1)]),'violation')
-            self.assertEqual(classify(model,[ok(1),ok(1,1)]),'no_violation_observed')
+        self.assertEqual(classify('MW',[ok(1),ok(0,1)]),'violation')
+        self.assertEqual(classify('MW',[ok(1),ok(1,1)]),'no_violation_observed')
+        self.assertEqual(classify('WFR',[ok(1),ok(1),ok(0,1),ok(0,1)]),'violation')
+        self.assertEqual(classify('WFR',[ok(1),ok(1),ok(1,1),ok(1,1)]),'no_violation_observed')
     def test_absent_successor_is_inconclusive(self):
         self.assertEqual(classify('MW',[ok(1),ok(0,0)]),'inconclusive')
     def test_error_is_not_violation(self):

@@ -7,8 +7,9 @@ Three Cassandra 5.0.9 containers (one datacenter, replication factor 3), a Pytho
 Prerequisites: Docker Engine/Desktop with Compose v2, about 8 GB assigned to Docker, 4 CPU cores, internet for initial image builds, and host Python 3.9+. The cluster publishes no host ports. Fault injection requires `NET_ADMIN` only inside the three lab containers.
 
 ```sh
-python3 scripts/lab.py up
-python3 scripts/lab.py run --repeats 5
+export COMPOSE_BIN=/Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose  # macOS if needed
+python3 scripts/run_randomized.py --plan-only
+python3 scripts/run_randomized.py --config config/randomized_experiments.json
 python3 -m venv .venv
 .venv/bin/pip install -r requirements-report.txt
 .venv/bin/python scripts/build_report.py
@@ -16,7 +17,7 @@ python3 -m unittest discover -s tests -v
 python3 scripts/lab.py down
 ```
 
-Initial startup is sequential and can take several minutes. The full experiment includes ten read-repair trials with network transitions and also takes several minutes. `run` creates a fresh UTC-stamped results directory and unique keys; earlier results are retained. Report generation selects the latest **completed** run. Pass `--results results/<run>` to select another run. The generator validates the saved histories and renders every PDF page into `report/qa/` for visual review.
+Initial startup is sequential and can take several minutes. The randomized default registers 600 main trials (10 rounds × 5 consistency configurations × 4 models × 3 scenarios), 20 read-repair trials and 10 timestamp controls. Each application read and write is routed independently by a random gateway; the application has no node argument. `--plan-only` validates the configuration and prints the exact counts without Docker. `--seed` enables replay of routing and case-order choices. `--repetitions N` changes the number of rounds, but N must be at least 10.
 
 If a macOS Docker installation has a broken Compose plugin symlink but includes the executable, use:
 
@@ -33,7 +34,12 @@ For interrupted runs, `python3 scripts/lab.py heal` restarts n3 and removes this
 | `compose.yaml`, `Dockerfile.*` | Reproducible deployment; base images pinned by digest |
 | `src/worker.py` | Coordinator-pinned CQL operations, explicit CLs, no driver retries |
 | `src/checks.py` | Finite-history violation checks |
-| `scripts/lab.py` | Startup, SIGKILL, storage-port partitions, recovery and evidence |
+| `scripts/run_randomized.py` | Parameterized randomized runner; one round per experiment block |
+| `scripts/build_plan_pdf.py` | Renders the detailed registered methodology to PDF |
+| `scripts/verify_randomized.py` | Validates completed randomized-run evidence |
+| `experiments/*.py` | Separate session, node-failure, partition, read-repair and timestamp definitions |
+| `experiments/faults.py` | Project-scoped SIGKILL, iptables partition, detection and recovery |
+| `scripts/lab.py` | Original fixed-route runner retained for historical reproduction |
 | `report/predictions.md` | Predictions written before measurements |
 | `scripts/build_report.py` | Generates PDF and Markdown directly from completed results |
 | `results/<run>/trials.json` | Raw matrix histories; failures retained |
@@ -42,7 +48,11 @@ For interrupted runs, `python3 scripts/lab.py heal` restarts n3 and removes this
 | `results/<run>/faults.json` | Node status and packet-drop evidence |
 | `results/<run>/environment.json` | Runtime versions and image metadata |
 
-To validate saved evidence independently of Docker, run `python3 scripts/verify_results.py results/<run>`. It checks trial counts, unique keys, successful initialization, sequential timing, requested consistency levels and recalculated verdicts.
+To validate old fixed-route evidence, run `python3 scripts/verify_results.py results/<run>`. To validate a completed redesigned run, run `python3 scripts/verify_randomized.py results/randomized_<run>`. The randomized verifier checks trial counts, at least ten attempts per case, fresh keys, operation order, random-routing metadata, and supplemental-control counts.
+
+The detailed randomized protocol, trial accounting, coordinator-versus-replica distinction, node-failure procedure, network-partition rules, and acceptance checks are in [docs/randomized-experiment-plan.md](docs/randomized-experiment-plan.md). The redesigned runner writes each round separately and records routing candidates, random draws, actual coordinators, fault commands, membership views and recovery barriers.
+
+The methodology is also available as [report/Randomized_Experiment_Plan.pdf](report/Randomized_Experiment_Plan.pdf). Edit `config/randomized_experiments.json` to select experiment types and scenarios. The runner rejects fewer than 10 repetitions and requires `repetitions == rounds`, so every selected main case receives at least 10 randomized trials.
 
 ## Interpretation
 

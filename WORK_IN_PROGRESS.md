@@ -1,6 +1,6 @@
 # Current snapshot status
 
-This snapshot contains the completed original Cassandra experiment project and an **in-progress randomized-routing redesign** requested afterward.
+This snapshot contains the completed original Cassandra experiment project and the **parameterized randomized-routing redesign** requested afterward.
 
 ## Completed original experiments
 
@@ -10,12 +10,16 @@ This snapshot contains the completed original Cassandra experiment project and a
 - The existing PDFs describe those original measurements, not the randomized redesign.
 - `report/previous_design/submission.zip` contains the complete, tested original source and reproduction package.
 
-## Randomized redesign in progress
+## Randomized redesign implementation
 
 - `src/routing.py` introduces a seeded random routing layer.
-- `src/worker.py` now exposes application reads and writes without node arguments; the routing layer independently selects client-reachable coordinators.
-- `src/checks.py` now checks the writes-follow-reads prerequisite directly.
-- The orchestration script, tests, verifier, predictions, and report generator still need integration with the new worker interface.
-- **The current checkout is not yet an end-to-end runnable randomized experiment suite.** New randomized results have not been collected, and the requested minimum of 10 trials per experiment type has not yet been executed.
+- `src/worker.py` exposes application reads and writes without node arguments; the routing layer independently selects client-reachable coordinators for every operation.
+- `config/randomized_experiments.json` controls repetitions, rounds, models, consistency configurations, scenarios, fault timing and enabled experiment types.
+- `experiments/session_guarantees.py`, `node_failure.py`, `network_partition.py`, `read_repair.py`, `timestamp_control.py` separate experiment definitions and accounting.
+- `experiments/faults.py` contains the exact project-scoped SIGKILL and iptables procedures.
+- `scripts/run_randomized.py` executes 10 rounds by default: 600 main trials, 20 read-repair trials and 10 timestamp-control trials.
+- `docs/randomized-experiment-plan.md` is the detailed registered methodology.
+
+New randomized measurements have not yet been collected in this checkout. The existing PDFs and `results/20260912T063741Z/` describe the previous fixed-coordinator design and must not be used as randomized redesign results.
 
 This status is explicit so that the existing measured results are not mistaken for validation of the unfinished redesign.
