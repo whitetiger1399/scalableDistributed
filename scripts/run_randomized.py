@@ -1,203 +1,401 @@
 #!/usr/bin/env python3
-"""Run the randomized-coordinator Cassandra experiment plan."""
+"""Execute the auditable randomized-coordinator Cassandra experiment suite."""
 import argparse
+from collections import Counter
 import datetime as dt
+import fcntl
+import hashlib
 import json
 import os
+from pathlib import Path
 import random
 import secrets
+import subprocess
+import sys
 import time
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-import sys
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
-from experiments.common import expected_main_trials
-from experiments import session_guarantees, node_failure, network_partition, read_repair, timestamp_control
-from experiments.faults import NODES, clear_partition, compose, kill_node, membership, restart_node, set_graph, set_partition, wait_failure, wait_healthy
+from checks import evaluate
+from experiments import node_failure, network_partition, read_repair, session_guarantees, timestamp_control
+from experiments.configuration import expected_main_trials, normalize
+from experiments.faults import (NODES, clear_partition, compose, kill_node, membership,
+                                partition_snapshot, recover_all, restart_node, set_graph,
+                                set_partition, wait_failure, wait_healthy)
 
-def load_config(path):
-    with open(path) as handle:
-        config = json.load(handle)
-    if config["repetitions"] < 10:
-        raise ValueError("repetitions must be at least 10")
-    if config["rounds"] < 10:
-        raise ValueError("rounds must be at least 10")
-    if config["repetitions"] != config["rounds"]:
-        raise ValueError("repetitions and rounds must match: one randomized case per round")
-    required = {"RYW", "MR", "MW", "WFR"}
-    if set(config["models"]) != required:
-        raise ValueError("models must contain exactly RYW, MR, MW, WFR")
-    allowed = {"session_guarantees", "node_failure", "network_partition", "read_repair", "timestamp_control"}
-    unknown = set(config.get("enabled_experiments", ())) - allowed
-    if unknown:
-        raise ValueError(f"unknown enabled experiment types: {sorted(unknown)}")
-    if any(s not in {"normal", "node_failure", "network_partition"} for s in config["scenarios"]):
-        raise ValueError("scenarios must be normal, node_failure, or network_partition")
-    if "node_failure" in config["scenarios"] and "node_failure" not in config["enabled_experiments"]:
-        raise ValueError("node_failure scenario is listed but node_failure experiment is disabled")
-    if "network_partition" in config["scenarios"] and "network_partition" not in config["enabled_experiments"]:
-        raise ValueError("network_partition scenario is listed but network_partition experiment is disabled")
-    return config
+EVIDENCE_SCHEMA = "randomized-cassandra-evidence-v3"
 
 
-def save(path, value):
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+def load_config(path, full=True, repetitions=None):
+    raw = json.loads(path.read_text())
+    if repetitions is not None:
+        raw["repetitions"] = repetitions
+        raw["rounds"] = repetitions
+    return normalize(raw, full=full)
 
 
-def worker(request):
-    # The client container reads one JSON request and writes one JSON response.
-    result = compose("exec", "-T", "client", "python", "src/worker.py", data=json.dumps(request))
+def atomic_save(path, value):
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True, default=str) + "\n")
+    os.replace(temporary, path)
+
+
+class Evidence:
+    def __init__(self, directory):
+        self.directory = directory
+        self.journal = directory / "events.jsonl"
+
+    def event(self, kind, **fields):
+        record = {"event": kind, "time_ns": time.time_ns(), **fields}
+        with self.journal.open("a") as handle:
+            handle.write(json.dumps(record, sort_keys=True, default=str) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        return record
+
+    def save(self, name, value):
+        atomic_save(self.directory / name, value)
+
+
+def derived_seed(root, label):
+    digest = hashlib.sha256(f"{root}:{label}".encode()).digest()
+    return int.from_bytes(digest[:8], "big")
+
+
+def worker(request, config):
+    payload = dict(request)
+    payload.update(nodes=list(NODES), cql_port=config["faults"]["cql_port"])
+    if payload.get("action") == "schema":
+        payload["database"] = config["database"]
+    result = compose("exec", "-T", "client", "python", "src/worker.py",
+                     data=json.dumps(payload), timeout=180)
     return json.loads(result)
 
 
-def initialize(schedule, seed, timestamp, table="blocking"):
-    items = [{"key": case["key"], "table": table} for case in schedule]
-    return worker({"action": "init", "items": items, "ts": timestamp, "seed": seed})
+def require_records(response, expected, label):
+    if not isinstance(response, dict):
+        raise RuntimeError(f"{label}: response is not an object")
+    records = response.get("records")
+    if not isinstance(records, list) or len(records) != expected:
+        raise RuntimeError(f"{label}: expected {expected} records, got {len(records or [])}")
+    errors = [record for record in records if record.get("status") != "ok"]
+    if errors:
+        raise RuntimeError(f"{label}: {len(errors)} operations failed: {json.dumps(errors)}")
+    return response
 
 
-def application_batch(schedule, seed, timestamp):
-    return worker({"action": "batch", "schedule": schedule, "ts": timestamp, "seed": seed})
+def initialize(schedule, seed, timestamp, config, table="blocking"):
+    items = [{"key": case["key"], "table": case.get("table", table)} for case in schedule]
+    response = worker({"action": "init", "items": items, "ts": timestamp, "seed": seed}, config)
+    return require_records(response, len(items), "initialization")
 
 
-def assert_initialization(response):
-    if not isinstance(response, dict) or any(r["status"] != "ok" for r in response.get("records", [])):
-        raise RuntimeError("initialization failed: " + json.dumps(response))
+def environment(config, seed, run_id):
+    def output(args):
+        result = subprocess.run(args, cwd=ROOT, text=True, capture_output=True, timeout=30)
+        return {"command": args, "returncode": result.returncode,
+                "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+    source_files = [ROOT / name for name in ("README.md", "WORK_IN_PROGRESS.md",
+                    "Project_Assignment.md", "AGENT_ACTION_PLAN.md", "compose.yaml",
+                    "Dockerfile.cassandra", "Dockerfile.client", "requirements-report.txt",
+                    "report/predictions.md", "report/authors.json")]
+    for directory in ("config", "docs", "experiments", "src", "scripts", "tests"):
+        source_files.extend(path for path in (ROOT / directory).rglob("*")
+                            if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc")
+    manifest = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(set(source_files))}
+    return {
+        "evidence_schema": EVIDENCE_SCHEMA, "design": config["design"], "run_id": run_id,
+        "started_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "root_seed": seed,
+        "python": sys.version, "platform": sys.platform,
+        "git_revision": output(["git", "rev-parse", "HEAD"]),
+        "git_status": output(["git", "status", "--short"]),
+        "docker_compose": output(([os.environ.get("COMPOSE_BIN")] if os.environ.get("COMPOSE_BIN")
+                                  else [os.environ.get("DOCKER_BIN", "docker"), "compose"]) + ["version"]),
+        "source_manifest_sha256": manifest,
+        "effective_config": config,
+    }
+
+
+def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials, fault_records):
+    schedule = session_guarantees.build_round(config, run_id, round_no, scenario, rngs["order"])
+    timestamp = time.time_ns() // 1000
+    init_seed = rngs["routing"].getrandbits(64)
+    initialization = initialize(schedule, init_seed, timestamp, config)
+    episode_id = f"main:{scenario}:{round_no}"
+    record = {"episode_id": episode_id, "scenario": scenario, "round": round_no,
+              "schedule": schedule, "initialization": initialization,
+              "started_ns": time.time_ns(), "fault": None, "recovery": None}
+    evidence.event("episode_initialized", episode_id=episode_id, scenario=scenario,
+                   round=round_no, keys=[case["key"] for case in schedule])
+    cleanup = None
+    try:
+        if scenario == "node_failure":
+            victim = node_failure.choose_victim(NODES, rngs["faults"])
+            fault = kill_node(victim)
+            cleanup = ("node", victim)
+            record["fault"] = fault
+            fault["detection"] = wait_failure(victim, fault["identity"]["ip"],
+                config["faults"]["failure_detection_timeout_seconds"])
+        elif scenario == "network_partition":
+            isolated = network_partition.choose_isolated(NODES, rngs["faults"])
+            fault = set_partition(isolated, config["faults"]["internode_ports"])
+            cleanup = ("partition", isolated)
+            expected_peers = {node: (2 if node == isolated else 1) for node in NODES}
+            for node, peer_count in expected_peers.items():
+                if len(fault["blocked"].get(node, [])) != peer_count:
+                    raise RuntimeError("installed partition graph differs from intended 2|1 cut")
+                if fault["rules"].get(node, "").count("-j DROP") < peer_count * 2:
+                    raise RuntimeError("partition DROP rules are incomplete")
+            if config["faults"]["partition_stabilization_seconds"]:
+                time.sleep(config["faults"]["partition_stabilization_seconds"])
+            probe = worker({"action": "probe"}, config)
+            if len(probe) != len(NODES) or not all(item.get("reachable") for item in probe):
+                raise RuntimeError("partition must retain CQL reachability to every node")
+            fault.update(isolated=isolated, client_probe=probe,
+                         established_ns=time.time_ns(), established_membership={n: membership(n) for n in NODES})
+            record["fault"] = fault
+        batch_seed = rngs["routing"].getrandbits(64)
+        batch = worker({"action": "batch", "schedule": schedule,
+                        "ts": timestamp + 1_000_000, "seed": batch_seed}, config)
+        trials = batch.get("records") if isinstance(batch, dict) else None
+        if not isinstance(trials, list) or len(trials) != len(schedule):
+            raise RuntimeError(f"application batch returned {len(trials or [])}/{len(schedule)} histories")
+        for trial in trials:
+            trial.update(episode_id=episode_id, routing_seed=batch_seed,
+                         worker_health=batch.get("health", []))
+        record["trials"] = trials
+        record["post_workload_partition"] = partition_snapshot() if scenario == "network_partition" else None
+        all_trials.extend(trials)
+    except BaseException as exc:
+        record["error"] = {"type": type(exc).__name__, "message": str(exc)}
+        evidence.event("episode_error", episode_id=episode_id, error=record["error"])
+        raise
+    finally:
+        try:
+            if cleanup and cleanup[0] == "node":
+                restart_node(cleanup[1])
+                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+            elif cleanup and cleanup[0] == "partition":
+                clear_partition()
+                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+        except BaseException as recovery_error:
+            record["recovery_error"] = {"type": type(recovery_error).__name__,
+                                        "message": str(recovery_error)}
+        record["ended_ns"] = time.time_ns()
+        fault_records.append(record)
+        evidence.save("trials.json", all_trials)
+        evidence.save("faults.json", fault_records)
+        evidence.save(f"episode_{scenario}_{round_no:02}.json", record)
+        evidence.event("episode_saved", episode_id=episode_id,
+                       trials=len(record.get("trials", [])),
+                       recovered=(scenario == "normal" or bool(record.get("recovery"))))
+
+
+def read_value(response, index, column):
+    try:
+        record = response["records"][index]
+        value = record.get("value")
+        return value.get(column) if record.get("status") == "ok" and isinstance(value, dict) else None
+    except (KeyError, IndexError, TypeError):
+        return None
+
+
+def run_read_repair(config, evidence, run_id, rngs):
+    results = []
+    if "read_repair" not in config["enabled_experiments"]:
+        evidence.save("read_repair.json", results)
+        return results
+    full_cut = [("n1", "n2"), ("n1", "n3"), ("n2", "n3")]
+    for round_no in range(config["rounds"]):
+        for table, setting in read_repair.settings(config):
+            attempt_id = f"repair:{round_no}:{table}"
+            key = f"{config['design']}:{run_id}:{attempt_id}"
+            case = {"attempt_id": attempt_id, "round": round_no, "table": table,
+                    "setting": setting, "key": key}
+            record = {"case": case, "started_ns": time.time_ns()}
+            try:
+                record["initialization"] = initialize([case], rngs["routing"].getrandbits(64),
+                                                       time.time_ns() // 1000, config, table)
+                record["full_cut"] = set_graph(full_cut, config["faults"]["internode_ports"])
+                if config["faults"]["partition_hold_seconds"]:
+                    time.sleep(config["faults"]["partition_hold_seconds"])
+                write = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                    "operations": [read_repair.minority_write(
+                        key, time.time_ns() // 1000, table)]}, config)
+                record["write"] = write
+                selected = write.get("records", [{}])[0].get("routing", {}).get("selected_node")
+                if selected not in NODES:
+                    raise RuntimeError("minority write did not identify its random coordinator")
+                pair1, pair2 = read_repair.topology_pairs(selected, NODES, rngs["topology"])
+                record["pair_sequence"] = [pair1, pair2]
+                record["pair1_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair1)],
+                                                   config["faults"]["internode_ports"])
+                time.sleep(config["faults"]["partition_stabilization_seconds"])
+                first = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                    "operations": [read_repair.quorum_read(key, table)]}, config)
+                record["first"] = first
+                record["pair2_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair2)],
+                                                   config["faults"]["internode_ports"])
+                time.sleep(config["faults"]["partition_stabilization_seconds"])
+                second = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                    "operations": [read_repair.quorum_read(key, table)]}, config)
+                record["second"] = second
+                first_record = first.get("records", [{}])[0]
+                second_record = second.get("records", [{}])[0]
+                if first_record.get("status") != "ok" or second_record.get("status") != "ok":
+                    record.update(verdict="inconclusive", reason="operation_error")
+                elif read_value(first, 0, "a") != 1:
+                    record.update(verdict="inconclusive", reason="first_read_not_exposed")
+                else:
+                    record.update(verdict=("regression" if read_value(second, 0, "a") != 1 else "no_regression_observed"),
+                                  reason=None)
+                record["post_workload_partition"] = partition_snapshot()
+            except BaseException as exc:
+                record.update(verdict="setup_failure", reason=type(exc).__name__, error=str(exc))
+                raise
+            finally:
+                try:
+                    clear_partition()
+                    record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                except BaseException as exc:
+                    record["recovery_error"] = {"type": type(exc).__name__, "message": str(exc)}
+                record["ended_ns"] = time.time_ns()
+                results.append(record)
+                evidence.save("read_repair.json", results)
+                evidence.event("read_repair_saved", attempt_id=attempt_id,
+                               verdict=record.get("verdict"))
+    return results
+
+
+def run_timestamp_controls(config, evidence, run_id, rngs):
+    results = []
+    if "timestamp_control" not in config["enabled_experiments"]:
+        evidence.save("timestamp_control.json", results)
+        return results
+    for round_no in range(config["rounds"]):
+        key = f"{config['design']}:{run_id}:timestamp:{round_no}"
+        ts = time.time_ns() // 1000
+        case = {"attempt_id": f"timestamp:{round_no}", "round": round_no,
+                "key": key, "table": "blocking"}
+        initialization = initialize([case], rngs["routing"].getrandbits(64), ts, config)
+        operations = timestamp_control.operations(key, ts, "blocking")
+        result = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                         "operations": operations}, config)
+        records = result.get("records", [])
+        if len(records) != 3 or any(record.get("status") != "ok" for record in records):
+            verdict, reason = "inconclusive", "operation_error"
+        else:
+            verdict = "expected" if read_value(result, 2, "a") == 1 else "unexpected"
+            reason = None
+        record = {"case": case, "initialization": initialization, "result": result,
+                  "verdict": verdict, "reason": reason, "timestamps": [ts + 100, ts + 50]}
+        results.append(record)
+        evidence.save("timestamp_control.json", results)
+        evidence.event("timestamp_saved", attempt_id=case["attempt_id"], verdict=verdict)
+    return results
 
 
 def run_plan(config, output, seed):
-    rng = random.Random(seed)
     output.mkdir(parents=True, exist_ok=False)
-    save(output / "plan.json", config)
-    save(output / "seeds.json", {"root": seed, "routing": seed ^ 0x13579BDF,
-                                 "case_order": seed ^ 0x2468ACE0, "faults": seed ^ 0x55AA55AA})
-    save(output / "experiment_catalog.json", {
-        "session_guarantees": session_guarantees.description(),
-        "node_failure": node_failure.description(),
-        "network_partition": network_partition.description(),
-        "read_repair": read_repair.description(),
-        "timestamp_control": timestamp_control.description(),
-        "expected_main_trials": expected_main_trials(config),
-        "expected_read_repair_trials": read_repair.expected_trials(config),
-        "expected_timestamp_trials": timestamp_control.expected_trials(config),
-    })
-    schema = worker({"action": "schema"})
-    save(output / "initial_cluster.json", {"membership": membership("n1"), "healthy": wait_healthy(600), "schema": schema})
-    all_trials = []
-    fault_records = []
-    scenarios = config["scenarios"] if "session_guarantees" in config["enabled_experiments"] else []
-    for scenario in scenarios:
-        for round_no in range(config["rounds"]):
-            schedule = session_guarantees.build_round(config, round_no, scenario, rng)
-            round_seed = rng.getrandbits(64)
-            timestamp = time.time_ns() // 1000
-            initialization = initialize(schedule, round_seed, timestamp)
-            assert_initialization(initialization)
-            record = {"scenario": scenario, "round": round_no, "schedule": schedule,
-                      "initialization": initialization, "seed": round_seed}
-            if scenario == "node_failure" and "node_failure" in config["enabled_experiments"]:
-                victim = node_failure.choose_victim(NODES, rng)
-                record["fault"] = kill_node(victim)
-                record["fault"]["victim"] = victim
-                record["fault"]["detection"] = wait_failure(victim, config["faults"]["failure_detection_timeout_seconds"])
-            elif scenario == "network_partition" and "network_partition" in config["enabled_experiments"]:
-                isolated = network_partition.choose_isolated(NODES, rng)
-                record["fault"] = set_partition(isolated, config["faults"]["internode_ports"])
-                time.sleep(config["faults"]["partition_stabilization_seconds"])
-                record["fault"]["isolated"] = isolated
-            batch = application_batch(schedule, round_seed ^ 0xA5A5A5A5, timestamp + 1000000)
-            trials = batch.get("records", [])
-            all_trials.extend(trials)
-            record["trials"] = trials
-            save(output / f"{scenario}_round_{round_no:02}.json", record)
-            if scenario == "node_failure" and "node_failure" in config["enabled_experiments"]:
-                restart_node(record["fault"]["victim"])
-                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
-            elif scenario == "network_partition" and "network_partition" in config["enabled_experiments"]:
-                clear_partition()
-                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
-            fault_records.append(record)
-            save(output / "trials.json", all_trials)
-    save(output / "faults.json", fault_records)
-    # Supplemental read-repair and timestamp controls are separate experiment types.
-    repairs = []
-    repair_rounds = range(config["rounds"]) if "read_repair" in config["enabled_experiments"] else []
-    for round_no in repair_rounds:
-        for table, setting in read_repair.settings(config):
-            key = f"{config['design']}:read_repair:r{round_no}:{table}"
-            case = {"key": key, "model": "MR", "config": "QUORUM/QUORUM", "scenario": "read_repair",
-                    "round": round_no, "table": table, "setting": setting}
-            init = initialize([case], rng.getrandbits(64), time.time_ns() // 1000, table)
-            if not isinstance(init, dict) or any(r["status"] != "ok" for r in init.get("records", [])):
-                raise RuntimeError("read-repair initialization failed")
-            full_cut = list(__import__('itertools').combinations(NODES, 2))
-            set_graph(full_cut, config["faults"]["internode_ports"])
-            time.sleep(config["faults"]["partition_hold_seconds"])
-            write = worker({"action": "ops", "seed": rng.getrandbits(64), "operations":
-                            [{"kind":"write", "key":key, "column":"a", "value":1,
-                              "ts":time.time_ns()//1000, "cl":"ONE", "table":table}]})
-            pair1 = ("n1", "n2")
-            set_graph([edge for edge in full_cut if set(edge) != set(pair1)], config["faults"]["internode_ports"])
-            first = worker({"action":"ops", "seed":rng.getrandbits(64), "operations":
-                            [{"kind":"read","key":key,"cl":"QUORUM","table":table}]})
-            pair2 = ("n2", "n3")
-            set_graph([edge for edge in full_cut if set(edge) != set(pair2)], config["faults"]["internode_ports"])
-            second = worker({"action":"ops", "seed":rng.getrandbits(64), "operations":
-                             [{"kind":"read","key":key,"cl":"QUORUM","table":table}]})
-            repairs.append({"case": case, "initialization": init, "write": write,
-                            "first": first, "second": second,
-                            "pair_sequence": [pair1, pair2]})
-            clear_partition()
-            wait_healthy(config["faults"]["recovery_timeout_seconds"])
-    save(output / "read_repair_plan.json", repairs)
-    timestamps = []
-    timestamp_rounds = range(config["rounds"]) if "timestamp_control" in config["enabled_experiments"] else []
-    for round_no in timestamp_rounds:
-        key = f"{config['design']}:timestamp:r{round_no}"
-        ts = time.time_ns() // 1000
-        case = {"key": key, "table": "blocking"}
-        init = initialize([case], rng.getrandbits(64), ts)
-        operations = [
-            {"kind":"write","key":key,"column":"a","value":1,"ts":ts+100,"cl":"ALL"},
-            {"kind":"write","key":key,"column":"a","value":2,"ts":ts+50,"cl":"ALL"},
-            {"kind":"read","key":key,"cl":"ALL"},
-        ]
-        result = worker({"action":"ops","seed":rng.getrandbits(64),"operations":operations})
-        timestamps.append({"round":round_no,"case":case,"initialization":init,"result":result})
-    save(output / "timestamp_control_plan.json", timestamps)
-    save(output / "completion.json", {"completed": True, "main_trials": len(all_trials),
-                                       "expected_main_trials": expected_main_trials(config),
-                                       "read_repair_trials": len(repairs), "timestamp_trials": len(timestamps),
-                                       "utc": dt.datetime.now(dt.timezone.utc).isoformat()})
-    return output
+    evidence = Evidence(output)
+    run_id = output.name.replace("randomized_", "")
+    seeds = {name: derived_seed(seed, name) for name in ("routing", "order", "faults", "topology")}
+    rngs = {name: random.Random(value) for name, value in seeds.items()}
+    evidence.save("plan.json", config)
+    evidence.save("seeds.json", {"root": seed, **seeds})
+    evidence.save("environment.json", environment(config, seed, run_id))
+    evidence.save("completion.json", {"completed": False, "evidence_schema": EVIDENCE_SCHEMA,
+                                       "run_id": run_id, "started_utc": dt.datetime.now(dt.timezone.utc).isoformat()})
+    evidence.event("run_started", run_id=run_id, profile=config["profile"])
+    ready_membership = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+    schema = worker({"action": "schema"}, config)
+    if schema.get("status") != "ok" or not schema.get("records"):
+        raise RuntimeError("schema creation/inspection failed")
+    initial = {"membership": ready_membership,
+               "schema": schema, "client_probe": worker({"action": "probe"}, config)}
+    if not all(item.get("reachable") for item in initial["client_probe"]):
+        raise RuntimeError("not every CQL endpoint is ready")
+    evidence.save("initial_cluster.json", initial)
+    all_trials, fault_records = [], []
+    try:
+        if "session_guarantees" in config["enabled_experiments"]:
+            for round_no in range(config["rounds"]):
+                scenarios = list(config["scenarios"])
+                rngs["order"].shuffle(scenarios)
+                for scenario in scenarios:
+                    main_episode(config, evidence, run_id, scenario, round_no, rngs,
+                                 all_trials, fault_records)
+        repairs = run_read_repair(config, evidence, run_id, rngs)
+        timestamps = run_timestamp_controls(config, evidence, run_id, rngs)
+        expected = expected_main_trials(config)
+        if len(all_trials) != expected:
+            raise RuntimeError(f"main trial count {len(all_trials)} != {expected}")
+        if len(repairs) != read_repair.expected_trials(config):
+            raise RuntimeError("read-repair attempt count mismatch")
+        if len(timestamps) != timestamp_control.expected_trials(config):
+            raise RuntimeError("timestamp-control attempt count mismatch")
+        completion = {"completed": True, "evidence_schema": EVIDENCE_SCHEMA, "run_id": run_id,
+                      "profile": config["profile"], "main_trials": len(all_trials),
+                      "expected_main_trials": expected, "read_repair_trials": len(repairs),
+                      "timestamp_trials": len(timestamps),
+                      "verdicts": dict(Counter(t["verdict"] for t in all_trials)),
+                      "completed_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
+        evidence.save("completion.json", completion)
+        evidence.event("run_completed", **completion)
+        return output
+    except BaseException as exc:
+        evidence.event("run_failed", error={"type": type(exc).__name__, "message": str(exc)})
+        raise
+
+
+def plan_summary(config, seed):
+    main = expected_main_trials(config)
+    repairs = read_repair.expected_trials(config)
+    timestamps = timestamp_control.expected_trials(config)
+    return {"seed": seed, "profile": config["profile"], "main_trials": main,
+            "read_repair_trials": repairs, "timestamp_trials": timestamps,
+            "total_trials": main + repairs + timestamps,
+            "per_case_repetitions": config["rounds"]}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=ROOT / "config/randomized_experiments.json")
-    parser.add_argument("--seed", type=int, default=None)
-    parser.add_argument("--plan-only", action="store_true", help="validate and print counts without Docker")
-    parser.add_argument("--repetitions", type=int, default=None, help="override repetitions and rounds; minimum 10")
+    parser.add_argument("--seed", type=int)
+    parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--smoke", action="store_true", help="allow fewer than ten attempts; never a submission run")
+    parser.add_argument("--repetitions", type=int)
+    parser.add_argument("--recover", action="store_true", help="restart all nodes and clear project firewall rules")
     args = parser.parse_args()
-    config = load_config(args.config)
-    if args.repetitions is not None:
-        config["repetitions"] = args.repetitions
-        config["rounds"] = args.repetitions
-        if args.repetitions < 10:
-            parser.error("--repetitions must be at least 10")
-    seed = args.seed if args.seed is not None else secrets.randbits(64)
+    config = load_config(args.config, full=not args.smoke, repetitions=args.repetitions)
+    seed = args.seed if args.seed is not None else config.get("seed")
+    seed = seed if seed is not None else secrets.randbits(64)
     if args.plan_only:
-        print(json.dumps({"seed": seed, "main_trials": expected_main_trials(config),
-                          "read_repair_trials": read_repair.expected_trials(config),
-                          "timestamp_trials": timestamp_control.expected_trials(config),
-                          "total_trials": expected_main_trials(config) + read_repair.expected_trials(config) + timestamp_control.expected_trials(config),
-                          "per_case_repetitions": config["rounds"]}, indent=2))
+        print(json.dumps(plan_summary(config, seed), indent=2))
         return
-    compose("up", "-d", "--build")
-    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output = ROOT / "results" / ("randomized_" + stamp)
-    print(run_plan(config, output, seed))
+    if args.recover:
+        print(json.dumps(recover_all(config["faults"]["recovery_timeout_seconds"]), indent=2))
+        return
+    lock_path = ROOT / ".randomized-run.lock"
+    with lock_path.open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            parser.error("another randomized run holds the project lock")
+        compose("up", "-d", "--build", timeout=1800)
+        stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        output = ROOT / "results" / f"randomized_{stamp}_{seed:016x}"
+        try:
+            print(run_plan(config, output, seed))
+        except BaseException:
+            try:
+                recover_all(config["faults"]["recovery_timeout_seconds"])
+            except BaseException as cleanup_error:
+                print(f"automatic recovery failed: {cleanup_error}", file=sys.stderr)
+            raise
 
 
 if __name__ == "__main__":

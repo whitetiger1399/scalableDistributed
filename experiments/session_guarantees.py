@@ -2,8 +2,8 @@
 from .common import cases, expected_main_trials
 
 
-def build_round(config, round_no, scenario, rng):
-    return cases(config, round_no, scenario, rng)
+def build_round(config, run_id, round_no, scenario, rng):
+    return cases(config, run_id, round_no, scenario, rng)
 
 
 def expected_trials(config):

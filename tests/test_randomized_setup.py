@@ -31,10 +31,11 @@ class RandomizedSetupTests(unittest.TestCase):
         self.assertTrue(all(set(x['candidates']) == {'n1','n2','n3'} for x in a))
 
     def test_case_order_is_randomized_without_losing_coverage(self):
-        rows = cases(self.config, 0, 'normal', random.Random(12))
+        rows = cases(self.config, 'run-test', 0, 'normal', random.Random(12))
         self.assertEqual(len(rows), 20)
         self.assertEqual({r['model'] for r in rows}, set(self.config['models']))
         self.assertEqual({r['config'] for r in rows}, set(self.config['consistency_configs']))
+        self.assertEqual(len({r['key'] for r in rows}), 20)
 
     def test_fault_victims_are_from_cluster(self):
         rng = random.Random(9)

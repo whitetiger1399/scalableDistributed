@@ -7,19 +7,21 @@ import time
 
 NODES = ("n1", "n2", "n3")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DOCKER_BIN = os.environ.get("DOCKER_BIN", "docker")
 
 
-def command(args, data=None, check=True):
-    result = subprocess.run(args, input=data, text=True, capture_output=True)
+def command(args, data=None, check=True, timeout=60):
+    result = subprocess.run(args, input=data, text=True, capture_output=True, timeout=timeout)
     if check and result.returncode:
         raise RuntimeError(f"{shlex.join(args)}\n{result.stdout}\n{result.stderr}")
     return result.stdout.strip()
 
 
-def compose(*args, data=None, check=True):
+def compose(*args, data=None, check=True, timeout=60):
     executable = os.environ.get("COMPOSE_BIN")
     base = [executable] if executable else ["docker", "compose"]
-    return command(base + ["-f", os.path.join(ROOT, "compose.yaml")] + list(args), data=data, check=check)
+    return command(base + ["-f", os.path.join(ROOT, "compose.yaml")] + list(args),
+                   data=data, check=check, timeout=timeout)
 
 
 def node_exec(node, *args, check=True):
@@ -27,9 +29,30 @@ def node_exec(node, *args, check=True):
 
 
 def container_ip(node):
-    cid = compose("ps", "-q", node)
-    info = json.loads(command(["docker", "inspect", cid]))[0]
+    cid = compose("ps", "-a", "-q", node)
+    info = json.loads(command([DOCKER_BIN, "inspect", cid]))[0]
     return next(iter(info["NetworkSettings"]["Networks"].values()))["IPAddress"]
+
+
+def container_identity(node):
+    cid = compose("ps", "-a", "-q", node)
+    if not cid:
+        raise RuntimeError(f"container is not present: {node}")
+    info = json.loads(command([DOCKER_BIN, "inspect", cid]))[0]
+    return {"node": node, "container_id": cid, "ip": next(iter(
+        info["NetworkSettings"]["Networks"].values()))["IPAddress"],
+        "running": bool(info["State"]["Running"]), "status": info["State"]["Status"]}
+
+
+def parse_status(text):
+    """Return nodetool rows keyed by address, independent of header/whitespace."""
+    rows = {}
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) >= 7 and fields[0] in {"UN", "DN", "UJ", "UL", "UM", "DL"}:
+            rows[fields[1]] = {"state": fields[0], "address": fields[1],
+                               "host_id": fields[-2], "rack": fields[-1], "raw": line}
+    return rows
 
 
 def membership(observer="n1"):
@@ -38,7 +61,8 @@ def membership(observer="n1"):
 
 def all_healthy():
     states = {node: membership(node) for node in NODES}
-    return all(sum(line.startswith("UN ") for line in value.splitlines()) == 3
+    return all(len(rows := parse_status(value)) == 3 and
+               all(row["state"] == "UN" for row in rows.values())
                for value in states.values())
 
 
@@ -52,22 +76,34 @@ def wait_healthy(timeout_seconds=600):
 
 
 def kill_node(node):
+    identity = container_identity(node)
     started = time.time_ns()
     output = compose("kill", "-s", "SIGKILL", node)
+    after = container_identity(node)
+    if after["running"]:
+        raise RuntimeError(f"container still running after SIGKILL: {node}")
     return {"action": "docker compose kill -s SIGKILL " + node,
-            "node": node, "start_ns": started, "output": output}
+            "node": node, "identity": identity, "after": after,
+            "start_ns": started, "end_ns": time.time_ns(), "output": output}
 
 
-def wait_failure(victim, timeout_seconds=90):
+def wait_failure(victim, victim_ip=None, timeout_seconds=90, consecutive=2):
+    victim_ip = victim_ip or container_identity(victim)["ip"]
     deadline = time.monotonic() + timeout_seconds
     observations = []
+    matching = 0
     while time.monotonic() < deadline:
         states = {node: membership(node) for node in NODES if node != victim}
-        observations.append(states)
-        if all(sum(line.startswith("UN ") for line in status.splitlines()) == 2 and
-               any(victim in line and line.startswith("DN ") for line in status.splitlines())
-               for status in states.values()):
-            return observations
+        parsed = {node: parse_status(status) for node, status in states.items()}
+        good = all(victim_ip in rows and rows[victim_ip]["state"] == "DN" and
+                   sum(row["state"] == "UN" for row in rows.values()) == 2
+                   for rows in parsed.values())
+        matching = matching + 1 if good else 0
+        observations.append({"time_ns": time.time_ns(), "raw": states,
+                             "parsed": parsed, "matching": good})
+        if matching >= consecutive:
+            return {"victim": victim, "victim_ip": victim_ip,
+                    "required_consecutive": consecutive, "observations": observations}
         time.sleep(2)
     raise TimeoutError(f"survivors did not confirm {victim} down")
 
@@ -129,3 +165,19 @@ def clear_partition():
         for rule in rules:
             node_exec(node, "iptables", "-D", "LAB_FAULT", *rule, check=False)
         node_exec(node, "iptables", "-D", "OUTPUT", "-j", "LAB_FAULT", check=False)
+
+
+def partition_snapshot():
+    return {node: {"rules": node_exec(node, "iptables", "-S", "LAB_FAULT", check=False),
+                   "counters": node_exec(node, "iptables", "-L", "LAB_FAULT", "-v", "-n", check=False)}
+            for node in NODES}
+
+
+def recover_all(timeout_seconds=600):
+    """Idempotently restart every lab node, remove lab rules, and verify membership."""
+    actions = []
+    for node in NODES:
+        actions.append({"node": node, "start": compose("start", node, check=False)})
+    clear_partition()
+    return {"actions": actions, "membership": wait_healthy(timeout_seconds),
+            "completed_ns": time.time_ns()}

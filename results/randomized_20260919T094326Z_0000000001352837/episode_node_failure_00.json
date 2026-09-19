@@ -1,0 +1,729 @@
+{
+  "ended_ns": 1789811023719830000,
+  "episode_id": "main:node_failure:0",
+  "error": {
+    "message": "container is not present: n1",
+    "type": "RuntimeError"
+  },
+  "fault": null,
+  "initialization": {
+    "health": [
+      {
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811021923914668,
+        "error": null,
+        "message": null,
+        "node": "n1",
+        "reachable": true,
+        "start_ns": 1789811021883999043
+      },
+      {
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811021973371709,
+        "error": null,
+        "message": null,
+        "node": "n2",
+        "reachable": true,
+        "start_ns": 1789811021923921501
+      },
+      {
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022029069834,
+        "error": null,
+        "message": null,
+        "node": "n3",
+        "reachable": true,
+        "start_ns": 1789811021973380543
+      }
+    ],
+    "records": [
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022035843251,
+        "latency_ms": 6.720291,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:RYW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 0,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022029124084,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022055107793,
+        "latency_ms": 19.248333,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:MR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 1,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022035861126,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022076434751,
+        "latency_ms": 21.301417,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:MW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 2,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022055135168,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022084880001,
+        "latency_ms": 8.417625,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:WFR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 3,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022076463501,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022095294709,
+        "latency_ms": 10.376,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:WFR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 4,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022084919126,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022104571043,
+        "latency_ms": 9.255,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:RYW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 5,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022095316293,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022129910584,
+        "latency_ms": 25.323042,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:WFR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 6,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022104588001,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022141083001,
+        "latency_ms": 11.147709,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:MW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 7,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022129935668,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022152671793,
+        "latency_ms": 11.573375,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:RYW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 8,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022141098918,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022167280209,
+        "latency_ms": 14.592833,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:MR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 9,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022152687834,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022176641209,
+        "latency_ms": 9.346333,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:WFR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 10,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022167295126,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022186428251,
+        "latency_ms": 9.755042,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:MR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 11,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022176673793,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022195033126,
+        "latency_ms": 8.573875,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:MW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 12,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022186459751,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022204316043,
+        "latency_ms": 9.268417,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:MR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 13,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022195048043,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811022212010126,
+        "latency_ms": 7.679417,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:WFR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 14,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811022204331001,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022217103709,
+        "latency_ms": 5.07875,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:RYW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 15,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022212025418,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022224538751,
+        "latency_ms": 7.420625,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:MW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 16,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022217118834,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022229851251,
+        "latency_ms": 5.29675,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:MR",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 17,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022224555168,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811022236105584,
+        "latency_ms": 6.238875,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:RYW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 18,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811022229867084,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811022245240459,
+        "latency_ms": 9.12075,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:MW",
+          1789811021455750
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 19,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811022236120293,
+        "status": "ok",
+        "value": null
+      }
+    ],
+    "seed": 3237629098064958191
+  },
+  "recovery": null,
+  "round": 0,
+  "scenario": "node_failure",
+  "schedule": [
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ALL/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ALL/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ALL/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ONE/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ONE/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:ALL/ALL:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:ALL/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094326Z_0000000001352837:node_failure:r0:QUORUM/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260919T094326Z_0000000001352837:node_failure:0:QUORUM/QUORUM:MW"
+    }
+  ],
+  "started_ns": 1789811022294359000
+}

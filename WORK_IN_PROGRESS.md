@@ -19,7 +19,9 @@ This snapshot contains the completed original Cassandra experiment project and t
 - `experiments/faults.py` contains the exact project-scoped SIGKILL and iptables procedures.
 - `scripts/run_randomized.py` executes 10 rounds by default: 600 main trials, 20 read-repair trials and 10 timestamp-control trials.
 - `docs/randomized-experiment-plan.md` is the detailed registered methodology.
+- The action-plan remediation is implemented: validated configuration, separate model workloads, IP-based crash detection, bounded and exception-safe fault handling, run locking, durable evidence, exact verification, and an explicit-run randomized report/archive builder.
+- Automated tests cover classifiers, configuration, random routing, status parsing and failure identity matching.
 
-New randomized measurements have not yet been collected in this checkout. The existing PDFs and `results/20260912T063741Z/` describe the previous fixed-coordinator design and must not be used as randomized redesign results.
+New randomized measurements have not yet been collected in this checkout. Run and validate a smoke profile before the full registered run. The existing PDFs and `results/20260912T063741Z/` describe the previous fixed-coordinator design and must not be used as randomized redesign results.
 
 This status is explicit so that the existing measured results are not mistaken for validation of the unfinished redesign.

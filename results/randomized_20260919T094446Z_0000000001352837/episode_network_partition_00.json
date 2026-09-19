@@ -1,0 +1,3543 @@
+{
+  "ended_ns": 1789811190682735000,
+  "episode_id": "main:network_partition:0",
+  "fault": {
+    "blocked": {
+      "n1": [
+        "n2"
+      ],
+      "n2": [
+        "n1",
+        "n3"
+      ],
+      "n3": [
+        "n2"
+      ]
+    },
+    "client_probe": [
+      {
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811179363024296,
+        "error": null,
+        "message": null,
+        "node": "n1",
+        "reachable": true,
+        "start_ns": 1789811179321157879
+      },
+      {
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811179388583379,
+        "error": null,
+        "message": null,
+        "node": "n2",
+        "reachable": true,
+        "start_ns": 1789811179363030921
+      },
+      {
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811179424028088,
+        "error": null,
+        "message": null,
+        "node": "n3",
+        "reachable": true,
+        "start_ns": 1789811179388588546
+      }
+    ],
+    "counters": {
+      "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+      "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    2   374 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.2           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.2           multiport sports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+      "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    1   187 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+    },
+    "established_membership": {
+      "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  328.1 KiB   16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1",
+      "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  399.28 KiB  16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1",
+      "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nDN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  399.28 KiB  16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1"
+    },
+    "established_ns": 1789811179458880000,
+    "ips": {
+      "n1": "172.19.0.2",
+      "n2": "172.19.0.4",
+      "n3": "172.19.0.5"
+    },
+    "isolated": "n2",
+    "rules": {
+      "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+      "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.2/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.2/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+      "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+    }
+  },
+  "initialization": {
+    "health": [
+      {
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160218601551,
+        "error": null,
+        "message": null,
+        "node": "n1",
+        "reachable": true,
+        "start_ns": 1789811160053108968
+      },
+      {
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160282462843,
+        "error": null,
+        "message": null,
+        "node": "n2",
+        "reachable": true,
+        "start_ns": 1789811160218607968
+      },
+      {
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160404195760,
+        "error": null,
+        "message": null,
+        "node": "n3",
+        "reachable": true,
+        "start_ns": 1789811160282469426
+      }
+    ],
+    "records": [
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160492049301,
+        "latency_ms": 87.782125,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:RYW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 0,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160404268885,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160519270760,
+        "latency_ms": 27.194291,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 1,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160492078301,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160531114385,
+        "latency_ms": 11.812708,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 2,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160519303301,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160549326135,
+        "latency_ms": 18.17925,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 3,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160531148676,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160565004093,
+        "latency_ms": 15.639083,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:RYW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 4,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811160549365426,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160577807593,
+        "latency_ms": 12.773,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 5,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160565035010,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160592498843,
+        "latency_ms": 14.666042,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 6,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160577833176,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160605436510,
+        "latency_ms": 12.908334,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 7,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160592528635,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160614461093,
+        "latency_ms": 9.004292,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 8,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160605457260,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160630360427,
+        "latency_ms": 15.881083,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:RYW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 9,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160614479760,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160644387927,
+        "latency_ms": 14.006541,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 10,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160630381843,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160649523385,
+        "latency_ms": 5.117833,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 11,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811160644406177,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160655895218,
+        "latency_ms": 6.336458,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:RYW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 12,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160649559468,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160660793177,
+        "latency_ms": 4.880958,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 13,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160655912718,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160665992885,
+        "latency_ms": 5.182833,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 14,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160660810593,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1789811160672708968,
+        "latency_ms": 6.698916,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 15,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789811160666010385,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160678280552,
+        "latency_ms": 5.555959,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 16,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811160672724968,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1789811160684595218,
+        "latency_ms": 6.2995,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 17,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789811160678296718,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160691570510,
+        "latency_ms": 6.9555,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 18,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811160684615343,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1789811160695722302,
+        "latency_ms": 4.13675,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:RYW",
+          1789811159753559
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 19,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789811160691585885,
+        "status": "ok",
+        "value": null
+      }
+    ],
+    "seed": 861466269989441289
+  },
+  "post_workload_partition": {
+    "n1": {
+      "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   16  5188 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+      "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+    },
+    "n2": {
+      "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   28 17672 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.2           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.2           multiport sports 7000,7001\n   23 12368 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+      "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.2/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.2/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+    },
+    "n3": {
+      "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   27 16524 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+      "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+    }
+  },
+  "recovery": {
+    "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  328.1 KiB   16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1",
+    "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  399.28 KiB  16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1",
+    "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  226.55 KiB  16      100.0%            b5f2f954-a430-4157-943a-e5575999aff2  rack1\nUN  172.19.0.5  190.93 KiB  16      100.0%            7a06a28b-51b9-464d-90f7-7adbd15b1f74  rack1\nUN  172.19.0.2  399.28 KiB  16      100.0%            4caf5871-ebbb-4fdb-8999-b903c54adc4b  rack1"
+  },
+  "round": 0,
+  "scenario": "network_partition",
+  "schedule": [
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:RYW"
+    }
+  ],
+  "started_ns": 1789811160754274000,
+  "trials": [
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": true,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:RYW",
+      "model": "RYW",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183120112881,
+          "kind": "write",
+          "latency_ms": 3.030292,
+          "node": "n3",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:RYW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183117083465,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183125219298,
+          "kind": "read",
+          "latency_ms": 5.086083,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:RYW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183120133631,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": null,
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:RYW",
+      "verdict": "no_violation_observed",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "coverage": {
+        "dependency_exposed": true,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR",
+      "model": "WFR",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183127469965,
+          "kind": "write",
+          "latency_ms": 2.218541,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183125252006,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183129865548,
+          "kind": "read",
+          "latency_ms": 2.3815,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 3,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183127484631,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183131820881,
+          "kind": "write",
+          "latency_ms": 1.937208,
+          "node": "n3",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 4,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183129883756,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183134198465,
+          "kind": "read",
+          "latency_ms": 2.361709,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 5,
+            "selected_node": "n2"
+          },
+          "sequence": 3,
+          "start_ns": 1789811183131836881,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        }
+      ],
+      "reason": "successor_not_observed",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:WFR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW",
+      "model": "MW",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183138055673,
+          "kind": "write",
+          "latency_ms": 3.8245,
+          "node": "n3",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 6,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183134231673,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183139977340,
+          "kind": "write",
+          "latency_ms": 1.894,
+          "node": "n2",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 7,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183138083548,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183143844298,
+          "kind": "read",
+          "latency_ms": 3.857542,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 8,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183139987173,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": "successor_not_observed",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:MW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR",
+      "model": "MR",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183146964215,
+          "kind": "write",
+          "latency_ms": 3.088209,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 9,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183143876256,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183150044548,
+          "kind": "read",
+          "latency_ms": 3.070042,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 10,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183146974798,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183151560006,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.506042,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 11,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183150054215,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:MR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": true,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:RYW",
+      "model": "RYW",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183152923131,
+          "kind": "write",
+          "latency_ms": 1.335292,
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:RYW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 12,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183151588131,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183155002215,
+          "kind": "read",
+          "latency_ms": 2.070917,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:RYW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 13,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183152931423,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        }
+      ],
+      "reason": null,
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:RYW",
+      "verdict": "violation",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR",
+      "model": "WFR",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183157739340,
+          "kind": "write",
+          "latency_ms": 2.695916,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 14,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183155043840,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183159171381,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.418125,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 15,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183157753465,
+          "status": "error"
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183161762131,
+          "kind": "write",
+          "latency_ms": 2.56775,
+          "node": "n1",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 16,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183159194673,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "observer-1",
+          "end_ns": 1789811183163232298,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.456791,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 17,
+            "selected_node": "n2"
+          },
+          "sequence": 3,
+          "start_ns": 1789811183161775715,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:WFR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR",
+      "model": "WFR",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183167162590,
+          "kind": "write",
+          "latency_ms": 3.88025,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 18,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183163282631,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183171042590,
+          "kind": "read",
+          "latency_ms": 3.868041,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 19,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183167174965,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183172650798,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.596708,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 20,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183171054506,
+          "status": "error"
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "observer-1",
+          "end_ns": 1789811183173702631,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.042625,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 21,
+            "selected_node": "n2"
+          },
+          "sequence": 3,
+          "start_ns": 1789811183172660090,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:WFR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR",
+      "model": "WFR",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183177094173,
+          "kind": "write",
+          "latency_ms": 3.355958,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 22,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183173738506,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183179308798,
+          "kind": "read",
+          "latency_ms": 2.200666,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 23,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183177108340,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183182139715,
+          "kind": "write",
+          "latency_ms": 2.821083,
+          "node": "n3",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 24,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183179318840,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183184051798,
+          "kind": "read",
+          "latency_ms": 1.901083,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 25,
+            "selected_node": "n2"
+          },
+          "sequence": 3,
+          "start_ns": 1789811183182150923,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        }
+      ],
+      "reason": "dependency_not_observed",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:WFR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR",
+      "model": "WFR",
+      "operations": [
+        {
+          "cl": "ALL",
+          "client_id": "producer-1",
+          "end_ns": 1789811183185595506,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.515875,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n3",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 26,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183184079840,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183186800715,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.196125,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 27,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183185604881,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183188006590,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.197584,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n3",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "dependent",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 28,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183186809173,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "observer-1",
+          "end_ns": 1789811183189007131,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 0.993291,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:WFR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 29,
+            "selected_node": "n2"
+          },
+          "sequence": 3,
+          "start_ns": 1789811183188013965,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:WFR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:RYW",
+      "model": "RYW",
+      "operations": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183191316090,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 2.285542,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:RYW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 30,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183189030840,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183192696256,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.37125,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:RYW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 31,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183191325215,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:RYW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR",
+      "model": "MR",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183194368798,
+          "kind": "write",
+          "latency_ms": 1.646833,
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 32,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183192722298,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183198016715,
+          "kind": "read",
+          "latency_ms": 3.637625,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 33,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183194379340,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183200164506,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 2.137584,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/QUORUM:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 34,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183198027381,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/QUORUM:MR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW",
+      "model": "MW",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183201468090,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.262667,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 35,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183200205548,
+          "status": "error"
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183204329215,
+          "kind": "write",
+          "latency_ms": 2.853541,
+          "node": "n3",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 36,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183201475965,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183207665881,
+          "kind": "read",
+          "latency_ms": 3.324167,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:MW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 37,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183204342006,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 1
+          }
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:MW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": true,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:RYW",
+      "model": "RYW",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183211293090,
+          "kind": "write",
+          "latency_ms": 3.599291,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:RYW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 38,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183207694215,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183214742215,
+          "kind": "read",
+          "latency_ms": 3.435625,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:RYW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 39,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183211306923,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": null,
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:RYW",
+      "verdict": "no_violation_observed",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW",
+      "model": "MW",
+      "operations": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183216319756,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.550625,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 40,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183214769298,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183218130423,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 1.802167,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n1",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 41,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183216328590,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "observer-1",
+          "end_ns": 1789811183219401006,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.26225,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 42,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183218139173,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:MW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW",
+      "model": "MW",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183220409590,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 0.983084,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 43,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183219426881,
+          "status": "error"
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183223395590,
+          "kind": "write",
+          "latency_ms": 2.956042,
+          "node": "n3",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 44,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183220439756,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183226558715,
+          "kind": "read",
+          "latency_ms": 3.13575,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 45,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183223423215,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 1
+          }
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:MW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": true,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR",
+      "model": "MR",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183229166798,
+          "kind": "write",
+          "latency_ms": 2.585792,
+          "node": "n3",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 46,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183226581256,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183231365173,
+          "kind": "read",
+          "latency_ms": 2.188,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 47,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183229177256,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183233494798,
+          "kind": "read",
+          "latency_ms": 2.121459,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/ONE:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 48,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183231373548,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": null,
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/ONE:MR",
+      "verdict": "no_violation_observed",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": true,
+        "mr_first_read_exposed": true,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR",
+      "model": "MR",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183236234465,
+          "kind": "write",
+          "latency_ms": 2.714625,
+          "node": "n3",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 49,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183233520340,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183238522798,
+          "kind": "read",
+          "latency_ms": 2.272875,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 50,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183236250131,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183240475923,
+          "kind": "read",
+          "latency_ms": 1.941916,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 51,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183238534340,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": null,
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:MR",
+      "verdict": "no_violation_observed",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR",
+      "model": "MR",
+      "operations": [
+        {
+          "cl": "ALL",
+          "client_id": "producer-1",
+          "end_ns": 1789811183243577423,
+          "error": "Unavailable",
+          "kind": "write",
+          "latency_ms": 3.075542,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 52,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183240502090,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183249215173,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 5.628333,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 2}",
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 53,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183243587048,
+          "status": "error"
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "end_ns": 1789811183250576590,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.348625,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ALL\" info={'consistency': 'ALL', 'required_replicas': 3, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ALL/ALL:MR"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 54,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183249228340,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ALL/ALL:MR",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW",
+      "model": "MW",
+      "operations": [
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183252139590,
+          "kind": "write",
+          "latency_ms": 1.533917,
+          "node": "n2",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 55,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183250606006,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183256225881,
+          "kind": "write",
+          "latency_ms": 4.074875,
+          "node": "n1",
+          "params": [
+            1789811160753560,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET b=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 56,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183252151173,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ONE",
+          "client_id": "observer-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183258240590,
+          "kind": "read",
+          "latency_ms": 2.002584,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:ONE/ONE:MW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "observer",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 57,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789811183256238256,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "reason": "successor_not_observed",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:ONE/ONE:MW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "coverage": {
+        "dependency_exposed": false,
+        "evaluable": false,
+        "mr_first_read_exposed": false,
+        "successor_exposed": false
+      },
+      "episode_id": "main:network_partition:0",
+      "key": "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:RYW",
+      "model": "RYW",
+      "operations": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183261438548,
+          "kind": "write",
+          "latency_ms": 3.17425,
+          "node": "n1",
+          "params": [
+            1789811160753559,
+            1,
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:RYW"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 58,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789811183258264673,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789811183262838673,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 1.375958,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260919T094446Z_0000000001352837:network_partition:r0:QUORUM/QUORUM:RYW"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 59,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789811183261463048,
+          "status": "error"
+        }
+      ],
+      "reason": "operation_error",
+      "round": 0,
+      "routing_seed": 12363864009316817916,
+      "scenario": "network_partition",
+      "trial_id": "20260919T094446Z_0000000001352837:network_partition:0:QUORUM/QUORUM:RYW",
+      "verdict": "inconclusive",
+      "worker_health": [
+        {
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1789811183052386715,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789811183004100465
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789811183090264465,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789811183052392340
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789811183117034506,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789811183090270673
+        }
+      ]
+    }
+  ]
+}
