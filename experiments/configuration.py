@@ -70,8 +70,10 @@ def normalize(raw, full=True):
     ports = faults.get("internode_ports")
     if not isinstance(ports, list) or not ports or any(not isinstance(p, int) for p in ports):
         raise ValueError("internode_ports must be a non-empty integer list")
+    faults.setdefault("post_recovery_settle_seconds", 0)
     for field in ("failure_detection_timeout_seconds", "recovery_timeout_seconds",
-                  "partition_stabilization_seconds", "partition_hold_seconds"):
+                  "partition_stabilization_seconds", "partition_hold_seconds",
+                  "post_recovery_settle_seconds"):
         value = faults.get(field)
         if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
             raise ValueError(f"{field} must be a non-negative number")

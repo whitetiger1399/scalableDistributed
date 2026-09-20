@@ -4,7 +4,7 @@
   "repetitions": 10,
   "rounds": 10,
   "models": ["RYW", "MR", "MW", "WFR"],
-  "consistency_configs": ["ONE/ONE", "QUORUM/ONE", "ONE/QUORUM", "QUORUM/QUORUM", "ALL/ALL"],
+  "consistency_configs": ["ONE/ONE", "ONE/QUORUM", "ONE/ALL", "QUORUM/ONE", "QUORUM/QUORUM", "QUORUM/ALL", "ALL/ONE", "ALL/QUORUM", "ALL/ALL"],
   "scenarios": ["normal", "node_failure", "network_partition"],
   "enabled_experiments": ["session_guarantees", "node_failure", "network_partition", "read_repair", "timestamp_control"],
   "faults": {
@@ -12,6 +12,7 @@
     "recovery_timeout_seconds": 600,
     "partition_stabilization_seconds": 15,
     "partition_hold_seconds": 15,
+    "post_recovery_settle_seconds": 20,
     "cql_port": 9042,
     "internode_ports": [7000, 7001]
   },

@@ -19,7 +19,9 @@ class RandomizedSetupTests(unittest.TestCase):
 
     def test_default_counts_are_at_least_ten(self):
         self.assertGreaterEqual(self.config['repetitions'], 10)
-        self.assertEqual(expected_main_trials(self.config), 600)
+        expected = (len(self.config['scenarios']) * len(self.config['consistency_configs'])
+                    * len(self.config['models']) * self.config['rounds'])
+        self.assertEqual(expected_main_trials(self.config), expected)
 
     def test_router_is_seeded_and_operation_local(self):
         left = RandomRouter(44, ('n1', 'n2', 'n3'))
@@ -32,10 +34,11 @@ class RandomizedSetupTests(unittest.TestCase):
 
     def test_case_order_is_randomized_without_losing_coverage(self):
         rows = cases(self.config, 'run-test', 0, 'normal', random.Random(12))
-        self.assertEqual(len(rows), 20)
+        expected_cases = len(self.config['consistency_configs']) * len(self.config['models'])
+        self.assertEqual(len(rows), expected_cases)
         self.assertEqual({r['model'] for r in rows}, set(self.config['models']))
         self.assertEqual({r['config'] for r in rows}, set(self.config['consistency_configs']))
-        self.assertEqual(len({r['key'] for r in rows}), 20)
+        self.assertEqual(len({r['key'] for r in rows}), expected_cases)
 
     def test_fault_victims_are_from_cluster(self):
         rng = random.Random(9)
