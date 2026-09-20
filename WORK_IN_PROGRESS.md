@@ -22,6 +22,6 @@ This snapshot contains the completed original Cassandra experiment project and t
 - The action-plan remediation is implemented: validated configuration, separate model workloads, IP-based crash detection, bounded and exception-safe fault handling, run locking, durable evidence, exact verification, and an explicit-run randomized report/archive builder.
 - Automated tests cover classifiers, configuration, random routing, status parsing and failure identity matching.
 
-New randomized measurements have not yet been collected in this checkout. Run and validate a smoke profile before the full registered run. The existing PDFs and `results/20260912T063741Z/` describe the previous fixed-coordinator design and must not be used as randomized redesign results.
+The randomized implementation is ready for the project group to execute separately. A result directory is reportable only when its completion marker is true and `scripts/verify_randomized.py` accepts it. Partial, smoke, and historical fixed-coordinator directories must not be presented as completed randomized results.
 
 This status is explicit so that the existing measured results are not mistaken for validation of the unfinished redesign.

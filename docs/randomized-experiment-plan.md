@@ -2,7 +2,7 @@
 
 **Detailed redesign plan | 12 September 2026**
 
-**Status: planned, not executed.** This document specifies the replacement experiments. The existing 300-trial results and PDFs describe the previous fixed-coordinator design and must not be presented as results of this redesign.
+**Status: implemented protocol; execution and result analysis are separate user steps.** This document specifies the randomized experiments and their interpretation boundaries. It does not claim outcomes. Historical fixed-coordinator evidence must not be presented as evidence from this design.
 
 ## 1. Objective and meaning of random access
 
@@ -96,7 +96,7 @@ Each round independently samples the node to kill and the node to isolate. Resto
 
 The 20 trials within a block share a fault episode. Their distinct keys do not make them statistically independent fault injections. Retain round and episode identifiers, summarize variation by episode, and do not report 600 independent fault realizations.
 
-The read-repair comparison uses another 10 topology-changing episodes. Each episode contains one BLOCKING trial and one NONE trial, using separate keys and independent routing draws. Their shared topology must be disclosed. Thus the plan contains 10 crash episodes and 20 network-fault episodes in total; individual repair episodes contain several partition transitions.
+The read-repair comparison uses 20 separately recorded topology-changing attempts: ten BLOCKING and ten NONE. Each attempt uses a separate key, independently sampled routes, and its own cleanup barrier. Thus the full design contains 10 crash episodes, 10 main partition episodes, and 20 supplemental topology-changing attempts. Each repair attempt contains several partition transitions.
 
 ### 4.2 Minimum trials and unsuccessful histories
 
@@ -179,7 +179,7 @@ The executed command must use the sampled victim, not always n2. Do not run `nod
 docker compose start n2
 ```
 
-12. Allow up to ten minutes for recovery. Require all three nodes to report the intended live membership, schema agreement, client-side CQL readiness, and a successful fresh-key ALL write/read barrier before starting another block.
+12. Allow up to the configured recovery timeout. Require every observer to report three `UN` members. The next block performs fresh-key ALL initialization and rejects any missing or unsuccessful initialization operation before its fault is installed.
 
 Repeat this procedure in ten rounds. Recovery confirms readiness for fresh experiments; with hints disabled, it does not establish that every old divergent key has converged. Fresh initialization at ALL prevents old trial data from contaminating the next block.
 
@@ -211,9 +211,9 @@ Execute equivalent rules for n2 to n3 and n3 to both n1 and n2. Source-port rule
 ### 7.2 Verify before accepting measurements
 
 6. Save `iptables -S LAB_FAULT` and verbose numeric packet counters before and after the episode. Verify that every intended cross-cut edge is covered and no within-component edge is blocked.
-7. Poll node views, up to 90 seconds. Require the two-node component to see its two members up and the isolated node down; require the isolated node to see itself up and the other two down, in two consecutive polls.
-8. Independently demonstrate that all three endpoints answer client-side CQL health queries. All three must be routing candidates. A CL-dependent Unavailable result must not cause the gateway to remove that endpoint.
-9. Execute all 20 randomized cases, retaining random candidate draws and actual coordinators. Save increasing DROP counters as evidence that the rules intercepted traffic. Save setup failures separately if the intended graph or reachability is not established.
+7. Save membership views after the stabilization interval as observational evidence. Cassandra failure-detector views may lag or differ across the cut, so membership text is not used alone as the partition oracle.
+8. Independently demonstrate that all three endpoints answer client-side CQL health queries. All three must be routing candidates. Verify the blocked-peer graph and required DROP-rule count before measurement. A CL-dependent Unavailable result must not cause the gateway to remove that endpoint.
+9. Execute all 20 randomized cases, retaining random candidate draws and actual coordinators. Save post-workload DROP counters as evidence that the rules remained installed. Save setup failures separately if the intended rule graph or CQL reachability is not established.
 
 ### 7.3 Heal safely and repeat
 
@@ -229,13 +229,13 @@ A genuine client-versus-server network outage is a different scenario and is out
 
 ### 8.1 Read-repair comparison: ten trials per setting
 
-Use ten episodes, each containing a BLOCKING-table trial and a NONE-table trial on different fresh keys. Randomize table operation order. Application routes are independently random throughout; no read is forced onto the component that can satisfy QUORUM.
+Use ten attempts for `BLOCKING` and ten attempts for `NONE`, each in its own fully recorded and cleaned-up topology episode. Application routes are independently random throughout; no read is forced onto the component that can satisfy QUORUM.
 
-1. Initialize both keys at ALL while the cluster is healthy.
-2. Fully partition the database nodes from one another while retaining CQL access. Confirm the intended views before issuing a ONE write of a=1 to a randomly selected coordinator for each table. This creates a minority version if the write succeeds.
+1. Initialize the attempt's fresh key at ALL while the cluster is healthy.
+2. Fully partition the database nodes from one another while retaining CQL access. Verify the rule graph before issuing a ONE write of a=1 to a randomly selected coordinator. This creates a minority version if the write succeeds.
 3. Keep the cut in place beyond the configured write-request timeout before allowing communication. Record the configured timeout and actual hold interval, and retain the possibility of delayed messages when interpreting results. Hints remain disabled.
-4. Independently select one of the three possible two-node components and allow only that pair to communicate. Confirm the graph and CQL reachability, then perform the first QUORUM read through a fresh random coordinator for each table.
-5. Select a different two-node component uniformly from the remaining two choices, independently of data values and previous routes. Change the graph without a fully connected interval. Confirm it, then perform the second QUORUM read through a fresh random coordinator.
+4. Form a two-node component containing the recorded write coordinator and a randomly selected peer. Confirm the graph, then perform the first QUORUM read through a fresh random coordinator.
+5. Form the overlapping component from that peer and the third node. Change the graph by adding required restrictions before removing obsolete ones, so there is no fully connected interval. Perform the second QUORUM read through a fresh random coordinator.
 6. Heal and verify the cluster; retain all three operations and every topology transition for each trial.
 
 A selected coordinator outside the connected pair cannot satisfy QUORUM: retain that trial as inconclusive. If the first read sees zero, the trial did not expose the minority version; report that coverage condition. If two successful reads return 1 then 0, record a regression. BLOCKING is expected to prevent that regression for successful quorum reads; NONE can permit it. [4]
@@ -301,26 +301,24 @@ Ten trials per cell are a minimum demonstration, not a strong statistical sample
 
 <!-- pagebreak -->
 
-## 11. Implementation sequence and current gaps
+## 11. Implementation and execution boundary
 
-The repository now contains the randomized worker/router, parameter file, separate experiment modules, fault helpers, runner, plan PDF generator and setup tests. A full 630-attempt randomized production run is intentionally a separate execution step; the pre-existing results directory is from the earlier fixed-coordinator design.
+The repository contains the randomized worker/router, validated parameter contract, separate model workloads, fault helpers, durable runner, independent verifier, report/archive builder, plan PDF generator, and tests. Executing a 630-attempt measured run and interpreting its outcomes remain separate operator steps. This document makes no claim that a particular result directory is valid.
 
 | Step | Files / deliverable | Completion criterion |
 |---|---|---|
-| 1. Freeze design | This document and a machine-readable run specification | Counts, seeds, routing policy and verdict rules agreed with the documented plan |
-| 2. Complete application/gateway separation | src/worker.py, src/routing.py | Implemented and smoke-tested: random route for every operation; no application node argument; no hidden retries |
-| 3. Refactor orchestration | scripts/run_randomized.py, experiments/faults.py | Implemented: ten rounds; random victim/order; measured state polling; cleanup and recovery barriers |
-| 4. Update supplemental controls | experiments/read_repair.py, timestamp_control.py, runner | Implemented: ten randomized trials per repair setting and timestamp control; topology phases recorded |
-| 5. Update checking | src/checks.py, tests, scripts/verify_randomized.py | Implemented setup checks and randomized-result validation |
-| 6. Smoke-test integration | Diagnostic worker batch | Completed against Cassandra 5.0.9; randomized routes and no-node-argument API verified; not counted as a full measured run |
-| 7. Execute the registered run | New timestamped results directory | Next execution: 600 main + 20 repair + 10 timestamp attempts, or explicit incomplete status |
-| 8. Publish artifacts | README, main report, experiment inventory, reproduction archive | Regenerate after the randomized run; documents explain routing, SIGKILL, iptables, episode counts and limitations |
+| 1. Freeze design | This document, predictions, configuration, and author metadata | Review and hash the exact material that will accompany the evidence |
+| 2. Validate locally | Tests and `--plan-only` | Tests pass and planned counts match the chosen profile |
+| 3. Smoke integration | Explicit `--smoke` run | Real startup, faults, cleanup, verification, and QA report work; never use as submission evidence |
+| 4. Execute registered run | New timestamped results directory | 600 main + 20 repair + 10 timestamp attempts and a complete marker |
+| 5. Verify independently | `scripts/verify_randomized.py` | Exact case, history, fault, recovery, and control validation succeeds |
+| 6. Publish artifacts | Explicit-run report builder | Source hashes match; PDF, checksums, and reproduction archive are generated and visually reviewed |
 
 Use a default repetition count of 10 and reject lower counts for a full measured run. A distinct smoke-test mode may use fewer attempts but must never emit a full-run completion marker. Provide an optional seed argument for replay and an explicit recovery command that can restart any sampled victim, not only n3.
 
 Do not overwrite the old experiment results. The new results and completion marker must identify the randomized design version, and the report generator must refuse old or incomplete data when producing the redesigned report. Capture the exact source revision or archived source content, not only hashes that cannot later be resolved.
 
-**Planned final outputs:** the updated executable project; a new results-backed project PDF; a new experiment-list/counts PDF; this detailed methodology; raw JSON/JSONL evidence; and a reproducible source/results archive. No new outcomes are claimed in this plan.
+**Expected outputs after a separately executed valid run:** the executable project, a results-backed PDF, this detailed methodology, raw JSON/JSONL evidence, checksums, and a reproducible source/results archive. No outcomes are claimed in this protocol.
 
 ## 12. Sources and AI assistance
 
