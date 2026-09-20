@@ -147,7 +147,23 @@ The runner performs these phases:
 8. run the decreasing-timestamp controls; and
 9. write a completion marker only after all expected attempts exist.
 
-The runner is intentionally quiet while Cassandra detects failures or recovers. Follow progress from another terminal without modifying files:
+Schema creation is idempotent. After cluster health is established, the runner retries schema
+creation and inspection up to ten times at three-second intervals to allow startup schema
+agreement to settle. Every response is retained in `initial_cluster.json`; if all attempts fail,
+the runner writes `schema_failure.json` and reports the failing nodes, queries, values, and errors.
+
+The runner prints line-oriented progress to the terminal. Each line shows a progress bar,
+overall percentage and completed/total attempt count, followed by the current experiment,
+scenario or setting, round, and completion verdict where applicable. Main session-guarantee
+progress advances after each 20-case scenario batch; read-repair and timestamp-control progress
+advance after every attempt. Setup, fault detection, and recovery messages retain the current
+percentage because they do not count as measured attempts. Example:
+
+```text
+[progress] [#####-------------------------]  19.05% (120/630) | session_guarantees | finished scenario=node_failure, round=3/10, saved_trials=20
+```
+
+The evidence journal remains available for monitoring from another terminal without modifying files:
 
 ```sh
 tail -f results/randomized_<run>/events.jsonl

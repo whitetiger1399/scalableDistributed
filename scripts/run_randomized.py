@@ -28,6 +28,27 @@ from experiments.faults import (NODES, clear_partition, compose, kill_node, memb
 EVIDENCE_SCHEMA = "randomized-cassandra-evidence-v3"
 
 
+class Progress:
+    """Print durable, line-oriented progress for long experiment runs."""
+
+    def __init__(self, total, stream=None):
+        self.total = total
+        self.completed = 0
+        self.stream = stream or sys.stdout
+
+    def show(self, experiment, detail, advance=0):
+        self.completed += advance
+        if self.completed > self.total:
+            raise RuntimeError("progress count exceeds planned experiment count")
+        percent = 100.0 if self.total == 0 else (100.0 * self.completed / self.total)
+        width = 30
+        filled = width if self.total == 0 else int(width * self.completed / self.total)
+        bar = "#" * filled + "-" * (width - filled)
+        print(f"[progress] [{bar}] {percent:6.2f}% "
+              f"({self.completed}/{self.total}) | {experiment} | {detail}",
+              file=self.stream, flush=True)
+
+
 def load_config(path, full=True, repetitions=None):
     raw = json.loads(path.read_text())
     if repetitions is not None:
@@ -119,8 +140,12 @@ def environment(config, seed, run_id):
     }
 
 
-def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials, fault_records):
+def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
+                 fault_records, progress):
     schedule = session_guarantees.build_round(config, run_id, round_no, scenario, rngs["order"])
+    progress.show("session_guarantees",
+                  f"starting scenario={scenario}, round={round_no + 1}/{config['rounds']}, "
+                  f"trials={len(schedule)}; initializing keys")
     timestamp = time.time_ns() // 1000
     init_seed = rngs["routing"].getrandbits(64)
     initialization = initialize(schedule, init_seed, timestamp, config)
@@ -130,10 +155,16 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
               "started_ns": time.time_ns(), "fault": None, "recovery": None}
     evidence.event("episode_initialized", episode_id=episode_id, scenario=scenario,
                    round=round_no, keys=[case["key"] for case in schedule])
+    progress.show("session_guarantees",
+                  f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                  "initialization complete")
     cleanup = None
     try:
         if scenario == "node_failure":
             victim = node_failure.choose_victim(NODES, rngs["faults"])
+            progress.show("session_guarantees",
+                          f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                          f"stopping {victim} and waiting for failure detection")
             fault = kill_node(victim)
             cleanup = ("node", victim)
             record["fault"] = fault
@@ -141,6 +172,9 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
                 config["faults"]["failure_detection_timeout_seconds"])
         elif scenario == "network_partition":
             isolated = network_partition.choose_isolated(NODES, rngs["faults"])
+            progress.show("session_guarantees",
+                          f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                          f"installing partition with isolated_node={isolated}")
             fault = set_partition(isolated, config["faults"]["internode_ports"])
             cleanup = ("partition", isolated)
             expected_peers = {node: (2 if node == isolated else 1) for node in NODES}
@@ -157,6 +191,9 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
             fault.update(isolated=isolated, client_probe=probe,
                          established_ns=time.time_ns(), established_membership={n: membership(n) for n in NODES})
             record["fault"] = fault
+        progress.show("session_guarantees",
+                      f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                      f"running {len(schedule)} randomized trials")
         batch_seed = rngs["routing"].getrandbits(64)
         batch = worker({"action": "batch", "schedule": schedule,
                         "ts": timestamp + 1_000_000, "seed": batch_seed}, config)
@@ -169,6 +206,10 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
         record["trials"] = trials
         record["post_workload_partition"] = partition_snapshot() if scenario == "network_partition" else None
         all_trials.extend(trials)
+        progress.show("session_guarantees",
+                      f"finished scenario={scenario}, round={round_no + 1}/{config['rounds']}, "
+                      f"saved_trials={len(trials)}",
+                      advance=len(trials))
     except BaseException as exc:
         record["error"] = {"type": type(exc).__name__, "message": str(exc)}
         evidence.event("episode_error", episode_id=episode_id, error=record["error"])
@@ -176,9 +217,15 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
     finally:
         try:
             if cleanup and cleanup[0] == "node":
+                progress.show("session_guarantees",
+                              f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                              f"restarting {cleanup[1]} and verifying recovery")
                 restart_node(cleanup[1])
                 record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
             elif cleanup and cleanup[0] == "partition":
+                progress.show("session_guarantees",
+                              f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
+                              "removing partition and verifying recovery")
                 clear_partition()
                 record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
         except BaseException as recovery_error:
@@ -203,7 +250,7 @@ def read_value(response, index, column):
         return None
 
 
-def run_read_repair(config, evidence, run_id, rngs):
+def run_read_repair(config, evidence, run_id, rngs, progress):
     results = []
     if "read_repair" not in config["enabled_experiments"]:
         evidence.save("read_repair.json", results)
@@ -216,6 +263,8 @@ def run_read_repair(config, evidence, run_id, rngs):
             case = {"attempt_id": attempt_id, "round": round_no, "table": table,
                     "setting": setting, "key": key}
             record = {"case": case, "started_ns": time.time_ns()}
+            progress.show("read_repair",
+                          f"starting setting={setting}, round={round_no + 1}/{config['rounds']}")
             try:
                 record["initialization"] = initialize([case], rngs["routing"].getrandbits(64),
                                                        time.time_ns() // 1000, config, table)
@@ -267,15 +316,20 @@ def run_read_repair(config, evidence, run_id, rngs):
                 evidence.save("read_repair.json", results)
                 evidence.event("read_repair_saved", attempt_id=attempt_id,
                                verdict=record.get("verdict"))
+                progress.show("read_repair",
+                              f"finished setting={setting}, round={round_no + 1}/{config['rounds']}, "
+                              f"verdict={record.get('verdict', 'error')}", advance=1)
     return results
 
 
-def run_timestamp_controls(config, evidence, run_id, rngs):
+def run_timestamp_controls(config, evidence, run_id, rngs, progress):
     results = []
     if "timestamp_control" not in config["enabled_experiments"]:
         evidence.save("timestamp_control.json", results)
         return results
     for round_no in range(config["rounds"]):
+        progress.show("timestamp_control",
+                      f"starting round={round_no + 1}/{config['rounds']}")
         key = f"{config['design']}:{run_id}:timestamp:{round_no}"
         ts = time.time_ns() // 1000
         case = {"attempt_id": f"timestamp:{round_no}", "round": round_no,
@@ -295,6 +349,9 @@ def run_timestamp_controls(config, evidence, run_id, rngs):
         results.append(record)
         evidence.save("timestamp_control.json", results)
         evidence.event("timestamp_saved", attempt_id=case["attempt_id"], verdict=verdict)
+        progress.show("timestamp_control",
+                      f"finished round={round_no + 1}/{config['rounds']}, verdict={verdict}",
+                      advance=1)
     return results
 
 
@@ -310,15 +367,42 @@ def run_plan(config, output, seed):
     evidence.save("completion.json", {"completed": False, "evidence_schema": EVIDENCE_SCHEMA,
                                        "run_id": run_id, "started_utc": dt.datetime.now(dt.timezone.utc).isoformat()})
     evidence.event("run_started", run_id=run_id, profile=config["profile"])
+    total = (expected_main_trials(config) + read_repair.expected_trials(config)
+             + timestamp_control.expected_trials(config))
+    progress = Progress(total)
+    progress.show("setup", f"run={run_id}, profile={config['profile']}, seed={seed}")
+    progress.show("setup", "waiting for three-node Cassandra membership")
     ready_membership = wait_healthy(config["faults"]["recovery_timeout_seconds"])
-    schema = worker({"action": "schema"}, config)
-    if schema.get("status") != "ok" or not schema.get("records"):
-        raise RuntimeError("schema creation/inspection failed")
+    progress.show("setup", "cluster healthy; creating and checking schema")
+    schema_attempts = []
+    for attempt in range(1, 11):
+        schema = worker({"action": "schema"}, config)
+        schema_attempts.append(schema)
+        if schema.get("status") == "ok" and schema.get("records"):
+            break
+        progress.show("setup", f"schema check attempt {attempt}/10 failed; retrying in 3 seconds")
+        if attempt < 10:
+            time.sleep(3)
+    else:
+        evidence.save("schema_failure.json", {"attempts": schema_attempts})
+        failures = []
+        for index, response in enumerate(schema_attempts, start=1):
+            for record in response.get("records", []):
+                if record.get("status") != "ok" or record.get("matches_expected") is False:
+                    failures.append({"attempt": index, "node": record.get("node"),
+                                     "query": record.get("query"), "status": record.get("status"),
+                                     "error": record.get("error"), "message": record.get("message"),
+                                     "value": record.get("value"),
+                                     "expected": record.get("expected")})
+        raise RuntimeError("schema creation/inspection failed after 10 attempts: "
+                           + json.dumps(failures[-12:], default=str))
     initial = {"membership": ready_membership,
-               "schema": schema, "client_probe": worker({"action": "probe"}, config)}
+               "schema": schema, "schema_attempts": schema_attempts,
+               "client_probe": worker({"action": "probe"}, config)}
     if not all(item.get("reachable") for item in initial["client_probe"]):
         raise RuntimeError("not every CQL endpoint is ready")
     evidence.save("initial_cluster.json", initial)
+    progress.show("setup", "schema and client endpoint probes passed")
     all_trials, fault_records = [], []
     try:
         if "session_guarantees" in config["enabled_experiments"]:
@@ -327,9 +411,9 @@ def run_plan(config, output, seed):
                 rngs["order"].shuffle(scenarios)
                 for scenario in scenarios:
                     main_episode(config, evidence, run_id, scenario, round_no, rngs,
-                                 all_trials, fault_records)
-        repairs = run_read_repair(config, evidence, run_id, rngs)
-        timestamps = run_timestamp_controls(config, evidence, run_id, rngs)
+                                 all_trials, fault_records, progress)
+        repairs = run_read_repair(config, evidence, run_id, rngs, progress)
+        timestamps = run_timestamp_controls(config, evidence, run_id, rngs, progress)
         expected = expected_main_trials(config)
         if len(all_trials) != expected:
             raise RuntimeError(f"main trial count {len(all_trials)} != {expected}")
@@ -345,6 +429,7 @@ def run_plan(config, output, seed):
                       "completed_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
         evidence.save("completion.json", completion)
         evidence.event("run_completed", **completion)
+        progress.show("complete", f"evidence saved in {output}")
         return output
     except BaseException as exc:
         evidence.event("run_failed", error={"type": type(exc).__name__, "message": str(exc)})
@@ -385,7 +470,9 @@ def main():
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             parser.error("another randomized run holds the project lock")
+        print("[runner] Building and starting the Docker Compose environment...", flush=True)
         compose("up", "-d", "--build", timeout=1800)
+        print("[runner] Docker Compose environment started; beginning experiment setup.", flush=True)
         stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         output = ROOT / "results" / f"randomized_{stamp}_{seed:016x}"
         try:
