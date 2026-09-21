@@ -1,6 +1,7 @@
 import json
 import random
 import sys
+import time
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from experiments.common import cases, expected_main_trials
 from experiments.node_failure import choose_victim
 from experiments.network_partition import choose_isolated, crossing_edges
 from routing import DriverRoutingEvidence, POLICY_NAME
+from scripts.run_randomized import timing_fields
 
 
 class RandomizedSetupTests(unittest.TestCase):
@@ -50,6 +52,13 @@ class RandomizedSetupTests(unittest.TestCase):
         self.assertIn(choose_victim(('n1','n2','n3'), rng), ('n1','n2','n3'))
         isolated = choose_isolated(('n1','n2','n3'), rng)
         self.assertEqual(len(crossing_edges(('n1','n2','n3'), isolated)), 2)
+
+    def test_completion_timing_has_start_end_and_elapsed_minutes(self):
+        started_utc = '2026-09-21T08:00:00+00:00'
+        timing = timing_fields(started_utc, time.monotonic() - 120)
+        self.assertEqual(timing['started_utc'], started_utc)
+        self.assertIn('ended_utc', timing)
+        self.assertGreaterEqual(timing['completion_time_minutes'], 2.0)
 
 
 if __name__ == '__main__':

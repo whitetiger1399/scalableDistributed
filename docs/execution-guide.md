@@ -133,7 +133,7 @@ This checks Cassandra's timestamp conflict resolution and is not pooled with the
 | `faults.json` | Atomically checkpointed main episode records |
 | `read_repair.json` | Atomically checkpointed supplemental repair attempts |
 | `timestamp_control.json` | Atomically checkpointed timestamp controls |
-| `completion.json` | Starts incomplete; changes to complete only after exact count checks |
+| `completion.json` | Starts incomplete; always records `started_utc`, and on success or failure records `ended_utc` plus `completion_time_minutes`; changes to complete only after exact count checks |
 
 Temporary `*.tmp` files are atomic-write intermediates. A partially written temporary file is not accepted by the verifier.
 

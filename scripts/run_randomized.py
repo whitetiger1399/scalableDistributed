@@ -63,6 +63,17 @@ def atomic_save(path, value):
     os.replace(temporary, path)
 
 
+def timing_fields(started_utc, started_monotonic):
+    """Return one consistent set of wall-clock and elapsed run timestamps."""
+    ended_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    elapsed_minutes = max(0.0, (time.monotonic() - started_monotonic) / 60.0)
+    return {
+        "started_utc": started_utc,
+        "ended_utc": ended_utc,
+        "completion_time_minutes": round(elapsed_minutes, 6),
+    }
+
+
 class Evidence:
     def __init__(self, directory):
         self.directory = directory
@@ -399,7 +410,7 @@ def run_timestamp_controls(config, evidence, run_id, rngs, progress):
     return results
 
 
-def run_plan(config, output, seed):
+def _run_plan(config, output, seed, started_utc, started_monotonic):
     output.mkdir(parents=True, exist_ok=False)
     evidence = Evidence(output)
     run_id = output.name.removeprefix("cassandra_policy_")
@@ -409,7 +420,7 @@ def run_plan(config, output, seed):
     evidence.save("seeds.json", {"root": seed, **seeds})
     evidence.save("environment.json", environment(config, seed, run_id))
     evidence.save("completion.json", {"completed": False, "evidence_schema": EVIDENCE_SCHEMA,
-                                       "run_id": run_id, "started_utc": dt.datetime.now(dt.timezone.utc).isoformat()})
+                                       "run_id": run_id, "started_utc": started_utc})
     evidence.event("run_started", run_id=run_id, profile=config["profile"])
     total = (expected_main_trials(config) + read_repair.expected_trials(config)
              + timestamp_control.expected_trials(config))
@@ -469,18 +480,50 @@ def run_plan(config, output, seed):
             raise RuntimeError("read-repair attempt count mismatch")
         if len(timestamps) != timestamp_control.expected_trials(config):
             raise RuntimeError("timestamp-control attempt count mismatch")
+        timing = timing_fields(started_utc, started_monotonic)
         completion = {"completed": True, "evidence_schema": EVIDENCE_SCHEMA, "run_id": run_id,
                       "profile": config["profile"], "main_trials": len(all_trials),
                       "expected_main_trials": expected, "read_repair_trials": len(repairs),
                       "timestamp_trials": len(timestamps),
                       "verdicts": dict(Counter(t["verdict"] for t in all_trials)),
-                      "completed_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
+                      "completed_utc": timing["ended_utc"], **timing}
         evidence.save("completion.json", completion)
         evidence.event("run_completed", **completion)
         progress.show("complete", f"evidence saved in {output}")
         return output
     except BaseException as exc:
         evidence.event("run_failed", error={"type": type(exc).__name__, "message": str(exc)})
+        raise
+
+
+def run_plan(config, output, seed):
+    """Run a plan and leave timing plus terminal status in completion.json."""
+    started_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    started_monotonic = time.monotonic()
+    try:
+        return _run_plan(config, output, seed, started_utc, started_monotonic)
+    except BaseException as exc:
+        # Setup errors occur before _run_plan's workload exception handler. Preserve
+        # their terminal state as well so every created run directory is auditable.
+        if output.is_dir():
+            path = output / "completion.json"
+            if path.exists():
+                try:
+                    completion = json.loads(path.read_text())
+                except (OSError, json.JSONDecodeError):
+                    completion = {}
+            else:
+                completion = {}
+            if completion.get("completed") is not True:
+                completion.update({
+                    "completed": False,
+                    "evidence_schema": EVIDENCE_SCHEMA,
+                    "run_id": output.name.removeprefix("cassandra_policy_"),
+                    "profile": config.get("profile"),
+                    "error": {"type": type(exc).__name__, "message": str(exc)},
+                    **timing_fields(started_utc, started_monotonic),
+                })
+                atomic_save(path, completion)
         raise
 
 
