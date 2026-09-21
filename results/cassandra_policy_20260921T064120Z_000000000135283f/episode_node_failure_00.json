@@ -1,0 +1,1913 @@
+{
+  "ended_ns": 1789973034884335000,
+  "episode_id": "main:node_failure:0",
+  "error": {
+    "message": "docker compose -f /Users/whitetiger/Desktop/WhiteTiger/17_projects/19_ScalableDist/compose.yaml exec -T client python src/worker.py\n\nTraceback (most recent call last):\n  File \"/work/src/worker.py\", line 215, in <module>\n    backend = Transport(request.get('nodes', DEFAULT_NODES), request.get('cql_port', 9042),\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/src/worker.py\", line 30, in __init__\n    self.node_ips = {node: socket.gethostbyname(node) for node in self.nodes}\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/src/worker.py\", line 30, in <dictcomp>\n    self.node_ips = {node: socket.gethostbyname(node) for node in self.nodes}\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^\nsocket.gaierror: [Errno -2] Name or service not known\n",
+    "type": "RuntimeError"
+  },
+  "fault": {
+    "action": "docker compose kill -s SIGKILL n3",
+    "after": {
+      "container_id": "414419624f9529b483cfd09a8a6607f872a93c7194b7d1f735fcaf8eb179c843",
+      "ip": "",
+      "node": "n3",
+      "running": false,
+      "status": "exited"
+    },
+    "detection": {
+      "observations": [
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972977148888000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972980776388000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972984431762000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972988157203000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972991880013000
+        },
+        {
+          "matching": true,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972995512618000
+        },
+        {
+          "matching": true,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.74 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789972999104507000
+        }
+      ],
+      "required_consecutive": 2,
+      "victim": "n3",
+      "victim_ip": "172.18.0.5"
+    },
+    "end_ns": 1789972975510845000,
+    "identity": {
+      "container_id": "414419624f9529b483cfd09a8a6607f872a93c7194b7d1f735fcaf8eb179c843",
+      "ip": "172.18.0.5",
+      "node": "n3",
+      "running": true,
+      "status": "running"
+    },
+    "node": "n3",
+    "output": "",
+    "start_ns": 1789972975122758000
+  },
+  "initialization": {
+    "health": [
+      {
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974535518342,
+        "error": null,
+        "message": null,
+        "node": "n1",
+        "reachable": true,
+        "start_ns": 1789972974500882467
+      },
+      {
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974579489300,
+        "error": null,
+        "message": null,
+        "node": "n2",
+        "reachable": true,
+        "start_ns": 1789972974535525592
+      },
+      {
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974626100759,
+        "error": null,
+        "message": null,
+        "node": "n3",
+        "reachable": true,
+        "start_ns": 1789972974579500633
+      }
+    ],
+    "records": [
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974676829675,
+        "latency_ms": 50.71475,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 0,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:RYW",
+        "start_ns": 1789972974626115592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974686027134,
+        "latency_ms": 9.18525,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 1,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MW",
+        "start_ns": 1789972974676842925,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974690872259,
+        "latency_ms": 4.836125,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 2,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:WFR",
+        "start_ns": 1789972974686037050,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974695885342,
+        "latency_ms": 5.003792,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 3,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:RYW",
+        "start_ns": 1789972974690882675,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974702239259,
+        "latency_ms": 6.344542,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 4,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MR",
+        "start_ns": 1789972974695895842,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974707974884,
+        "latency_ms": 5.728875,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 5,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MR",
+        "start_ns": 1789972974702250217,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974712140342,
+        "latency_ms": 4.152334,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 6,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:WFR",
+        "start_ns": 1789972974707988842,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974716168134,
+        "latency_ms": 4.013,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 7,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MW",
+        "start_ns": 1789972974712155634,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974722280050,
+        "latency_ms": 6.068042,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 8,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:RYW",
+        "start_ns": 1789972974716212425,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974727268300,
+        "latency_ms": 4.973084,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 9,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:WFR",
+        "start_ns": 1789972974722295467,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974731324384,
+        "latency_ms": 4.046542,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 10,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:RYW",
+        "start_ns": 1789972974727278384,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974736225259,
+        "latency_ms": 4.891708,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 11,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:RYW",
+        "start_ns": 1789972974731333967,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974740652009,
+        "latency_ms": 4.417333,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 12,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MW",
+        "start_ns": 1789972974736235259,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974746041342,
+        "latency_ms": 5.37625,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 13,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:RYW",
+        "start_ns": 1789972974740665592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974754038009,
+        "latency_ms": 7.986959,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 14,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:WFR",
+        "start_ns": 1789972974746051717,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974758610342,
+        "latency_ms": 4.537209,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 15,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MR",
+        "start_ns": 1789972974754073092,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974762639967,
+        "latency_ms": 4.020042,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 16,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MW",
+        "start_ns": 1789972974758620467,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974767387134,
+        "latency_ms": 4.737708,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 17,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:WFR",
+        "start_ns": 1789972974762649759,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974773152425,
+        "latency_ms": 5.747208,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 18,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MR",
+        "start_ns": 1789972974767405634,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974779521300,
+        "latency_ms": 6.359375,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 19,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MW",
+        "start_ns": 1789972974773162884,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974788865467,
+        "latency_ms": 9.330125,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 20,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:WFR",
+        "start_ns": 1789972974779535925,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974795348592,
+        "latency_ms": 6.470208,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 21,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:RYW",
+        "start_ns": 1789972974788878967,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974800299384,
+        "latency_ms": 4.939625,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 22,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MW",
+        "start_ns": 1789972974795360592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974805814759,
+        "latency_ms": 5.503417,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 23,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MR",
+        "start_ns": 1789972974800311884,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974811784342,
+        "latency_ms": 5.958375,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 24,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:WFR",
+        "start_ns": 1789972974805826592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974817076175,
+        "latency_ms": 5.280625,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 25,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MR",
+        "start_ns": 1789972974811796050,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974823594634,
+        "latency_ms": 6.506708,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 26,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MW",
+        "start_ns": 1789972974817088342,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974828249550,
+        "latency_ms": 4.644875,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 27,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:WFR",
+        "start_ns": 1789972974823605217,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974832744634,
+        "latency_ms": 4.472542,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 28,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MW",
+        "start_ns": 1789972974828272675,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974838539759,
+        "latency_ms": 5.781375,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 29,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MR",
+        "start_ns": 1789972974832758925,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974844084259,
+        "latency_ms": 5.530709,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 30,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:RYW",
+        "start_ns": 1789972974838554134,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974848219759,
+        "latency_ms": 4.122542,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:WFR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 31,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:WFR",
+        "start_ns": 1789972974844097592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789972974852260259,
+        "latency_ms": 4.030834,
+        "node": "n1",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:RYW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n1"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 32,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n1"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:RYW",
+        "start_ns": 1789972974848229967,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974856407509,
+        "latency_ms": 4.136292,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 33,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MR",
+        "start_ns": 1789972974852271759,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789972974860949759,
+        "latency_ms": 4.5335,
+        "node": "n2",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MW",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n2"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 34,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n2"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MW",
+        "start_ns": 1789972974856416592,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789972974868561759,
+        "latency_ms": 7.601208,
+        "node": "n3",
+        "params": [
+          "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MR",
+          1789972974276816
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "attempted_nodes": [
+            "n3"
+          ],
+          "eligible_nodes": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "local_dc": "dc1",
+          "operation_index": 35,
+          "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+          "selected_node": "n3"
+        },
+        "routing_key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MR",
+        "start_ns": 1789972974860961467,
+        "status": "ok",
+        "value": null
+      }
+    ],
+    "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
+  },
+  "recovery": {
+    "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.9 MiB   16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+    "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.9 MiB   16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+    "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.86 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.9 MiB   16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+  },
+  "round": 0,
+  "scenario": "node_failure",
+  "schedule": [
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ALL:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/ONE:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ALL:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ALL:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/ONE:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/QUORUM:WFR",
+      "model": "WFR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:RYW",
+      "model": "RYW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ALL/QUORUM:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ALL/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:ONE/QUORUM:MW",
+      "model": "MW",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:ONE/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "cassandra-driver-policy-v3:20260921T064120Z_000000000135283f:node_failure:r0:QUORUM/ONE:MR",
+      "model": "MR",
+      "round": 0,
+      "scenario": "node_failure",
+      "trial_id": "20260921T064120Z_000000000135283f:node_failure:0:QUORUM/ONE:MR"
+    }
+  ],
+  "settled_seconds": 20,
+  "started_ns": 1789972974952455000
+}

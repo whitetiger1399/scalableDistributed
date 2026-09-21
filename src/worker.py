@@ -27,7 +27,16 @@ class Transport:
         self.nodes = tuple(nodes)
         self.cql_port = cql_port
         self.local_dc = local_dc
-        self.node_ips = {node: socket.gethostbyname(node) for node in self.nodes}
+        # A Cassandra service may intentionally be absent during a node-failure
+        # episode. Resolve each service independently so one missing Docker DNS
+        # entry does not abort the whole worker before measurements can run.
+        self.node_ips = {}
+        self.resolution_errors = {}
+        for node in self.nodes:
+            try:
+                self.node_ips[node] = socket.gethostbyname(node)
+            except socket.gaierror as exc:
+                self.resolution_errors[node] = str(exc)
         self.address_to_node = {ip: node for node, ip in self.node_ips.items()}
         self.direct_clusters, self.direct_sessions = [], {}
         self.application_cluster = None
@@ -35,6 +44,11 @@ class Transport:
         self.routing_evidence = DriverRoutingEvidence(self.address_to_node, local_dc)
 
     def direct_session(self, node):
+        if node not in self.node_ips:
+            raise RuntimeError(
+                f"CQL endpoint {node!r} is not currently resolvable: "
+                f"{self.resolution_errors.get(node, 'unknown DNS error')}"
+            )
         if node not in self.direct_sessions:
             ip = self.node_ips[node]
             profile = ExecutionProfile(load_balancing_policy=WhiteListRoundRobinPolicy([ip]),
@@ -48,6 +62,8 @@ class Transport:
 
     def policy_session(self):
         if self.application_session is None:
+            if not self.node_ips:
+                raise RuntimeError('No Cassandra service names are currently resolvable')
             policy = TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=self.local_dc))
             profile = ExecutionProfile(load_balancing_policy=policy,
                 retry_policy=FallthroughRetryPolicy(),

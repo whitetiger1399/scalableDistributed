@@ -1,0 +1,221 @@
+[
+  {
+    "case": {
+      "attempt_id": "timestamp:0",
+      "key": "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+      "round": 0,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.18.0.3:9042",
+          "end_ns": 1789978328271074042,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789978328246204834
+        },
+        {
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328296169542,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789978328271079042
+        },
+        {
+          "coordinator": "172.18.0.5:9042",
+          "end_ns": 1789978328318080459,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789978328296174875
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328365292209,
+          "latency_ms": 47.194917,
+          "node": "n2",
+          "params": [
+            "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+            1789978327935024
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+          "start_ns": 1789978328318098167,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.18.0.3:9042",
+          "end_ns": 1789978328625858834,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789978328606424792
+        },
+        {
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328654795626,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789978328625864500
+        },
+        {
+          "coordinator": "172.18.0.5:9042",
+          "end_ns": 1789978328693413042,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789978328654801876
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328737119251,
+          "kind": "write",
+          "latency_ms": 43.598917,
+          "node": "n2",
+          "params": [
+            1789978327935124,
+            1,
+            "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+          "sequence": 0,
+          "start_ns": 1789978328693520959,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328740571959,
+          "kind": "write",
+          "latency_ms": 3.439958,
+          "node": "n2",
+          "params": [
+            1789978327935074,
+            2,
+            "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 1,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+          "sequence": 1,
+          "start_ns": 1789978328737132792,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.18.0.4:9042",
+          "end_ns": 1789978328747381417,
+          "kind": "read",
+          "latency_ms": 6.798541,
+          "node": "n2",
+          "params": [
+            "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 2,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260921T080637Z_00000000000003e9:timestamp:0",
+          "sequence": 2,
+          "start_ns": 1789978328740583376,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
+    },
+    "timestamps": [
+      1789978327935124,
+      1789978327935074
+    ],
+    "verdict": "expected"
+  }
+]
