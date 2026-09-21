@@ -253,7 +253,100 @@ These expected reductions concern the probability of **observing a witness**. Th
 - Zero violations in the new run means **no violation was observed along the routes that the driver selected**.
 - It does not prove that Cassandra guarantees RYW, MR, MW, or WFR for every execution or consistency configuration.
 
-## 13. Related project evidence
+## 13. Why token-aware routing is generally better
+
+Token-aware routing is generally preferred because the client driver knows which Cassandra nodes store the partition being accessed. It can send the request directly to one of those replicas instead of choosing an unrelated coordinator.
+
+### Main advantages
+
+1. **Avoids an unnecessary network hop**
+
+   - A non-token-aware client may send a request to a node that is not a replica for the key.
+   - That coordinator must forward the request to the actual replicas.
+   - A token-aware driver normally sends the request directly to a replica, avoiding this extra forwarding step.
+
+2. **Reduces request latency**
+
+   - Direct replica coordination usually requires less network communication.
+   - Removing the extra coordinator-to-replica hop can reduce end-to-end read and write latency.
+   - The improvement is more significant when nodes are separated by racks, availability zones, or datacenters.
+
+3. **Reduces coordinator overhead**
+
+   - A non-replica coordinator performs request parsing, replica discovery, forwarding, response collection, and result delivery without storing the requested partition locally.
+   - Token-aware routing gives this work to a node already involved as a replica.
+   - This reduces unnecessary CPU, connection, and network work across the cluster.
+
+4. **Reduces internal network traffic**
+
+   - Requests are less likely to travel through an unrelated Cassandra node before reaching the replicas.
+   - Lower internal traffic leaves more capacity for replication, repair, compaction-related streaming, and application queries.
+
+5. **Uses Cassandra's token-ring metadata**
+
+   - The driver obtains token and topology metadata from Cassandra.
+   - It hashes the statement's routing key and identifies the replicas responsible for that token.
+   - Coordinator selection therefore reflects the actual data placement strategy.
+
+6. **Combines with datacenter-aware routing**
+
+   - This project wraps `DCAwareRoundRobinPolicy(local_dc="dc1")` inside `TokenAwarePolicy`.
+   - The driver prefers a replica in the local datacenter.
+   - This avoids unnecessary cross-datacenter coordination when a suitable local replica exists.
+
+7. **Balances requests among relevant replicas**
+
+   - Across many partition keys, different tokens map to different replica orderings.
+   - Requests are distributed according to data ownership rather than through completely uninformed node selection.
+   - The child policy provides fallback ordering when preferred replicas cannot be used.
+
+8. **Responds to host availability**
+
+   - The driver maintains host and connection state.
+   - If a preferred replica is down or unusable, the query plan can move to another available host.
+   - Applications do not need to maintain their own list of fault victims.
+
+9. **Matches normal Cassandra application practice**
+
+   - Applications ordinarily connect through a Cassandra driver instead of manually choosing a different node for every query.
+   - Token-aware results therefore better represent production-style client behavior.
+
+### Comparison
+
+| Property | Non-token-aware routing | Token-aware routing |
+|---|---|---|
+| Knowledge of partition ownership | Does not use the statement's token to choose the coordinator | Uses the routing key and token metadata |
+| Initial coordinator | May be an unrelated node | Normally one of the replicas for the key |
+| Extra coordinator hop | Often required | Usually avoided |
+| Internal network traffic | Higher | Usually lower |
+| Coordinator work | May be performed by a node that does not store the partition | Usually performed by a relevant replica |
+| Typical latency | May be higher | Usually lower |
+| Datacenter locality | Depends on the underlying policy | Can combine replica awareness with local-datacenter preference |
+| Production realism | Lower when the harness manually selects nodes | Higher for normal driver-based applications |
+| Cross-node experiment coverage | Can be deliberately high | May repeatedly prefer the same replica for one key |
+
+### Important limitation in this project
+
+Token-aware routing is operationally better for typical Cassandra workloads, but “better” does not mean that it provides a stronger consistency level.
+
+- Token awareness changes the coordinator-selection path.
+- It does not change replication factor 3.
+- It does not change the requested `ONE`, `QUORUM`, or `ALL` consistency level.
+- It does not create formal RYW, MR, MW, or WFR guarantees.
+- It can reduce the probability of observing a stale value because operations on one key often use the same preferred replica.
+- That reduced observation probability must not be interpreted as a stronger database guarantee.
+
+The performance advantage is also smaller in this particular deployment:
+
+- The cluster has three nodes and RF=3.
+- Every node is a replica for every experiment key.
+- Therefore, even a randomly selected coordinator is already a replica.
+- Token awareness cannot eliminate a non-replica coordinator hop because no non-replica Cassandra node exists in this topology.
+- Its main observable effect here is stable coordinator preference for each key.
+
+In a larger cluster where RF is lower than the number of nodes, token awareness provides a clearer routing advantage because many nodes do not store a given partition.
+
+## 14. Related project evidence
 
 - Previous pooled results: `report/violation_matrix_v2.md`.
 - New driver-policy results: `report/violation_matrix_v3.md`.
