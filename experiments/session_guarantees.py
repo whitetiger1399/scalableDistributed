@@ -1,4 +1,4 @@
-"""Main four-model randomized session-guarantee experiment."""
+"""Main four-model driver-routed session-guarantee experiment."""
 from .common import cases, expected_main_trials
 
 
@@ -11,4 +11,4 @@ def expected_trials(config):
 
 
 def description():
-    return "For every model/configuration/scenario case, every operation is routed independently by the customer-facing random gateway."
+    return "For every model/configuration/scenario case, Cassandra's token-aware, DC-aware driver policy selects each operation's coordinator."

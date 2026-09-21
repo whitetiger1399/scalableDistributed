@@ -1,4 +1,4 @@
-"""Randomized internode partition scenario definition."""
+"""Seeded internode partition scenario definition."""
 import random
 
 

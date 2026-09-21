@@ -12,7 +12,7 @@ def expected_trials(config):
 
 
 def description():
-    return "Create a minority-only value, change between two-node quorum components without a fully connected interval, and compare successive random-coordinator QUORUM reads."
+    return "Create a minority-only value, change between two-node quorum components without a fully connected interval, and compare successive driver-routed QUORUM reads."
 
 
 def minority_write(key, timestamp, table):

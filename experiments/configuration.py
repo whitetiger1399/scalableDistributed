@@ -19,7 +19,7 @@ def _unique(name, values):
 
 def normalize(raw, full=True):
     config = deepcopy(raw)
-    required = {"design", "repetitions", "rounds", "models", "consistency_configs",
+    required = {"design", "routing", "repetitions", "rounds", "models", "consistency_configs",
                 "scenarios", "enabled_experiments", "faults", "database"}
     missing = required - set(config)
     if missing:
@@ -29,6 +29,9 @@ def normalize(raw, full=True):
     if config.get("seed") is not None and (isinstance(config["seed"], bool) or
                                              not isinstance(config["seed"], int)):
         raise ValueError("seed must be null or an integer")
+    routing = config["routing"]
+    if routing != {"policy": "token_aware_dc_aware", "local_dc": "dc1"}:
+        raise ValueError("routing must use token_aware_dc_aware in local_dc dc1")
     for name in ("models", "consistency_configs", "scenarios", "enabled_experiments"):
         _unique(name, config[name])
     if set(config["models"]) - set(MODELS):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute the auditable randomized-coordinator Cassandra experiment suite."""
+"""Execute the auditable Cassandra-driver-policy experiment suite."""
 import argparse
 from collections import Counter
 import datetime as dt
@@ -25,7 +25,7 @@ from experiments.faults import (NODES, clear_partition, compose, kill_node, memb
                                 partition_snapshot, recover_all, restart_node, set_graph,
                                 set_partition, wait_failure, wait_healthy)
 
-EVIDENCE_SCHEMA = "randomized-cassandra-evidence-v3"
+EVIDENCE_SCHEMA = "cassandra-driver-policy-evidence-v4"
 
 
 class Progress:
@@ -87,7 +87,8 @@ def derived_seed(root, label):
 
 def worker(request, config):
     payload = dict(request)
-    payload.update(nodes=list(NODES), cql_port=config["faults"]["cql_port"])
+    payload.update(nodes=list(NODES), cql_port=config["faults"]["cql_port"],
+                   routing=config["routing"])
     if payload.get("action") == "schema":
         payload["database"] = config["database"]
     result = compose("exec", "-T", "client", "python", "src/worker.py",
@@ -107,7 +108,7 @@ def require_records(response, expected, label):
     return response
 
 
-def initialize(schedule, seed, timestamp, config, table="blocking", attempts=4):
+def initialize(schedule, timestamp, config, table="blocking", attempts=4):
     """Establish fresh ALL-consistency setup rows.
 
     Initialization is administration, not a measured application session, so a
@@ -119,7 +120,7 @@ def initialize(schedule, seed, timestamp, config, table="blocking", attempts=4):
     last_error = None
     for attempt in range(attempts):
         response = worker({"action": "init", "items": items,
-                           "ts": timestamp + attempt, "seed": seed + attempt}, config)
+                           "ts": timestamp + attempt}, config)
         try:
             return require_records(response, len(items), "initialization")
         except RuntimeError as exc:
@@ -190,8 +191,7 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
                   f"starting scenario={scenario}, round={round_no + 1}/{config['rounds']}, "
                   f"trials={len(schedule)}; initializing keys")
     timestamp = time.time_ns() // 1000
-    init_seed = rngs["routing"].getrandbits(64)
-    initialization = initialize(schedule, init_seed, timestamp, config)
+    initialization = initialize(schedule, timestamp, config)
     episode_id = f"main:{scenario}:{round_no}"
     record = {"episode_id": episode_id, "scenario": scenario, "round": round_no,
               "schedule": schedule, "initialization": initialization,
@@ -236,15 +236,14 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
             record["fault"] = fault
         progress.show("session_guarantees",
                       f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
-                      f"running {len(schedule)} randomized trials")
-        batch_seed = rngs["routing"].getrandbits(64)
+                      f"running {len(schedule)} driver-routed trials")
         batch = worker({"action": "batch", "schedule": schedule,
-                        "ts": timestamp + 1_000_000, "seed": batch_seed}, config)
+                        "ts": timestamp + 1_000_000}, config)
         trials = batch.get("records") if isinstance(batch, dict) else None
         if not isinstance(trials, list) or len(trials) != len(schedule):
             raise RuntimeError(f"application batch returned {len(trials or [])}/{len(schedule)} histories")
         for trial in trials:
-            trial.update(episode_id=episode_id, routing_seed=batch_seed,
+            trial.update(episode_id=episode_id, routing_policy=config["routing"]["policy"],
                          worker_health=batch.get("health", []))
         record["trials"] = trials
         record["post_workload_partition"] = partition_snapshot() if scenario == "network_partition" else None
@@ -311,30 +310,30 @@ def run_read_repair(config, evidence, run_id, rngs, progress):
             progress.show("read_repair",
                           f"starting setting={setting}, round={round_no + 1}/{config['rounds']}")
             try:
-                record["initialization"] = initialize([case], rngs["routing"].getrandbits(64),
-                                                       time.time_ns() // 1000, config, table)
+                record["initialization"] = initialize([case], time.time_ns() // 1000,
+                                                       config, table)
                 record["full_cut"] = set_graph(full_cut, config["faults"]["internode_ports"])
                 if config["faults"]["partition_hold_seconds"]:
                     time.sleep(config["faults"]["partition_hold_seconds"])
-                write = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                write = worker({"action": "ops",
                     "operations": [read_repair.minority_write(
                         key, time.time_ns() // 1000, table)]}, config)
                 record["write"] = write
                 selected = write.get("records", [{}])[0].get("routing", {}).get("selected_node")
                 if selected not in NODES:
-                    raise RuntimeError("minority write did not identify its random coordinator")
+                    raise RuntimeError("minority write did not identify its driver-selected coordinator")
                 pair1, pair2 = read_repair.topology_pairs(selected, NODES, rngs["topology"])
                 record["pair_sequence"] = [pair1, pair2]
                 record["pair1_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair1)],
                                                    config["faults"]["internode_ports"])
                 time.sleep(config["faults"]["partition_stabilization_seconds"])
-                first = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                first = worker({"action": "ops",
                     "operations": [read_repair.quorum_read(key, table)]}, config)
                 record["first"] = first
                 record["pair2_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair2)],
                                                    config["faults"]["internode_ports"])
                 time.sleep(config["faults"]["partition_stabilization_seconds"])
-                second = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
+                second = worker({"action": "ops",
                     "operations": [read_repair.quorum_read(key, table)]}, config)
                 record["second"] = second
                 first_record = first.get("records", [{}])[0]
@@ -380,10 +379,9 @@ def run_timestamp_controls(config, evidence, run_id, rngs, progress):
         ts = time.time_ns() // 1000
         case = {"attempt_id": f"timestamp:{round_no}", "round": round_no,
                 "key": key, "table": "blocking"}
-        initialization = initialize([case], rngs["routing"].getrandbits(64), ts, config)
+        initialization = initialize([case], ts, config)
         operations = timestamp_control.operations(key, ts, "blocking")
-        result = worker({"action": "ops", "seed": rngs["routing"].getrandbits(64),
-                         "operations": operations}, config)
+        result = worker({"action": "ops", "operations": operations}, config)
         records = result.get("records", [])
         if len(records) != 3 or any(record.get("status") != "ok" for record in records):
             verdict, reason = "inconclusive", "operation_error"
@@ -404,8 +402,8 @@ def run_timestamp_controls(config, evidence, run_id, rngs, progress):
 def run_plan(config, output, seed):
     output.mkdir(parents=True, exist_ok=False)
     evidence = Evidence(output)
-    run_id = output.name.replace("randomized_", "")
-    seeds = {name: derived_seed(seed, name) for name in ("routing", "order", "faults", "topology")}
+    run_id = output.name.removeprefix("cassandra_policy_")
+    seeds = {name: derived_seed(seed, name) for name in ("order", "faults", "topology")}
     rngs = {name: random.Random(value) for name, value in seeds.items()}
     evidence.save("plan.json", config)
     evidence.save("seeds.json", {"root": seed, **seeds})
@@ -498,7 +496,7 @@ def plan_summary(config, seed):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=ROOT / "config/randomized_experiments.json")
+    parser.add_argument("--config", type=Path, default=ROOT / "config/cassandra_driver_experiments.json")
     parser.add_argument("--seed", type=int)
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--smoke", action="store_true", help="allow fewer than ten attempts; never a submission run")
@@ -514,17 +512,17 @@ def main():
     if args.recover:
         print(json.dumps(recover_all(config["faults"]["recovery_timeout_seconds"]), indent=2))
         return
-    lock_path = ROOT / ".randomized-run.lock"
+    lock_path = ROOT / ".cassandra-policy-run.lock"
     with lock_path.open("w") as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            parser.error("another randomized run holds the project lock")
+            parser.error("another Cassandra-policy run holds the project lock")
         print("[runner] Building and starting the Docker Compose environment...", flush=True)
         compose("up", "-d", "--build", timeout=1800)
         print("[runner] Docker Compose environment started; beginning experiment setup.", flush=True)
         stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        output = ROOT / "results" / f"randomized_{stamp}_{seed:016x}"
+        output = ROOT / "results" / f"cassandra_policy_{stamp}_{seed:016x}"
         try:
             print(run_plan(config, output, seed))
         except BaseException:

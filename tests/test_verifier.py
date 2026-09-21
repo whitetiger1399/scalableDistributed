@@ -15,7 +15,11 @@ def operation(kind, key, sequence, cl, start, value=None):
     record = {"kind":kind, "sequence":sequence, "status":"ok", "cl":cl,
               "params":[key], "start_ns":start, "end_ns":start+1,
               "node":"n1", "coordinator":"127.0.0.1:9042", "client_id":"client-1",
-              "routing":{"selected_node":"n1", "candidates":["n1","n2","n3"], "draw":sequence}}
+              "routing_key":key,
+              "routing":{"policy":"TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+                         "local_dc":"dc1", "selected_node":"n1",
+                         "eligible_nodes":["n1","n2","n3"],
+                         "attempted_nodes":["n1"], "operation_index":sequence}}
     if kind == 'read':
         record['value'] = value
     return record
@@ -25,7 +29,7 @@ class VerifierTests(unittest.TestCase):
     def make_run(self):
         temp = tempfile.TemporaryDirectory()
         run = Path(temp.name)
-        base = json.loads((ROOT/'config/randomized_experiments.json').read_text())
+        base = json.loads((ROOT/'config/cassandra_driver_experiments.json').read_text())
         base.update(models=['RYW'], consistency_configs=['ONE/ONE'], scenarios=['normal'],
                     enabled_experiments=['session_guarantees'], rounds=1, repetitions=1,
                     profile='smoke')
@@ -41,9 +45,9 @@ class VerifierTests(unittest.TestCase):
                  "fault":None, "recovery":None}
         files={
             'plan.json':base,
-            'completion.json':{"completed":True,"evidence_schema":"randomized-cassandra-evidence-v3",
+            'completion.json':{"completed":True,"evidence_schema":"cassandra-driver-policy-evidence-v4",
                                "run_id":"run","main_trials":1,"read_repair_trials":0,"timestamp_trials":0},
-            'environment.json':{"evidence_schema":"randomized-cassandra-evidence-v3","run_id":"run"},
+            'environment.json':{"evidence_schema":"cassandra-driver-policy-evidence-v4","run_id":"run"},
             'trials.json':[trial], 'faults.json':[episode],
             'read_repair.json':[], 'timestamp_control.json':[]}
         for name,value in files.items():

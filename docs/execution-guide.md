@@ -1,10 +1,10 @@
 # Execution, fault injection, and evidence guide
 
-This guide explains what the randomized runner does and how to operate it. It contains no experiment outcomes.
+This guide explains what the Cassandra driver-policy runner does and how to operate it. It contains no experiment outcomes.
 
 ## Lifecycle of a run
 
-The runner creates a uniquely named `results/randomized_<UTC>_<seed>/` directory. It immediately writes an incomplete `completion.json`, the normalized plan, seed streams, environment details, source hashes, and a durable `events.jsonl` journal. A run remains incomplete unless every required phase finishes and its exact count checks pass.
+The runner creates a uniquely named `results/cassandra_policy_<UTC>_<seed>/` directory. It immediately writes an incomplete `completion.json`, the normalized plan, seed streams, environment details, source hashes, and a durable `events.jsonl` journal. A run remains incomplete unless every required phase finishes and its exact count checks pass.
 
 The project lock prevents concurrent runners from injecting conflicting faults. The lock file may remain on disk; concurrency is controlled by the operating-system lock held on the file.
 
@@ -24,16 +24,19 @@ The schema phase:
 
 Existing `CREATE IF NOT EXISTS` objects are accepted only when inspection matches the expected table settings. Schema errors stop the run before measured histories.
 
-## Random application routing
+## Cassandra driver coordinator routing
 
-Every worker probes the configured endpoints using CQL before constructing its candidate set. The application API accepts a key, value, and consistency level but no node. For every operation the gateway draws uniformly with replacement from the candidate set.
+Every worker receives all configured contact points. The application API accepts a key, value, and consistency level but no node. For every measured operation, the Python driver chooses the coordinator with `TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc="dc1"))`.
+
+Each statement sets keyspace `lab` and the encoded partition key as its routing key. The token-aware policy therefore prefers replicas, and the DC-aware child policy orders usable local hosts. Because RF=3 equals the three-node cluster size, all nodes are replicas for every experiment key. The driver—not the experiment controller—selects among hosts it considers available.
 
 Each operation records:
 
 - logical client ID and role;
 - operation kind and sequence number;
 - requested consistency level;
-- random draw index, candidate set, and selected endpoint;
+- policy name, local datacenter, operation index, driver-eligible hosts, attempted hosts, and selected coordinator;
+- partition routing key;
 - actual coordinator reported by the driver on success;
 - query parameters, including the run-scoped key and mutation timestamp;
 - wall-clock start/end values and monotonic duration; and
@@ -49,7 +52,7 @@ Before a block, every key is initialized to `(a=0,b=0)` at consistency `ALL` whi
 
 ### Normal operation
 
-The runner immediately executes the randomized histories against the healthy three-node cluster. It still records every client-side endpoint probe and random route.
+The runner immediately executes the shuffled histories against the healthy three-node cluster. It records every client-side endpoint probe and driver routing decision.
 
 ### Abrupt node failure
 
@@ -61,7 +64,7 @@ For every failure block:
 4. inspect the same stopped container and require `running=false`;
 5. poll `nodetool status` through both survivors;
 6. parse numeric membership addresses and require both survivors to report the exact victim IP as `DN`, with two remaining `UN` members, in consecutive observations;
-7. start a new worker, whose CQL probes make the two reachable nodes its random candidates;
+7. start a new worker; its driver connects through the surviving contact points and excludes the stopped host;
 8. execute and save all histories without retrying errors;
 9. restart the same service with its persistent volume; and
 10. wait until all observers report all three members `UN`.
@@ -82,12 +85,12 @@ For every partition block:
 6. require the saved blocked-peer graph and DROP-rule count to match the intended cut;
 7. wait the configured stabilization interval;
 8. prove that all three CQL endpoints remain reachable to the client;
-9. save membership views and execute randomized histories with all three client-reachable nodes eligible;
+9. save membership views and execute shuffled histories while the driver determines which of the three client-reachable nodes are eligible;
 10. save post-workload rules and verbose packet counters;
 11. delete only rules in `LAB_FAULT` and its project jump; and
 12. verify three-node recovery.
 
-The rules never block CQL port 9042 and never modify the host firewall. A coordinator on the isolated side may complete `ONE` but cannot reach a quorum; that CL-dependent error does not remove it from the gateway candidate set.
+The rules never block CQL port 9042 and never modify the host firewall. A coordinator on the isolated side may complete `ONE` but cannot reach a quorum. Cassandra or driver liveness state may affect later query plans; the controller never filters a host based on the intended partition side.
 
 ## Read-repair controls
 
@@ -96,11 +99,11 @@ For each round and table setting, the runner:
 1. initializes one fresh key at ALL;
 2. blocks every internode pair while keeping CQL access;
 3. holds the full cut for the configured interval;
-4. issues `a=1` at ONE through a random coordinator and records that selected node;
+4. issues `a=1` at ONE through a driver-selected coordinator and records that selected node;
 5. creates a random two-node component containing the write coordinator;
-6. waits for stabilization and issues the first QUORUM read through a new random coordinator;
+6. waits for stabilization and issues the first QUORUM read through a fresh driver query plan;
 7. changes to an overlapping two-node component without a fully connected interval;
-8. waits and issues the second random-coordinator QUORUM read;
+8. waits and issues the second QUORUM read through a fresh driver query plan;
 9. records topology rules and post-workload counters; and
 10. clears the partition and verifies recovery.
 
@@ -121,7 +124,7 @@ This checks Cassandra's timestamp conflict resolution and is not pooled with the
 | File | Contents |
 |---|---|
 | `plan.json` | Normalized effective configuration and profile |
-| `seeds.json` | Root and independently derived random streams |
+| `seeds.json` | Root plus independently derived case-order, fault and topology streams |
 | `environment.json` | Runtime commands/versions, git status, configuration, and source SHA-256 manifest |
 | `initial_cluster.json` | Membership, schema operations/inspection, and CQL probes |
 | `events.jsonl` | Append-only lifecycle journal flushed and fsynced after every event |
@@ -152,7 +155,7 @@ The evidence verifier is intentionally separate from orchestration. It rebuilds 
 
 The report builder requires an explicit result path and invokes verification again. For a full report it also compares every recorded source hash with the current workspace. This prevents packaging edited code as though it produced older evidence.
 
-A smoke report requires `--allow-smoke` and receives filenames beginning with `Smoke_Randomized`. It is a pipeline QA artifact, not a submission report.
+A smoke report requires `--allow-smoke` and receives filenames beginning with `Smoke_Driver_Policy`. It is a pipeline QA artifact, not a submission report.
 
 ## Troubleshooting
 

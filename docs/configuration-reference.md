@@ -1,22 +1,24 @@
-# Randomized experiment configuration reference
+# Cassandra driver-policy experiment configuration reference
 
-The runner reads `config/randomized_experiments.json`, applies any command-line repetition override, and validates the complete effective configuration before starting Docker. Unknown experiment/model/scenario values, duplicates, empty lists, unsupported deployment settings, and inconsistent options fail immediately.
+The runner reads `config/cassandra_driver_experiments.json`, applies any command-line repetition override, and validates the complete effective configuration before starting Docker. Unknown routing policies, experiment/model/scenario values, duplicates, empty lists, unsupported deployment settings, and inconsistent options fail immediately.
 
 ## Default configuration
 
 ```json
 {
-  "design": "random-coordinator-v2",
+  "design": "cassandra-driver-policy-v3",
+  "routing": {
+    "policy": "token_aware_dc_aware",
+    "local_dc": "dc1"
+  },
   "seed": null,
-  "repetitions": 10,
-  "rounds": 10,
+  "repetitions": 50,
+  "rounds": 50,
   "models": ["RYW", "MR", "MW", "WFR"],
   "consistency_configs": [
-    "ONE/ONE",
-    "QUORUM/ONE",
-    "ONE/QUORUM",
-    "QUORUM/QUORUM",
-    "ALL/ALL"
+    "ONE/ONE", "ONE/QUORUM", "ONE/ALL",
+    "QUORUM/ONE", "QUORUM/QUORUM", "QUORUM/ALL",
+    "ALL/ONE", "ALL/QUORUM", "ALL/ALL"
   ],
   "scenarios": ["normal", "node_failure", "network_partition"],
   "enabled_experiments": [
@@ -53,7 +55,24 @@ JSON keys and string values are case-sensitive. JSON does not allow comments or 
 
 A nonempty design identifier saved in keys, evidence, and provenance. Letters, digits, hyphens, and underscores are appropriate; the normalized value must be a safe identifier. Change it when experiment semantics or the evidence schema change materially. Do not change it only to relabel old evidence.
 
-Default: `random-coordinator-v2`.
+Default: `cassandra-driver-policy-v3`.
+
+### `routing`
+
+The routing object is fixed for this design:
+
+```json
+{
+  "policy": "token_aware_dc_aware",
+  "local_dc": "dc1"
+}
+```
+
+- `TokenAwarePolicy` uses the statement keyspace and partition routing key to prefer replicas.
+- `DCAwareRoundRobinPolicy` orders hosts in the configured local datacenter and supplies fallback ordering.
+- With RF=3 on three nodes, every node is a replica; token awareness therefore preserves all three healthy nodes as local replica choices.
+- The driver excludes hosts it considers down. The experiment controller never supplies a preferred coordinator.
+- Retries and speculative execution remain disabled so one logical operation is not silently repeated elsewhere.
 
 ### `seed`
 
@@ -63,7 +82,7 @@ Either `null` or an integer.
 - Integer: the configured value is used unless `--seed` is supplied.
 - `--seed N`: overrides the file for that invocation.
 
-The runner derives independent routing, case-order, fault-victim, and topology seeds using SHA-256 and saves them in `seeds.json`. Reusing a seed reconstructs intended pseudorandom choices for the same source/configuration and candidate sets. It cannot reproduce Cassandra timing, failure-detection timing, or distributed responses exactly.
+The runner derives independent case-order, fault-victim, and topology seeds using SHA-256 and saves them in `seeds.json`. Reusing a seed reconstructs those experiment choices. Coordinator selection is controlled by live driver policy state and is not seed-replayable. A seed also cannot reproduce Cassandra timing, failure-detection timing, or distributed responses exactly.
 
 ### `repetitions` and `rounds`
 
@@ -217,13 +236,13 @@ When `timestamp_control` is enabled:
 timestamp = rounds
 ```
 
-Default:
+Current default:
 
 ```text
-main        = 10 × 3 × 5 × 4 = 600
-read repair = 10 × 2         = 20
-timestamp   = 10             = 10
-total                            630
+main        = 50 × 3 × 9 × 4 = 5,400
+read repair = 50 × 2         =   100
+timestamp   = 50             =    50
+total                          5,550
 ```
 
 Use `--plan-only` as the authoritative count check for an edited profile.
@@ -234,12 +253,12 @@ Use the default file and an explicit seed:
 
 ```sh
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --seed 20260927 \
   --plan-only
 
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --seed 20260927
 ```
 
@@ -251,7 +270,11 @@ Copy the default JSON to a separately named file and edit only the diagnostic se
 
 ```json
 {
-  "design": "random-coordinator-v2",
+  "design": "cassandra-driver-policy-v3",
+  "routing": {
+    "policy": "token_aware_dc_aware",
+    "local_dc": "dc1"
+  },
   "seed": 1001,
   "repetitions": 1,
   "rounds": 1,
