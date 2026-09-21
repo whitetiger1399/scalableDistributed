@@ -64,7 +64,94 @@ The two experiment designs differ mainly in **who selects the Cassandra coordina
 
 The previous inconclusive total contains operation errors, dependency-not-observed outcomes, and successor-not-observed outcomes. All 443 inconclusive outcomes in the new run were caused by operation errors.
 
-## 6. Effect on consistency-model testing
+## 6. What RF=3 means in both setups
+
+The phrase “write to a node” refers to sending the request to a **coordinator**. It does not mean that Cassandra stores the mutation only on that coordinator.
+
+The request flow in both experiment designs is:
+
+```text
+Application
+    │
+    ▼
+Selected coordinator
+    │
+    ▼
+Coordinator sends the mutation to the replicas
+    │
+    ▼
+Consistency level determines how many responses are required
+```
+
+The database behavior is the same in both designs:
+
+- The replication factor is 3.
+- The cluster contains exactly three Cassandra nodes.
+- Therefore, all three nodes are replicas for every experiment key.
+- A coordinator normally forwards a write to all replicas that it can reach.
+- The write consistency level controls how many acknowledgements are required before the client sees success.
+- `ONE` requires one replica acknowledgement.
+- `QUORUM` requires two replica acknowledgements.
+- `ALL` requires acknowledgements from all three replicas.
+- The read consistency level similarly controls how many replicas must participate in a read.
+
+Consequently, the previous setup did not randomly choose the only node that would store the data. It randomly chose the coordinator that received the client request. Cassandra still controlled replica communication and storage.
+
+### Normal operation
+
+When all three replicas are reachable, a successful write is normally delivered to all three replicas even when the requested consistency level is `ONE`. The client can return after the required acknowledgement count is reached, while slower replica work may finish afterward.
+
+The statement that data will “eventually replicate to all three nodes” is generally reasonable during healthy operation, but it is not an unconditional guarantee for every fault execution. During a failure or partition, some replicas may not receive the mutation.
+
+This experiment disables hinted handoff. Therefore, a replica that misses a write is not guaranteed to receive it later through a stored hint. Convergence may instead require a successful read repair, explicit repair, or another later mutation.
+
+## 7. What changed in the new setup
+
+The replication factor, replica set, consistency levels, Cassandra write path, and Cassandra read path did not change. The changed component is the method used to select the **coordinator**.
+
+### Previous setup
+
+```text
+Operation 1 → harness randomly chooses n1
+Operation 2 → harness independently chooses n3
+Operation 3 → harness independently chooses n2
+```
+
+- Every operation made a fresh independent coordinator choice.
+- Operations on the same key frequently reached different coordinators.
+- During a partition, one logical client could easily move between the majority and isolated sides.
+- This made it more likely that the client would observe replicas with different versions of the data.
+
+### New setup
+
+```text
+Operation 1 → driver prefers the first replica for key K
+Operation 2 → driver usually prefers the same replica for key K
+Operation 3 → driver usually prefers the same replica for key K
+```
+
+- The application provides the routing key but does not select a node.
+- The driver calculates the replicas for that routing key.
+- `TokenAwarePolicy` places those replicas first in its query plan.
+- The default stable replica ordering normally gives the same key the same preferred coordinator.
+- The driver changes coordinator when the preferred host is unavailable, is marked down, or cannot be used.
+
+Because RF=3 equals the cluster size, every node is a replica. Token awareness does not reduce the replica set below three nodes, but the stable ordering still creates a strong preference for one coordinator for a particular key.
+
+## 8. Expected experimental difference
+
+| Scenario | Previous randomized coordinator | New driver-selected coordinator | Expected result difference |
+|---|---|---|---|
+| Normal operation | Operations move among healthy coordinators | Operations normally stay with one preferred coordinator | Both should usually show no violations because replicas can communicate and converge |
+| One node stopped | Harness removes the stopped node and samples a survivor | Driver detects or skips the unusable host and selects a survivor | Similar consistency results: `ONE` and `QUORUM` can complete; `ALL` cannot |
+| 2\|1 network partition | Successive operations frequently cross partition sides | Successive operations for one key normally stay on one side | New setup should expose far fewer stale or reordered observations |
+| Coordinator on majority side | Randomly occurs per operation | Stable preferred coordinator may remain on majority side | `ONE` and `QUORUM` can usually complete |
+| Coordinator on isolated side | Randomly occurs per operation | Stable preferred coordinator may remain isolated | `ONE` may complete locally; `QUORUM` and `ALL` fail |
+| Cross-cut client history | Common | Rare | Previous setup has a much higher chance of producing a consistency violation witness |
+
+The two designs should produce broadly similar **availability rules** because Cassandra quorum arithmetic did not change. They can produce very different **observed consistency results** because the route sequence determines whether a client sees divergent replicas.
+
+## 9. Expected difference by consistency model
 
 | Consistency model | Previous randomized setup | New driver-policy setup |
 |---|---|---|
@@ -73,7 +160,37 @@ The previous inconclusive total contains operation errors, dependency-not-observ
 | Monotonic writes (MW) | Predecessor and successor writes could reach different partition components | Both writes normally followed the same token-aware coordinator preference |
 | Writes-follow-reads (WFR) | Dependency read, dependent write, and observer read frequently used different coordinators | The stable replica order usually kept the dependency history within one component |
 
-## 7. Fault-scenario interpretation
+### Read-your-writes
+
+- A RYW violation requires a successful write followed by a read that does not return that write.
+- Independent random routing makes it easier for the write and read to use different partition components.
+- Stable driver routing makes the following read likely to return to the same coordinator and component as the write.
+- Therefore, fewer RYW violations are expected in the new setup even though weak consistency still does not provide a universal RYW guarantee.
+
+### Monotonic reads
+
+- An MR violation requires the client to observe a newer value and later observe an older value.
+- Random routing frequently moves the two reads between replicas with different states.
+- Stable driver routing normally keeps both reads on the same preferred replica.
+- Therefore, the new setup is less likely to expose read regression.
+
+### Monotonic writes
+
+- An MW witness requires an observer to see the successor write without seeing its predecessor.
+- Independent routing makes it possible for predecessor and successor writes to reach different sides of a partition.
+- Stable driver routing usually sends both writes through the same coordinator and reachable component.
+- Therefore, the new setup is less likely to create or expose the required reordered visibility.
+
+### Writes-follow-reads
+
+- A WFR witness requires a client to read a dependency, issue a dependent write, and later expose the dependent write without the original dependency.
+- Random routing gives each phase a greater chance of reaching a different component.
+- Stable token-aware routing normally keeps the dependency chain on one preferred coordinator.
+- Therefore, fewer WFR witnesses are expected in the new setup.
+
+These expected reductions concern the probability of **observing a witness**. They do not convert weak consistency configurations into formal guarantees.
+
+## 10. Fault-scenario interpretation
 
 ### Normal operation
 
@@ -95,7 +212,7 @@ The previous inconclusive total contains operation errors, dependency-not-observ
 - `QUORUM` could complete on the two-node side but not through a coordinator on the isolated side.
 - Both cross-cut histories in the new run became inconclusive because a quorum operation failed.
 
-## 8. Advantages and limitations
+## 11. Advantages and limitations
 
 ### Previous randomized setup
 
@@ -126,7 +243,7 @@ The previous inconclusive total contains operation errors, dependency-not-observ
 - The run has little power to detect consistency violations requiring observations from divergent components.
 - Increasing the trial count alone does not remove the structural preference for the same first replica.
 
-## 9. Academic interpretation
+## 12. Academic interpretation
 
 - The previous experiment answers: **What can happen when successive client operations reach independently selected coordinators?**
 - The new experiment answers: **What does a client observe when Cassandra's standard token-aware driver policy chooses coordinators?**
@@ -136,7 +253,7 @@ The previous inconclusive total contains operation errors, dependency-not-observ
 - Zero violations in the new run means **no violation was observed along the routes that the driver selected**.
 - It does not prove that Cassandra guarantees RYW, MR, MW, or WFR for every execution or consistency configuration.
 
-## 10. Related project evidence
+## 13. Related project evidence
 
 - Previous pooled results: `report/violation_matrix_v2.md`.
 - New driver-policy results: `report/violation_matrix_v3.md`.
