@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the randomized-design report and reproduction archive from verified evidence."""
+"""Build the Cassandra-driver-policy report and reproduction archive."""
 import argparse
 from collections import Counter, defaultdict
 import hashlib
@@ -78,14 +78,14 @@ def build_markdown(run, validation):
         "",
         "## Abstract",
         "",
-        f"We tested read-your-writes (RYW), monotonic reads (MR), monotonic writes (MW), and writes-follow-reads (WFR) on a three-node Cassandra 5.0.9 cluster. Every application operation independently selected a random CQL coordinator from the endpoints reachable to the client. The verified evidence contains {len(trials)} main histories, {len(repairs)} read-repair attempts, and {len(timestamps)} timestamp controls. Main results comprise "
+        f"We tested read-your-writes (RYW), monotonic reads (MR), monotonic writes (MW), and writes-follow-reads (WFR) on a three-node Cassandra 5.0.9 cluster. Every application operation delegated coordinator selection to the Python driver's token-aware, datacenter-aware policy. The verified evidence contains {len(trials)} main histories, {len(repairs)} read-repair attempts, and {len(timestamps)} timestamp controls. Main results comprise "
         f"{totals['violation']} violation witnesses, {totals['no_violation_observed']} completed histories without a witness, and {totals['inconclusive']} inconclusive histories.",
         "",
         "## System and installation",
         "",
         "The deployment uses three Docker containers in one datacenter (`dc1`) with NetworkTopologyStrategy replication factor 3. All three nodes own replicas for every experiment key. Cassandra is 5.0.9; the Python client image is 3.11.13 and uses cassandra-driver 3.29.2. Base images are pinned by digest. Hinted handoff is deliberately disabled, driver retries and speculative execution are disabled, and main tables use `read_repair=BLOCKING`.",
         "",
-        "Install Docker Compose, allocate about 8 GB and four CPU cores, then run `python3 scripts/run_randomized.py --plan-only` followed by `python3 scripts/run_randomized.py --config config/randomized_experiments.json`. Validate using `python3 scripts/verify_randomized.py <run>` and build this report with `python3 scripts/build_report.py --results <run>`.",
+        "Install Docker Compose, allocate about 8 GB and four CPU cores, then run `python3 scripts/run_randomized.py --plan-only` followed by `python3 scripts/run_randomized.py --config config/cassandra_driver_experiments.json`. Validate using `python3 scripts/verify_randomized.py <run>` and build this report with `python3 scripts/build_report.py --results <run>`.",
         "",
         "## Configuration and predictions",
         "",
@@ -93,13 +93,13 @@ def build_markdown(run, validation):
         "",
         markdown_table(["Write/read", "RYW", "MR with BLOCKING", "MW/WFR observable"], predictions),
         "",
-        "These predictions were registered before the randomized measurements. Random routing may select the same coordinator repeatedly; this is a valid random outcome and was not filtered.",
+        "These predictions were registered before measurement. Driver routing may select the same coordinator repeatedly; coordinator choices were not filtered or overridden.",
         "",
         "## Experimental method",
         "",
         f"The {plan['profile']} matrix uses {plan['rounds']} attempt{'s' if plan['rounds'] != 1 else ''} for every selected model/configuration/scenario cell. Each trial starts with a unique key initialized to `(a=0,b=0)` at ALL. RYW tests write then read by one logical client. MR performs a producer write then two reads by one client. MW and WFR search for the observable counterexample `(a=0,b=1)`, where a successor is visible without its predecessor. This is a finite dependency-visibility test; it does not reconstruct every replica's execution order.",
         "",
-        "The router draws independently with replacement for every operation and saves the selected endpoint, candidate set, draw number, requested consistency level, actual coordinator, timing and response. Logical client identities preserve session order even when operations use different backend connections.",
+        "The application supplies a partition routing key but no coordinator. TokenAwarePolicy first considers local replicas, while DCAwareRoundRobinPolicy supplies the local-datacenter ordering and fallback. Evidence saves driver-eligible hosts, attempted hosts, actual coordinator, requested consistency level, timing and response. Retries and speculative execution are disabled. Logical client identities preserve session order when coordinators change.",
         "",
         "For node failure, the runner samples a victim, records its container ID/IP, sends SIGKILL, proves the container stopped, and waits until both survivors report that exact IP as down in consecutive membership observations. It then runs the histories, restarts the same container with its volume retained, and waits for all three nodes to be healthy.",
         "",
@@ -129,7 +129,7 @@ def build_markdown(run, validation):
         "",
         f"The evidence validator accepted the evidence schema, all {validation['main_trials']} main histories, exact per-case coverage, {validation['read_repair_trials']} read-repair attempts, {validation['timestamp_trials']} timestamp controls, routing metadata, setup/fault links and recomputed verdicts. Runtime revision information and dirty-worktree status are preserved in `environment.json`; the root and derived random seeds are in `seeds.json`. The archive includes the selected evidence, configuration, experiment modules, source, tests, instructions and report.",
         "",
-        "Sources: Apache Cassandra [Dynamo architecture](https://cassandra.apache.org/doc/5.0/cassandra/architecture/dynamo.html), [read repair](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/read_repair.html), [hints](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/hints.html), and [CQL DML](https://cassandra.apache.org/doc/5.0/cassandra/developing/cql/dml.html). Docker and Python package versions are recorded in the project Dockerfiles and requirements.",
+        "Sources: Apache Cassandra [Dynamo architecture](https://cassandra.apache.org/doc/5.0/cassandra/architecture/dynamo.html), [read repair](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/read_repair.html), [hints](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/hints.html), and [CQL DML](https://cassandra.apache.org/doc/5.0/cassandra/developing/cql/dml.html); DataStax Python driver 3.29 [load-balancing policies](https://docs.datastax.com/en/developer/python-driver/3.29/api/cassandra/policies/). Docker and Python package versions are recorded in the project Dockerfiles and requirements.",
         "",
         "OpenAI Codex assisted with design review, implementation, documentation lookup, code generation, testing, experiment orchestration, evidence validation, analysis and report generation. Database outcomes in this report come only from the verified saved evidence; AI did not invent or replace measurements. Group members must review the code, results and interpretations before submission.",
         "",
@@ -183,7 +183,7 @@ def render_pdf(markdown, pdf):
 
     def footer(canvas, document):
         canvas.saveState(); canvas.setFont("Helvetica", 8); canvas.setFillColor(colors.grey)
-        canvas.drawString(15 * mm, 10 * mm, "Cassandra randomized consistency experiments")
+        canvas.drawString(15 * mm, 10 * mm, "Cassandra driver-policy consistency experiments")
         canvas.drawRightString(A4[0] - 15 * mm, 10 * mm, str(document.page)); canvas.restoreState()
     doc = SimpleDocTemplate(str(pdf), pagesize=A4, rightMargin=15*mm, leftMargin=15*mm,
                             topMargin=14*mm, bottomMargin=16*mm,
@@ -205,7 +205,7 @@ def verify_source_manifest(environment):
         raise ValueError("current source differs from measured source: " + ", ".join(changed))
 
 
-def package(run, outputs, prefix="randomized"):
+def package(run, outputs, prefix="driver_policy"):
     include = [ROOT / name for name in ("README.md", "WORK_IN_PROGRESS.md", "Project_Assignment.md",
                "AGENT_ACTION_PLAN.md", "compose.yaml", "Dockerfile.cassandra", "Dockerfile.client",
                "requirements-report.txt", "report/predictions.md", "report/authors.json")]
@@ -229,7 +229,7 @@ def package(run, outputs, prefix="randomized"):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results", type=Path, required=True,
-                        help="explicit randomized evidence directory; latest-run selection is forbidden")
+                        help="explicit driver-policy evidence directory; latest-run selection is forbidden")
     parser.add_argument("--allow-smoke", action="store_true",
                         help="render a clearly labelled smoke artifact for integration testing")
     args = parser.parse_args()
@@ -241,7 +241,7 @@ def main():
     verify_source_manifest(load(run / "environment.json"))
     report_dir = ROOT / "report"
     report_dir.mkdir(exist_ok=True)
-    prefix = "Randomized" if plan.get("profile") == "full" else "Smoke_Randomized"
+    prefix = "Driver_Policy" if plan.get("profile") == "full" else "Smoke_Driver_Policy"
     markdown_path = report_dir / f"{prefix}_Cassandra_Consistency_Report.md"
     pdf_path = report_dir / f"{prefix}_Cassandra_Consistency_Report.pdf"
     markdown = build_markdown(run, validation)
@@ -249,7 +249,7 @@ def main():
     render_pdf(markdown, pdf_path)
     try:
         import fitz
-        qa = report_dir / "qa_randomized"
+        qa = report_dir / "qa_driver_policy"
         qa.mkdir(exist_ok=True)
         document = fitz.open(pdf_path)
         for number, page in enumerate(document, 1):

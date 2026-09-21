@@ -1,12 +1,28 @@
 {
   "design": "random-coordinator-v2",
   "seed": null,
-  "repetitions": 10,
-  "rounds": 10,
+  "repetitions": 50,
+  "rounds": 50,
   "models": ["RYW", "MR", "MW", "WFR"],
-  "consistency_configs": ["ONE/ONE", "ONE/QUORUM", "ONE/ALL", "QUORUM/ONE", "QUORUM/QUORUM", "QUORUM/ALL", "ALL/ONE", "ALL/QUORUM", "ALL/ALL"],
+  "consistency_configs": [
+    "ONE/ONE",
+    "ONE/QUORUM",
+    "ONE/ALL",
+    "QUORUM/ONE",
+    "QUORUM/QUORUM",
+    "QUORUM/ALL",
+    "ALL/ONE",
+    "ALL/QUORUM",
+    "ALL/ALL"
+  ],
   "scenarios": ["normal", "node_failure", "network_partition"],
-  "enabled_experiments": ["session_guarantees", "node_failure", "network_partition", "read_repair", "timestamp_control"],
+  "enabled_experiments": [
+    "session_guarantees",
+    "node_failure",
+    "network_partition",
+    "read_repair",
+    "timestamp_control"
+  ],
   "faults": {
     "failure_detection_timeout_seconds": 90,
     "recovery_timeout_seconds": 600,
@@ -18,7 +34,7 @@
   },
   "database": {
     "replication_factor": 3,
-    "read_repair_tables": {"blocking": "BLOCKING", "no_repair": "NONE"},
+    "read_repair_tables": { "blocking": "BLOCKING", "no_repair": "NONE" },
     "hints_enabled": false
   }
 }

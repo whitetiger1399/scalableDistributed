@@ -1,17 +1,51 @@
-"""Seeded random routing, separate from the application workload."""
-import random
+"""Evidence helpers for Cassandra-driver coordinator selection."""
+
+POLICY_NAME = "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
 
 
-class RandomRouter:
-    def __init__(self, seed, candidates):
-        self.rng = random.Random(seed)
-        self.candidates = sorted(candidates)
-        self.draw = 0
+def host_address(host):
+    """Return a stable address string for a driver Host or test double."""
+    address = getattr(host, "address", None)
+    if address is not None:
+        return str(address)
+    return str(host).rsplit(":", 1)[0]
 
-    def select(self):
-        if not self.candidates:
-            raise RuntimeError('No client-reachable CQL endpoint')
-        node = self.rng.choice(self.candidates)
-        result = dict(selected_node=node, candidates=list(self.candidates), draw=self.draw)
-        self.draw += 1
-        return result
+
+class DriverRoutingEvidence:
+    """Record driver-visible hosts and the coordinator it actually selected.
+
+    This class does not choose a host. TokenAwarePolicy and its
+    DCAwareRoundRobinPolicy child own coordinator selection.
+    """
+
+    def __init__(self, address_to_node, local_dc):
+        self.address_to_node = dict(address_to_node)
+        self.local_dc = local_dc
+        self.operation_index = 0
+
+    def node_name(self, host):
+        if host is None:
+            return None
+        address = host_address(host)
+        return self.address_to_node.get(address, address)
+
+    def begin(self, hosts):
+        eligible = sorted(
+            self.node_name(host)
+            for host in hosts
+            if getattr(host, "is_up", True) is not False
+            and getattr(host, "datacenter", self.local_dc) == self.local_dc
+        )
+        route = {
+            "policy": POLICY_NAME,
+            "local_dc": self.local_dc,
+            "operation_index": self.operation_index,
+            "eligible_nodes": eligible,
+        }
+        self.operation_index += 1
+        return route
+
+    def finish(self, route, coordinator_host, attempted_hosts):
+        route["selected_node"] = self.node_name(coordinator_host)
+        route["attempted_nodes"] = [self.node_name(host) for host in attempted_hosts]
+        return route

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class ConfigurationTests(unittest.TestCase):
     def setUp(self):
-        self.raw = json.loads((ROOT/'config/randomized_experiments.json').read_text())
+        self.raw = json.loads((ROOT/'config/cassandra_driver_experiments.json').read_text())
 
     def test_default_is_valid(self):
         self.assertEqual(normalize(self.raw)['profile'], 'full')
@@ -21,6 +21,11 @@ class ConfigurationTests(unittest.TestCase):
     def test_unsupported_runtime_setting_is_rejected(self):
         self.raw['database']['replication_factor'] = 2
         with self.assertRaisesRegex(ValueError, 'replication_factor'):
+            normalize(self.raw)
+
+    def test_custom_coordinator_policy_is_rejected(self):
+        self.raw['routing']['policy'] = 'uniform_random'
+        with self.assertRaisesRegex(ValueError, 'routing'):
             normalize(self.raw)
 
     def test_duplicate_case_is_rejected(self):

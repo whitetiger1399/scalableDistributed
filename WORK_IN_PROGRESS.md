@@ -1,6 +1,19 @@
 # Current snapshot status
 
-This snapshot contains the completed original Cassandra experiment project and the **parameterized randomized-routing redesign** requested afterward.
+This snapshot contains the completed original Cassandra experiment project, the historical uniform-random-routing redesign, and the current **Cassandra driver-policy routing design**.
+
+## Cassandra driver-policy implementation
+
+- Active development branch: `cassandra-driver-routing`.
+- `src/worker.py` delegates coordinator selection to `TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc="dc1"))`.
+- Every measured statement supplies keyspace `lab` and its partition routing key.
+- Driver retries and speculative execution are disabled; errors remain visible to the experiment.
+- `src/routing.py` records driver-eligible hosts, attempted hosts, and the actual coordinator without choosing a node itself.
+- `config/cassandra_driver_experiments.json` is the current configuration and uses design ID `cassandra-driver-policy-v3`.
+- New evidence uses schema `cassandra-driver-policy-evidence-v4` and directories named `results/cassandra_policy_<run>/`.
+- Historical v3 randomized evidence is intentionally incompatible and must not be pooled with v4 evidence.
+- The current protocol is documented in `docs/cassandra-driver-policy-plan.md`.
+- Unit tests and plan-only validation pass; no Cassandra measurements have been run for this new design yet.
 
 ## Completed original experiments
 

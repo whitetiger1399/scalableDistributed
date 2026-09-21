@@ -13,7 +13,8 @@ from checks import evaluate
 from experiments.configuration import expected_main_trials, normalize
 from experiments import read_repair, timestamp_control
 
-SCHEMA = "randomized-cassandra-evidence-v3"
+SCHEMA = "cassandra-driver-policy-evidence-v4"
+ROUTING_POLICY = "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
 
 
 class EvidenceError(ValueError):
@@ -66,14 +67,22 @@ def verify_operation(operation, key, expected_cl, sequence):
     require(operation.get("start_ns", 1) <= operation.get("end_ns", 0), "operation time is reversed")
     route = operation.get("routing")
     require(isinstance(route, dict), "operation lacks routing evidence")
-    require(route.get("selected_node") in route.get("candidates", []), "selected route is not a candidate")
-    require(len(route.get("candidates", [])) == len(set(route.get("candidates", []))),
-            "routing candidates contain duplicates")
-    require(isinstance(route.get("draw"), int) and route["draw"] >= 0,
-            "routing draw is invalid")
-    require(operation.get("node") == route.get("selected_node"), "requested node differs from selected route")
+    require(route.get("policy") == ROUTING_POLICY, "unexpected coordinator policy")
+    require(route.get("local_dc") == "dc1", "unexpected routing datacenter")
+    eligible = route.get("eligible_nodes")
+    require(isinstance(eligible, list) and len(eligible) == len(set(eligible)),
+            "driver eligible-node evidence is invalid")
+    require(isinstance(route.get("operation_index"), int) and route["operation_index"] >= 0,
+            "routing operation index is invalid")
+    selected = route.get("selected_node")
+    require(operation.get("node") == selected, "actual coordinator differs from routing evidence")
+    require(selected is None or selected in eligible, "actual coordinator was not driver-eligible")
+    attempted = route.get("attempted_nodes")
+    require(isinstance(attempted, list), "attempted-host evidence is invalid")
+    require(operation.get("routing_key") == key, "operation lacks the partition routing key")
     if operation.get("status") == "ok":
-        require(operation.get("coordinator"), "successful operation lacks actual coordinator")
+        require(operation.get("coordinator") and selected,
+                "successful operation lacks actual coordinator")
     require(isinstance(operation.get("client_id"), str), "operation lacks logical client identity")
 
 
@@ -115,10 +124,10 @@ def verify_faults(faults, plan, trials):
         verify_initialization(record.get("initialization"), len(schedule),
                               [case.get("key") for case in schedule])
         episode_trials = record.get("trials", [])
-        draws = [operation["routing"]["draw"] for trial in episode_trials
-                 for operation in trial.get("operations", [])]
-        require(draws == list(range(len(draws))),
-                f"episode {episode_id} routing draws are not continuous")
+        operation_indexes = [operation["routing"]["operation_index"] for trial in episode_trials
+                             for operation in trial.get("operations", [])]
+        require(operation_indexes == list(range(len(operation_indexes))),
+                f"episode {episode_id} routing indexes are not continuous")
         require("recovery_error" not in record, f"episode {episode_id} failed recovery")
         if scenario == "node_failure":
             fault = record.get("fault") or {}
@@ -149,6 +158,18 @@ def verify_controls(run, plan, completion):
         require(item.get("verdict") in {"regression", "no_regression_observed", "inconclusive"},
                 "invalid read-repair verdict")
         require("recovery_error" not in item, "read-repair cleanup failed")
+        key = item["case"]["key"]
+        for field, kind, cl in (("write", "write", "ONE"),
+                                ("first", "read", "QUORUM"),
+                                ("second", "read", "QUORUM")):
+            response = item.get(field)
+            require(isinstance(response, dict), f"read-repair {field} response is missing")
+            records = response.get("records")
+            require(isinstance(records, list) and len(records) == 1,
+                    f"read-repair {field} operation count mismatch")
+            operation = records[0]
+            require(operation.get("kind") == kind, f"read-repair {field} kind mismatch")
+            verify_operation(operation, key, cl, 0)
     timestamp_ids = [item.get("case", {}).get("attempt_id") for item in timestamps]
     require(len(timestamp_ids) == len(set(timestamp_ids)), "duplicate timestamp attempt ID")
     for item in timestamps:
@@ -157,6 +178,13 @@ def verify_controls(run, plan, completion):
                 "invalid timestamp verdict")
         require(item.get("timestamps", [0, 0])[0] > item.get("timestamps", [0, 0])[1],
                 "timestamp control did not reverse application order")
+        key = item["case"]["key"]
+        records = item.get("result", {}).get("records")
+        require(isinstance(records, list) and len(records) == 3,
+                "timestamp control operation count mismatch")
+        for sequence, (operation, kind) in enumerate(zip(records, ("write", "write", "read"))):
+            require(operation.get("kind") == kind, "timestamp control operation kind mismatch")
+            verify_operation(operation, key, "ALL", sequence)
     require(completion.get("read_repair_trials") == len(repairs), "completion repair count mismatch")
     require(completion.get("timestamp_trials") == len(timestamps), "completion timestamp count mismatch")
     return repairs, timestamps

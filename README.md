@@ -2,15 +2,15 @@
 
 This project studies client-centric consistency in a replicated Apache Cassandra 5.0.9 cluster. It tests read-your-writes (RYW), monotonic reads (MR), monotonic writes (MW), and writes-follow-reads (WFR) under normal operation, an abrupt Cassandra-node failure, and an internode network partition.
 
-The application never chooses a Cassandra node. It submits a read or write to a customer-facing client API, and a seeded gateway independently chooses a client-reachable CQL coordinator for every operation. Cassandra then chooses the replicas involved in the request. With three nodes and replication factor 3, every node stores a replica; `ONE`, `QUORUM`, and `ALL` control the number of required replica responses, not a specific storage node.
+The application never chooses a Cassandra node. It submits a read or write to a customer-facing client API, and the Cassandra Python driver's `TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc="dc1"))` selects the coordinator. Every measured statement supplies its partition routing key. Cassandra then chooses the replicas involved in the request. With three nodes and replication factor 3, every node stores a replica; `ONE`, `QUORUM`, and `ALL` control the number of required replica responses, not a specific storage node.
 
-The default full plan contains 630 attempts:
+The default full plan contains 5,550 attempts:
 
-- 600 main histories: 10 rounds × 3 scenarios × 5 write/read consistency pairs × 4 models;
-- 20 read-repair attempts: 10 using `BLOCKING` and 10 using `NONE`; and
-- 10 decreasing-timestamp controls.
+- 5,400 main histories: 50 rounds × 3 scenarios × 9 write/read consistency pairs × 4 models;
+- 100 read-repair attempts: 50 using `BLOCKING` and 50 using `NONE`; and
+- 50 decreasing-timestamp controls.
 
-No result is accepted merely because the runner exits. A separate verifier checks exact coverage, initialization, operation order, random-routing evidence, consistency levels, fault evidence, cleanup, controls, and recomputed verdicts. The report builder accepts only explicit, complete, verified evidence.
+No result is accepted merely because the runner exits. A separate verifier checks exact coverage, initialization, operation order, driver-policy evidence, routing keys, actual coordinators, consistency levels, fault evidence, cleanup, controls, and recomputed verdicts. The report builder accepts only explicit, complete, verified evidence.
 
 ## Repository layout
 
@@ -19,27 +19,29 @@ No result is accepted merely because the runner exits. A separate verifier check
 | `compose.yaml` | Three Cassandra services and one client service on a private Docker network |
 | `Dockerfile.cassandra` | Pinned Cassandra 5.0.9 image, `iptables`, and hints-disabled experiment setting |
 | `Dockerfile.client` | Pinned Python client and cassandra-driver 3.29.2 |
-| `config/randomized_experiments.json` | Main experiment configuration |
+| `config/cassandra_driver_experiments.json` | Main driver-policy experiment configuration |
+| `config/randomized_experiments.json` | Historical uniform-random-routing configuration; incompatible with the new evidence schema |
 | `experiments/configuration.py` | Shared configuration validation and count calculation |
 | `experiments/workloads/` | Separate RYW, MR, MW, and WFR operation schedules |
 | `experiments/faults.py` | SIGKILL, failure detection, partition rules, cleanup, and recovery |
 | `experiments/read_repair.py` | Read-repair control schedule and topology choices |
 | `experiments/timestamp_control.py` | Decreasing-timestamp control schedule |
-| `src/routing.py` | Seeded, uniform random coordinator selection with replacement |
+| `src/routing.py` | Evidence recorder for driver-eligible, attempted, and selected coordinator hosts |
 | `src/worker.py` | Customer API, CQL transport, schema checks, and operation recording |
 | `src/checks.py` | Finite-history verdicts, reason codes, and coverage fields |
 | `scripts/run_randomized.py` | Planner and experiment runner |
 | `scripts/verify_randomized.py` | Independent evidence validator |
 | `scripts/build_report.py` | Verified-evidence PDF/Markdown report and reproduction archive builder |
 | `tests/` | Classifier, configuration, routing, fault-parser, and verifier tests |
-| `docs/randomized-experiment-plan.md` | Detailed experimental rationale and protocol |
+| `docs/cassandra-driver-policy-plan.md` | Current driver-policy rationale and protocol |
+| `docs/randomized-experiment-plan.md` | Historical uniform-random-routing protocol |
 | `docs/configuration-reference.md` | Every configuration field, allowed value, and effect |
 | `docs/execution-guide.md` | Operational phases, fault injection, recovery, and troubleshooting |
 | `report/predictions.md` | Predictions registered before a measured run |
 | `report/authors.json` | Course and group-member information used by the report |
-| `results/randomized_<run>/` | One immutable evidence directory per randomized run |
+| `results/cassandra_policy_<run>/` | One immutable evidence directory per driver-policy run |
 
-The old fixed-coordinator runner and historical artifacts are retained for provenance. Do not use `scripts/lab.py` with the redesigned worker, and do not combine historical fixed-route evidence with randomized evidence.
+The old fixed-coordinator and uniform-random artifacts are retained for provenance. Do not use `scripts/lab.py` with the redesigned worker, and do not combine evidence schema v3 with driver-policy evidence schema v4.
 
 ## Prerequisites
 
@@ -88,7 +90,7 @@ Complete these steps before starting Cassandra. The runner records SHA-256 hashe
 
 1. Fill in `report/authors.json` with the course and up to three group members.
 2. Review and finalize `report/predictions.md` before viewing new outcomes.
-3. Review `config/randomized_experiments.json` and the field-by-field [configuration reference](docs/configuration-reference.md).
+3. Review `config/cassandra_driver_experiments.json` and the field-by-field [configuration reference](docs/configuration-reference.md).
 4. Ensure the working source, instructions, predictions, and configuration are the exact versions to accompany the evidence.
 5. Do not edit hashed source files between the measured run and report generation. If a code, configuration, prediction, author, or documented-method change is required, create a new run afterward.
 
@@ -96,12 +98,12 @@ Validate the full plan without starting Docker:
 
 ```sh
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --seed 20260927 \
   --plan-only
 ```
 
-Expected default planning counts are 600 main, 20 read-repair, 10 timestamp, and 630 total attempts. `--plan-only` validates only the plan; it does not build containers or contact Cassandra.
+Expected default planning counts are 5,400 main, 100 read-repair, 50 timestamp, and 5,550 total attempts. `--plan-only` validates only the plan; it does not build containers or contact Cassandra.
 
 ## Optional integration smoke run
 
@@ -109,7 +111,7 @@ Use a smoke run after changing orchestration, Docker images, fault handling, or 
 
 ```sh
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --smoke \
   --repetitions 1 \
   --seed 1001
@@ -119,7 +121,7 @@ python3 scripts/run_randomized.py \
 
 ```sh
 .venv/bin/python scripts/build_report.py \
-  --results results/randomized_<smoke-run> \
+  --results results/cassandra_policy_<smoke-run> \
   --allow-smoke
 ```
 
@@ -131,7 +133,7 @@ Use an explicit seed so the intended case order, routes, fault victims, and topo
 
 ```sh
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --seed 20260927
 ```
 
@@ -140,10 +142,10 @@ The runner performs these phases:
 1. build and start the images and containers;
 2. wait until all three Cassandra nodes report healthy membership;
 3. create and inspect the keyspace and tables on every node;
-4. run ten randomized scenario rounds, with successful ALL initialization before each block;
+4. run the configured shuffled scenario rounds, with successful ALL initialization before each block;
 5. for a node-failure block, sample a victim, send SIGKILL, prove that exact container stopped, wait for both survivors to report its IP down, run the block, restart the same container, and verify recovery;
 6. for a partition block, sample one isolated node, add bilateral internode DROP rules while retaining CQL access, verify the intended 2|1 graph, run the block, record packet counters, remove only project rules, and verify recovery;
-7. run the `BLOCKING` and `NONE` read-repair controls through randomized overlapping quorum components;
+7. run the `BLOCKING` and `NONE` read-repair controls through seeded overlapping quorum components while the driver chooses coordinators;
 8. run the decreasing-timestamp controls; and
 9. write a completion marker only after all expected attempts exist.
 
@@ -160,19 +162,19 @@ advance after every attempt. Setup, fault detection, and recovery messages retai
 percentage because they do not count as measured attempts. Example:
 
 ```text
-[progress] [#####-------------------------]  19.05% (120/630) | session_guarantees | finished scenario=node_failure, round=3/10, saved_trials=20
+[progress] [#-----------------------------]   1.95% (108/5550) | session_guarantees | finished scenario=node_failure, round=1/50, saved_trials=36
 ```
 
 The evidence journal remains available for monitoring from another terminal without modifying files:
 
 ```sh
-tail -f results/randomized_<run>/events.jsonl
+tail -f results/cassandra_policy_<run>/events.jsonl
 ```
 
 To count durably saved main histories:
 
 ```sh
-jq length results/randomized_<run>/trials.json
+jq length results/cassandra_policy_<run>/trials.json
 ```
 
 Do not stop a run merely because an operation returns `Unavailable`, times out, or produces an unexpected value. Those are measured outcomes. Stop only for operational reasons; interrupted or setup-failed runs remain incomplete and must not be reported as complete.
@@ -183,13 +185,13 @@ If a run is interrupted, Docker exits, or the host restarts, start Docker and ru
 
 ```sh
 python3 scripts/run_randomized.py \
-  --config config/randomized_experiments.json \
+  --config config/cassandra_driver_experiments.json \
   --recover
 ```
 
 Recovery starts all three Cassandra containers, removes only rules in the project `LAB_FAULT` chain, and waits for all three nodes to return to healthy membership. It does not change an incomplete run into a complete run and does not delete its partial evidence.
 
-If `.randomized-run.lock` exists after a crash, it is not sufficient evidence that a controller is active: the operating-system lock, rather than the file's existence, controls concurrency.
+If `.cassandra-policy-run.lock` exists after a crash, it is not sufficient evidence that a controller is active: the operating-system lock, rather than the file's existence, controls concurrency.
 
 ## Validate evidence
 
@@ -197,7 +199,7 @@ Always pass the exact result directory. The verifier never selects a “latest�
 
 ```sh
 python3 scripts/verify_randomized.py \
-  results/randomized_<full-run>
+  results/cassandra_policy_<full-run>
 ```
 
 A valid full run must have:
@@ -207,11 +209,11 @@ A valid full run must have:
 - unique trial IDs and run-scoped keys;
 - successful, matching ALL initialization;
 - ordered operations with the requested consistency levels and logical-client IDs;
-- one auditable random route per operation;
+- one auditable driver-policy decision per operation, including routing key, eligible hosts, attempted hosts, and actual coordinator;
 - recomputed verdicts, reasons, and coverage equal to stored values;
 - exact fault-episode coverage, victim/partition proof, and recovery evidence;
-- ten attempts per read-repair setting; and
-- ten timestamp controls.
+- the configured number of attempts per read-repair setting; and
+- the configured number of timestamp controls.
 
 The verifier exits nonzero and prints `INVALID:` when any requirement fails. Do not edit raw JSON to make a failed run pass. Correct the implementation or environment and perform a new run.
 
@@ -221,16 +223,16 @@ Generate the submission artifacts only from a verified full run:
 
 ```sh
 .venv/bin/python scripts/build_report.py \
-  --results results/randomized_<full-run>
+  --results results/cassandra_policy_<full-run>
 ```
 
 The builder verifies the evidence again, checks that every source hash matches the measured source, and writes:
 
-- `report/Randomized_Cassandra_Consistency_Report.pdf`;
-- `report/Randomized_Cassandra_Consistency_Report.md`;
-- `report/randomized_SHA256SUMS.txt`;
-- `report/randomized_submission.zip`; and
-- rendered PDF pages under `report/qa_randomized/` for visual inspection.
+- `report/Driver_Policy_Cassandra_Consistency_Report.pdf`;
+- `report/Driver_Policy_Cassandra_Consistency_Report.md`;
+- `report/driver_policy_SHA256SUMS.txt`;
+- `report/driver_policy_submission.zip`; and
+- rendered PDF pages under `report/qa_driver_policy/` for visual inspection.
 
 Inspect every rendered page, check member/course information, and review the interpretation as a group. The archive contains the selected run, code, configuration, experiment modules, tests, predictions, documentation, author metadata, report, and checksum manifest.
 
@@ -258,7 +260,7 @@ docker compose down -v
 
 ## Configuration overview
 
-The default file is `config/randomized_experiments.json`. JSON does not support comments; keep explanations in documentation. Important relationships are:
+The default file is `config/cassandra_driver_experiments.json`. JSON does not support comments; keep explanations in documentation. Important relationships are:
 
 - `repetitions` and `rounds` must be equal;
 - a full profile requires at least 10 and all four consistency models;
