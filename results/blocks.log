@@ -3,16 +3,53 @@ nohup: ignoring input
    config:   config/randomized_experiments.json
    progress: results/blocks_progress
 
-[block 1/10] already completed (results/randomized_20260920T000159Z_36915629d2b6f5ad) - skipping
-[block 2/10] already completed (results/randomized_20260920T010744Z_0977bac4dcb260ac) - skipping
-[block 3/10] already completed (results/randomized_20260920T021504Z_dc8094a55ebf425f) - skipping
-[block 4/10] already completed (results/randomized_20260920T032029Z_4d1c6194b3309a6b) - skipping
-[block 5/10] already completed (results/randomized_20260920T042616Z_b3e212c5ede5c29f) - skipping
-[block 6/10] already completed (results/randomized_20260920T061739Z_e6f386623a3b950e) - skipping
-[block 7/10] recovering cluster to a clean state...
-[block 7/10] running 10-round matrix...
-/home/amritsat/scalableDistributed/results/randomized_20260920T093803Z_840000846ff9a34a
-[block 7/10] verifying results/randomized_20260920T093803Z_840000846ff9a34a ...
-INVALID: read-repair cleanup failed
-[block 7/10] VERIFICATION FAILED for results/randomized_20260920T093803Z_840000846ff9a34a. Stopping.
-   Inspect it with: python3 scripts/verify_randomized.py results/randomized_20260920T093803Z_840000846ff9a34a
+[block 1/10] recovering cluster to a clean state...
+[block 1/10] running 10-round matrix...
+[runner] Building and starting the Docker Compose environment...
+[runner] Docker Compose environment started; beginning experiment setup.
+[progress] [------------------------------]   0.00% (0/1110) | setup | run=20260920T134345Z_20f9bd4e519e46d5, profile=full, seed=2376138422489073365
+[progress] [------------------------------]   0.00% (0/1110) | setup | waiting for three-node Cassandra membership
+[progress] [------------------------------]   0.00% (0/1110) | setup | cluster healthy; creating and checking schema
+[progress] [------------------------------]   0.00% (0/1110) | setup | schema and client endpoint probes passed
+[progress] [------------------------------]   0.00% (0/1110) | session_guarantees | starting scenario=network_partition, round=1/10, trials=36; initializing keys
+[progress] [------------------------------]   0.00% (0/1110) | session_guarantees | scenario=network_partition, round=1/10; initialization complete
+[progress] [------------------------------]   0.00% (0/1110) | session_guarantees | scenario=network_partition, round=1/10; installing partition with isolated_node=n1
+[progress] [------------------------------]   0.00% (0/1110) | session_guarantees | scenario=network_partition, round=1/10; running 36 randomized trials
+[progress] [------------------------------]   3.24% (36/1110) | session_guarantees | finished scenario=network_partition, round=1/10, saved_trials=36
+[progress] [------------------------------]   3.24% (36/1110) | session_guarantees | scenario=network_partition, round=1/10; removing partition and verifying recovery
+[progress] [------------------------------]   3.24% (36/1110) | session_guarantees | starting scenario=normal, round=1/10, trials=36; initializing keys
+[progress] [------------------------------]   3.24% (36/1110) | session_guarantees | scenario=normal, round=1/10; initialization complete
+[progress] [------------------------------]   3.24% (36/1110) | session_guarantees | scenario=normal, round=1/10; running 36 randomized trials
+[progress] [#-----------------------------]   6.49% (72/1110) | session_guarantees | finished scenario=normal, round=1/10, saved_trials=36
+[progress] [#-----------------------------]   6.49% (72/1110) | session_guarantees | starting scenario=node_failure, round=1/10, trials=36; initializing keys
+[progress] [#-----------------------------]   6.49% (72/1110) | session_guarantees | scenario=node_failure, round=1/10; initialization complete
+[progress] [#-----------------------------]   6.49% (72/1110) | session_guarantees | scenario=node_failure, round=1/10; stopping n2 and waiting for failure detection
+[progress] [#-----------------------------]   6.49% (72/1110) | session_guarantees | scenario=node_failure, round=1/10; running 36 randomized trials
+[progress] [##----------------------------]   9.73% (108/1110) | session_guarantees | finished scenario=node_failure, round=1/10, saved_trials=36
+[progress] [##----------------------------]   9.73% (108/1110) | session_guarantees | scenario=node_failure, round=1/10; restarting n2 and verifying recovery
+[progress] [##----------------------------]   9.73% (108/1110) | session_guarantees | starting scenario=normal, round=2/10, trials=36; initializing keys
+[progress] [##----------------------------]   9.73% (108/1110) | session_guarantees | scenario=normal, round=2/10; initialization complete
+[progress] [##----------------------------]   9.73% (108/1110) | session_guarantees | scenario=normal, round=2/10; running 36 randomized trials
+[progress] [###---------------------------]  12.97% (144/1110) | session_guarantees | finished scenario=normal, round=2/10, saved_trials=36
+[progress] [###---------------------------]  12.97% (144/1110) | session_guarantees | starting scenario=node_failure, round=2/10, trials=36; initializing keys
+Traceback (most recent call last):
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 539, in <module>
+    main()
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 529, in main
+    print(run_plan(config, output, seed))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 463, in run_plan
+    main_episode(config, evidence, run_id, scenario, round_no, rngs,
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 194, in main_episode
+    initialization = initialize(schedule, init_seed, timestamp, config)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 132, in initialize
+    raise last_error
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 124, in initialize
+    return require_records(response, len(items), "initialization")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amritsat/scalableDistributed/scripts/run_randomized.py", line 106, in require_records
+    raise RuntimeError(f"{label}: {len(errors)} operations failed: {json.dumps(errors)}")
+RuntimeError: initialization: 2 operations failed: [{"node": "n1", "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s", "params": ["random-coordinator-v2:20260920T134345Z_20f9bd4e519e46d5:node_failure:r1:ALL/ALL:MW", 1789912197141119], "cl": "ALL", "start_ns": 1789912382372421465, "status": "error", "error": "WriteTimeout", "message": "Error from server: code=1100 [Coordinator node timed out waiting for replica nodes' responses] message=\"Operation timed out - received only 1 responses.\" info={'consistency': 'ALL', 'required_responses': 3, 'received_responses': 1, 'write_type': 'SIMPLE'}", "end_ns": 1789912384374809964, "latency_ms": 2002.389564, "routing": {"selected_node": "n1", "candidates": ["n1", "n2", "n3"], "draw": 2}, "role": "initialization"}, {"node": "n1", "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s", "params": ["random-coordinator-v2:20260920T134345Z_20f9bd4e519e46d5:node_failure:r1:ONE/ALL:MW", 1789912197141119], "cl": "ALL", "start_ns": 1789912384383514889, "status": "error", "error": "WriteTimeout", "message": "Error from server: code=1100 [Coordinator node timed out waiting for replica nodes' responses] message=\"Operation timed out - received only 1 responses.\" info={'consistency': 'ALL', 'required_responses': 3, 'received_responses': 1, 'write_type': 'SIMPLE'}", "end_ns": 1789912386385572167, "latency_ms": 2002.058081, "routing": {"selected_node": "n1", "candidates": ["n1", "n2", "n3"], "draw": 5}, "role": "initialization"}]
+[block 1/10] RUN FAILED. Recovering and stopping.
+   Fix the issue (or just re-run this script) to resume from block 1.
