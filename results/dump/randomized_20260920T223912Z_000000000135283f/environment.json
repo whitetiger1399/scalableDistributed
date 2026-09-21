@@ -1,0 +1,140 @@
+{
+  "design": "random-coordinator-v2",
+  "docker_compose": {
+    "command": [
+      "docker",
+      "compose",
+      "version"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "Docker Compose version v5.5.1"
+  },
+  "effective_config": {
+    "consistency_configs": [
+      "ONE/ONE",
+      "ONE/QUORUM",
+      "ONE/ALL",
+      "QUORUM/ONE",
+      "QUORUM/QUORUM",
+      "QUORUM/ALL",
+      "ALL/ONE",
+      "ALL/QUORUM",
+      "ALL/ALL"
+    ],
+    "database": {
+      "hints_enabled": false,
+      "read_repair_tables": {
+        "blocking": "BLOCKING",
+        "no_repair": "NONE"
+      },
+      "replication_factor": 3
+    },
+    "design": "random-coordinator-v2",
+    "enabled_experiments": [
+      "session_guarantees",
+      "node_failure",
+      "network_partition",
+      "read_repair",
+      "timestamp_control"
+    ],
+    "faults": {
+      "cql_port": 9042,
+      "failure_detection_timeout_seconds": 90,
+      "internode_ports": [
+        7000,
+        7001
+      ],
+      "partition_hold_seconds": 15,
+      "partition_stabilization_seconds": 15,
+      "post_recovery_settle_seconds": 20,
+      "recovery_timeout_seconds": 600
+    },
+    "models": [
+      "RYW",
+      "MR",
+      "MW",
+      "WFR"
+    ],
+    "profile": "full",
+    "repetitions": 50,
+    "rounds": 50,
+    "scenarios": [
+      "normal",
+      "node_failure",
+      "network_partition"
+    ],
+    "seed": null
+  },
+  "evidence_schema": "randomized-cassandra-evidence-v3",
+  "git_revision": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "fecf60c25af3f73e11a1fd5a2edda60ddb720139"
+  },
+  "git_status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "M config/randomized_experiments.json\n M experiments/common.py\n D results/20260912T063741Z/completion.json\n D results/20260912T063741Z/environment.json\n D results/20260912T063741Z/faults.json\n D results/20260912T063741Z/initial_cluster.json\n D results/20260912T063741Z/node_failure_initialization.json\n D results/20260912T063741Z/normal_initialization.json\n D results/20260912T063741Z/partition_initialization.json\n D results/20260912T063741Z/read_repair.json\n D results/20260912T063741Z/runtime_checks.json\n D results/20260912T063741Z/source_hashes.json\n D results/20260912T063741Z/timestamp_control.json\n D results/20260912T063741Z/trials.json\n D results/randomized_20260919T094231Z_0000000001352837/completion.json\n D results/randomized_20260919T094231Z_0000000001352837/environment.json\n D results/randomized_20260919T094231Z_0000000001352837/events.jsonl\n D results/randomized_20260919T094231Z_0000000001352837/plan.json\n D results/randomized_20260919T094231Z_0000000001352837/seeds.json\n D results/randomized_20260919T094326Z_0000000001352837/completion.json\n D results/randomized_20260919T094326Z_0000000001352837/environment.json\n D results/randomized_20260919T094326Z_0000000001352837/episode_node_failure_00.json\n D results/randomized_20260919T094326Z_0000000001352837/episode_normal_00.json\n D results/randomized_20260919T094326Z_0000000001352837/events.jsonl\n D results/randomized_20260919T094326Z_0000000001352837/faults.json\n D results/randomized_20260919T094326Z_0000000001352837/initial_cluster.json\n D results/randomized_20260919T094326Z_0000000001352837/plan.json\n D results/randomized_20260919T094326Z_0000000001352837/seeds.json\n D results/randomized_20260919T094326Z_0000000001352837/trials.json\n D results/randomized_20260919T094446Z_0000000001352837/completion.json\n D results/randomized_20260919T094446Z_0000000001352837/environment.json\n D results/randomized_20260919T094446Z_0000000001352837/episode_network_partition_00.json\n D results/randomized_20260919T094446Z_0000000001352837/episode_node_failure_00.json\n D results/randomized_20260919T094446Z_0000000001352837/episode_normal_00.json\n D results/randomized_20260919T094446Z_0000000001352837/events.jsonl\n D results/randomized_20260919T094446Z_0000000001352837/faults.json\n D results/randomized_20260919T094446Z_0000000001352837/initial_cluster.json\n D results/randomized_20260919T094446Z_0000000001352837/plan.json\n D results/randomized_20260919T094446Z_0000000001352837/read_repair.json\n D results/randomized_20260919T094446Z_0000000001352837/seeds.json\n D results/randomized_20260919T094446Z_0000000001352837/timestamp_control.json\n D results/randomized_20260919T094446Z_0000000001352837/trials.json\n D results/randomized_20260919T095158Z_0000000001352838/completion.json\n D results/randomized_20260919T095158Z_0000000001352838/environment.json\n D results/randomized_20260919T095158Z_0000000001352838/events.jsonl\n D results/randomized_20260919T095158Z_0000000001352838/plan.json\n D results/randomized_20260919T095158Z_0000000001352838/seeds.json\n D results/randomized_20260919T095446Z_0000000001352839/completion.json\n D results/randomized_20260919T095446Z_0000000001352839/environment.json\n D results/randomized_20260919T095446Z_0000000001352839/episode_network_partition_00.json\n D results/randomized_20260919T095446Z_0000000001352839/episode_node_failure_00.json\n D results/randomized_20260919T095446Z_0000000001352839/episode_normal_00.json\n D results/randomized_20260919T095446Z_0000000001352839/events.jsonl\n D results/randomized_20260919T095446Z_0000000001352839/faults.json\n D results/randomized_20260919T095446Z_0000000001352839/initial_cluster.json\n D results/randomized_20260919T095446Z_0000000001352839/plan.json\n D results/randomized_20260919T095446Z_0000000001352839/read_repair.json\n D results/randomized_20260919T095446Z_0000000001352839/seeds.json\n D results/randomized_20260919T095446Z_0000000001352839/timestamp_control.json\n D results/randomized_20260919T095446Z_0000000001352839/trials.json\n D results/randomized_20260919T100144Z_000000000135283a/completion.json\n D results/randomized_20260919T100144Z_000000000135283a/environment.json\n D results/randomized_20260919T100144Z_000000000135283a/episode_network_partition_00.json\n D results/randomized_20260919T100144Z_000000000135283a/episode_node_failure_00.json\n D results/randomized_20260919T100144Z_000000000135283a/episode_normal_00.json\n D results/randomized_20260919T100144Z_000000000135283a/events.jsonl\n D results/randomized_20260919T100144Z_000000000135283a/faults.json\n D results/randomized_20260919T100144Z_000000000135283a/initial_cluster.json\n D results/randomized_20260919T100144Z_000000000135283a/plan.json\n D results/randomized_20260919T100144Z_000000000135283a/read_repair.json\n D results/randomized_20260919T100144Z_000000000135283a/seeds.json\n D results/randomized_20260919T100144Z_000000000135283a/timestamp_control.json\n D results/randomized_20260919T100144Z_000000000135283a/trials.json\n D results/randomized_20260919T100850Z_000000000135283b/completion.json\n D results/randomized_20260919T100850Z_000000000135283b/environment.json\n D results/randomized_20260919T100850Z_000000000135283b/episode_network_partition_00.json\n D results/randomized_20260919T100850Z_000000000135283b/episode_node_failure_00.json\n D results/randomized_20260919T100850Z_000000000135283b/episode_normal_00.json\n D results/randomized_20260919T100850Z_000000000135283b/events.jsonl\n D results/randomized_20260919T100850Z_000000000135283b/faults.json\n D results/randomized_20260919T100850Z_000000000135283b/initial_cluster.json\n D results/randomized_20260919T100850Z_000000000135283b/plan.json\n D results/randomized_20260919T100850Z_000000000135283b/read_repair.json\n D results/randomized_20260919T100850Z_000000000135283b/seeds.json\n D results/randomized_20260919T100850Z_000000000135283b/timestamp_control.json\n D results/randomized_20260919T100850Z_000000000135283b/trials.json\n D results/randomized_20260919T101330Z_000000000135283f/completion.json\n D results/randomized_20260919T101330Z_000000000135283f/environment.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_00.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_01.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_02.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_03.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_04.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_05.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_06.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_07.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_08.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_network_partition_09.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_00.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_01.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_02.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_03.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_04.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_05.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_06.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_07.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_08.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_node_failure_09.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_00.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_01.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_02.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_03.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_04.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_05.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_06.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_07.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_08.json\n D results/randomized_20260919T101330Z_000000000135283f/episode_normal_09.json\n D results/randomized_20260919T101330Z_000000000135283f/events.jsonl\n D results/randomized_20260919T101330Z_000000000135283f/faults.json\n D results/randomized_20260919T101330Z_000000000135283f/initial_cluster.json\n D results/randomized_20260919T101330Z_000000000135283f/plan.json\n D results/randomized_20260919T101330Z_000000000135283f/read_repair.json\n D results/randomized_20260919T101330Z_000000000135283f/seeds.json\n D results/randomized_20260919T101330Z_000000000135283f/trials.json\n D results/randomized_20260920T035710Z_000000000135283f/completion.json\n D results/randomized_20260920T035710Z_000000000135283f/environment.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_00.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_01.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_02.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_03.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_04.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_05.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_06.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_07.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_08.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_network_partition_09.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_00.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_01.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_02.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_03.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_04.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_05.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_06.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_07.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_08.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_node_failure_09.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_00.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_01.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_02.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_03.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_04.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_05.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_06.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_07.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_08.json\n D results/randomized_20260920T035710Z_000000000135283f/episode_normal_09.json\n D results/randomized_20260920T035710Z_000000000135283f/events.jsonl\n D results/randomized_20260920T035710Z_000000000135283f/faults.json\n D results/randomized_20260920T035710Z_000000000135283f/initial_cluster.json\n D results/randomized_20260920T035710Z_000000000135283f/plan.json\n D results/randomized_20260920T035710Z_000000000135283f/read_repair.json\n D results/randomized_20260920T035710Z_000000000135283f/seeds.json\n D results/randomized_20260920T035710Z_000000000135283f/timestamp_control.json\n D results/randomized_20260920T035710Z_000000000135283f/trials.json\n?? config/v2randomized_experiments.json\n?? results/dump/\n?? results/randomized_20260920T124703Z_0000000001352841/\n?? results/randomized_20260920T223912Z_000000000135283f/"
+  },
+  "platform": "darwin",
+  "python": "3.9.12 (main, Apr  5 2022, 01:53:17) \n[Clang 12.0.0 ]",
+  "root_seed": 20260927,
+  "run_id": "20260920T223912Z_000000000135283f",
+  "source_manifest_sha256": {
+    "AGENT_ACTION_PLAN.md": "45ff57b4c9d689aba9721e89b3398b716abfff8614d98f19d898d860c22ce78e",
+    "Dockerfile.cassandra": "7a908e839d10efd2408b69d814a97a76910f03d614b03ae6714f277ac77b8f9e",
+    "Dockerfile.client": "ed1787acc4723683498f91a0aeccc1e383ed719de06059027ce3a5bbeec487e6",
+    "Project_Assignment.md": "8ec95fa0932d073e92d81d8fe4d452b97a4287b33f4a029a7881a40417bee84a",
+    "README.md": "5f5f6dfaa20eb76d1f52629958b526866ed2007b7ee8302ad2113577f8730e00",
+    "WORK_IN_PROGRESS.md": "f0e00d0ca6f8060005979eb95f32f0472877226b96322d73bda0451786fa763b",
+    "compose.yaml": "628d53a4668a20bea96726e4826365c735b29580ab597f2a544ae719155e433e",
+    "config/randomized_experiments.json": "08aa4a61c638d5197fa6af8af4fd85fa9fbfad85a5ea43a7edf6a39650907566",
+    "config/v2randomized_experiments.json": "4de52a00df44ad12c6e95818f1da41bbb9376f83c250fb3d219f3110aa7f357f",
+    "docs/configuration-reference.md": "da9850ced23bb687d2d16f7db9e0e31b1afc1db103dc59d5639a01fbe8441714",
+    "docs/execution-guide.md": "5bb0e5fc57fcce91cb73b27c5a44e966d3820b1e73c784d37052a4407d1b4694",
+    "docs/randomized-experiment-plan.md": "a6867ecea54c2202b343a718213015c267b68383cb3a95a52938f3a69a2dd9e5",
+    "experiments/__init__.py": "6728b7a135d5b2cd73dab0800343db8d621c534e72273940214c457ea4eaf523",
+    "experiments/common.py": "c52abc2b94575cb419e63b94feb64303e862744318ad1e000845d6c51aa45370",
+    "experiments/configuration.py": "eda5bd577ec62de17da092cca6f9cdd12ea738b5820fde05a2a7f95b55b4bbdc",
+    "experiments/faults.py": "da3bedd1d83150eefc263b95f2e940e10042d1a1d03ee4ff9d49e4e4a48723f4",
+    "experiments/network_partition.py": "9dc0f43ccac345ce74020a8624c11315a76a30fb33bca25be8d19d457d298e42",
+    "experiments/node_failure.py": "bb6f3cec0ff396627b5ab6dd33452524ede0a46fff3b5d5663cdae8c3af38ad6",
+    "experiments/read_repair.py": "ceddd05f48a2a55d1fdd583de36bda405bcf355ecce7349f30f0f8e2447bc8b4",
+    "experiments/session_guarantees.py": "09a52b6c059d5c7fb4fb1192dd3b4fb4fa07de42779aad40af1a04b8886f6534",
+    "experiments/timestamp_control.py": "28d1912059eb0b3c28113c991c500100bd469495c0f79b7dcd5da4a42b2ba202",
+    "experiments/workloads/__init__.py": "370d5912decf3da9871c5f3a980a522e970ed423cf365a60a70593e2b8a481ba",
+    "experiments/workloads/mr.py": "f99ace4f227efcac4b7fe943cc941fc3163f0dbec414aed739116fd197b81322",
+    "experiments/workloads/mw.py": "da03853751b1a20c402730c276d09081a3672d4943c8ccf17fd41f835cfca5dc",
+    "experiments/workloads/ryw.py": "8968538d331f847fe7b61c589feb3fb04c679071fcddf4b80b22dc28d27d60fa",
+    "experiments/workloads/wfr.py": "d4c2ea7fce6d91aef1739f45955a732b30dd54acba6e14c623320a58233b80c3",
+    "report/authors.json": "5c5a982383cda3642bb86065fa1061b37dfed464258098af72892d76e52dffbb",
+    "report/predictions.md": "811ca17835cb2218db9cf20debd6b629940aad10f30415a5d84a83121c2d7e5d",
+    "requirements-report.txt": "f4a0b84527c1ae7e54c3a1b7c165007eee39ce7aae9ebb5be17142067c2e9749",
+    "scripts/build_plan_pdf.py": "5eea65120c30f2457149ddf664a3ebac2c538dc0a287b5ffc6d7ecb8cb3b2573",
+    "scripts/build_report.py": "2d4d2afa1f720f1fddf256bc20d2f3d8019b1b221535b8c46a25a9ef1dcc1462",
+    "scripts/lab.py": "5f16e76a8c8c35948ecfb9ec4f0c3ed306de8946956b39cc00728e3a13460e21",
+    "scripts/run_randomized.py": "1937e6d5ec9c541b5d60266fa035e1a8ebaa633eb2920299f88205315721f40a",
+    "scripts/verify_randomized.py": "803a2ec0e86c7e0c3675defff056d3014c98186001dfe497a3790bad4b466e3d",
+    "scripts/verify_results.py": "3a35171aec7d8fa25aa91c160304a44bc66acd97069fde02bc33f276d3dfc033",
+    "src/checks.py": "03defd729db0d23ac3882c5cd2408d724c7ddd10c8138662af2bfad70defc32a",
+    "src/routing.py": "01447adce442bb02a2fe6c9639ea8fb4868d3e863058d945158fc0f8932e468d",
+    "src/worker.py": "0275f4ed400283d90772e3b14cefb4a7c0341c59dbcba21b82410c5bff44d831",
+    "tests/test_checks.py": "6f79158baf75610b7db3bcbbc1958c540b26cee5ee2f7616a04959bc84b0aa17",
+    "tests/test_configuration.py": "f1df60befada721970f23747b600cf73133160cd0296c50642631abb478bf37d",
+    "tests/test_faults.py": "d796337e9735064141f75f4b9403d37905c3906b4869d9f3aacd41a7e17f9985",
+    "tests/test_randomized_setup.py": "7a31236fc6db489e7936e875c8c10e2d9c43a9be17c6be38b7ba83ed92d0b94f",
+    "tests/test_verifier.py": "8a09c32c4541be9a8e76d93be2c5229e3f233dee79f6531d5f9e16b4d6a93a09"
+  },
+  "started_utc": "2026-09-20T22:39:12.066928+00:00"
+}
