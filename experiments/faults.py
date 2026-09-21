@@ -24,8 +24,8 @@ def compose(*args, data=None, check=True, timeout=60):
                    data=data, check=check, timeout=timeout)
 
 
-def node_exec(node, *args, check=True):
-    return compose("exec", "-T", "-u", "root", node, *args, check=check)
+def node_exec(node, *args, check=True, timeout=60):
+    return compose("exec", "-T", "-u", "root", node, *args, check=check, timeout=timeout)
 
 
 def container_ip(node):
@@ -55,8 +55,20 @@ def parse_status(text):
     return rows
 
 
-def membership(observer="n1"):
-    return node_exec(observer, "nodetool", "status", check=False)
+def membership(observer="n1", attempts=3, timeout=30):
+    """Query nodetool status, tolerating a transient slow/hung gossip call.
+
+    nodetool can briefly hang right after a partition is torn down; a bounded,
+    retried call keeps that from surfacing as a 60s subprocess timeout.
+    """
+    last = ""
+    for _ in range(attempts):
+        try:
+            return node_exec(observer, "nodetool", "status", check=False, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            last = ""
+            time.sleep(2)
+    return last
 
 
 def all_healthy():

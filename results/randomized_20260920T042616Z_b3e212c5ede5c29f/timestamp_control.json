@@ -1,0 +1,1952 @@
+[
+  {
+    "case": {
+      "attempt_id": "timestamp:0",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:0",
+      "round": 0,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882267654452046,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882267616027569
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882267690673403,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882267654461973
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882267722184542,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882267690682965
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882267728179811,
+          "latency_ms": 5.938131,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:0",
+            1789882267221456
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "start_ns": 1789882267722242547,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 6875759295814683709
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268240374622,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882268201944683
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882268273183550,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882268240382391
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882268302389512,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882268273201892
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268308672628,
+          "kind": "write",
+          "latency_ms": 6.215193,
+          "node": "n1",
+          "params": [
+            1789882267221556,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:0"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789882268302458419,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268311433644,
+          "kind": "write",
+          "latency_ms": 2.727002,
+          "node": "n1",
+          "params": [
+            1789882267221506,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:0"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789882268308707173,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268315054731,
+          "kind": "read",
+          "latency_ms": 3.593694,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:0"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789882268311461722,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 1882041750843711966
+    },
+    "timestamps": [
+      1789882267221556,
+      1789882267221506
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:1",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:1",
+      "round": 1,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268819771449,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882268781407354
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882268851271768,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882268819783170
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882268883535818,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882268851286650
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882268886392222,
+          "latency_ms": 2.797648,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:1",
+            1789882268384088
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "start_ns": 1789882268883595076,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 29805215069269255
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882269376769714,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882269341909290
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882269406435043,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882269376778727
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882269435517746,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882269406446032
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882269438468189,
+          "kind": "write",
+          "latency_ms": 2.890678,
+          "node": "n3",
+          "params": [
+            1789882268384188,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:1"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789882269435577810,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882269440939222,
+          "kind": "write",
+          "latency_ms": 2.446394,
+          "node": "n1",
+          "params": [
+            1789882268384138,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:1"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789882269438493637,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882269444615137,
+          "kind": "read",
+          "latency_ms": 3.649599,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:1"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789882269440966222,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 16578356510598083434
+    },
+    "timestamps": [
+      1789882268384188,
+      1789882268384138
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:2",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:2",
+      "round": 2,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882269928670939,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882269889526720
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882269961093167,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882269928680559
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882269994784183,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882269961106682
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882269998045732,
+          "latency_ms": 3.209698,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:2",
+            1789882269511425
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "start_ns": 1789882269994836313,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 15277162758274394478
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882270495547436,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882270460853366
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882270528167354,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882270495555417
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882270561143147,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882270528182555
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882270564201666,
+          "kind": "write",
+          "latency_ms": 2.974444,
+          "node": "n1",
+          "params": [
+            1789882269511525,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:2"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789882270561227483,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882270566376673,
+          "kind": "write",
+          "latency_ms": 2.147072,
+          "node": "n1",
+          "params": [
+            1789882269511475,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:2"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789882270564230025,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882270569576303,
+          "kind": "read",
+          "latency_ms": 3.178549,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:2"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789882270566398409,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 3588479022491841037
+    },
+    "timestamps": [
+      1789882269511525,
+      1789882269511475
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:3",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:3",
+      "round": 3,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882271084030561,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882271040909456
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882271125723113,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882271084041839
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882271159591772,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882271125732656
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882271162672900,
+          "latency_ms": 3.028488,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:3",
+            1789882270645118
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "start_ns": 1789882271159644596,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 15006801619746770380
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882271735961894,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882271691567424
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882271772097189,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882271735974078
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882271803848131,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882271772109942
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882271807616583,
+          "kind": "write",
+          "latency_ms": 3.706297,
+          "node": "n2",
+          "params": [
+            1789882270645218,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:3"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789882271803910874,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882271811522224,
+          "kind": "write",
+          "latency_ms": 3.874959,
+          "node": "n2",
+          "params": [
+            1789882270645168,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:3"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789882271807648181,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882271815821831,
+          "kind": "read",
+          "latency_ms": 4.258264,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:3"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789882271811565167,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 5755122925138767239
+    },
+    "timestamps": [
+      1789882270645218,
+      1789882270645168
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:4",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:4",
+      "round": 4,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882272351415705,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882272317434236
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882272383811167,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882272351423069
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882272414854209,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882272383818705
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882272418491845,
+          "latency_ms": 3.568617,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:4",
+            1789882271894996
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "start_ns": 1789882272414923883,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 12214501397500663433
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882272933283385,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882272893473127
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882272968817942,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882272933292967
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882273003564978,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882272968827697
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882273007111541,
+          "kind": "write",
+          "latency_ms": 3.48808,
+          "node": "n2",
+          "params": [
+            1789882271895096,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:4"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n2"
+          },
+          "sequence": 0,
+          "start_ns": 1789882273003624202,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882273010379890,
+          "kind": "write",
+          "latency_ms": 3.236617,
+          "node": "n3",
+          "params": [
+            1789882271895046,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:4"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789882273007143804,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882273014356159,
+          "kind": "read",
+          "latency_ms": 3.949269,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:4"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n1"
+          },
+          "sequence": 2,
+          "start_ns": 1789882273010407691,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 4302833863436745040
+    },
+    "timestamps": [
+      1789882271895096,
+      1789882271895046
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:5",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:5",
+      "round": 5,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882273511585416,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882273473056163
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882273546304758,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882273511598960
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882273581053828,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882273546313077
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882273583632448,
+          "latency_ms": 2.529806,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:5",
+            1789882273083795
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "start_ns": 1789882273581103037,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 16553239219253474331
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882274085139782,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882274046191446
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882274114703202,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882274085149403
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882274146614215,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882274114713641
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882274149346625,
+          "kind": "write",
+          "latency_ms": 2.680145,
+          "node": "n1",
+          "params": [
+            1789882273083895,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:5"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789882274146667001,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882274151649616,
+          "kind": "write",
+          "latency_ms": 2.276329,
+          "node": "n1",
+          "params": [
+            1789882273083845,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:5"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789882274149373751,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882274155612669,
+          "kind": "read",
+          "latency_ms": 3.93424,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:5"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789882274151679065,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 14096658201231557808
+    },
+    "timestamps": [
+      1789882273083895,
+      1789882273083845
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:6",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:6",
+      "round": 6,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882274666300295,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882274629438290
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882274699127227,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882274666309934
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882274733852863,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882274699136230
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882274737206666,
+          "latency_ms": 3.306272,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:6",
+            1789882274220784
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n2"
+          },
+          "start_ns": 1789882274733901108,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 17765879570802036398
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882275269399442,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882275223268097
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882275310454588,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882275269409804
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882275345074943,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882275310464671
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882275348659745,
+          "kind": "write",
+          "latency_ms": 3.508159,
+          "node": "n1",
+          "params": [
+            1789882274220884,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:6"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789882275345168050,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882275352100312,
+          "kind": "write",
+          "latency_ms": 3.390664,
+          "node": "n3",
+          "params": [
+            1789882274220834,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:6"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n3"
+          },
+          "sequence": 1,
+          "start_ns": 1789882275348710208,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882275356678823,
+          "kind": "read",
+          "latency_ms": 4.546797,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:6"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789882275352133028,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 10338514064205678479
+    },
+    "timestamps": [
+      1789882274220884,
+      1789882274220834
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:7",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:7",
+      "round": 7,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882275876698105,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882275834169001
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882275909905888,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882275876713548
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882275942971996,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882275909917851
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882275946915837,
+          "latency_ms": 3.883045,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:7",
+            1789882275434905
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "start_ns": 1789882275943033486,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 18332982960702604492
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882276460981268,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882276415280290
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882276498468837,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882276460992816
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882276536671883,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882276498480925
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882276540101183,
+          "kind": "write",
+          "latency_ms": 3.37583,
+          "node": "n3",
+          "params": [
+            1789882275435005,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:7"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789882276536726452,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882276543953989,
+          "kind": "write",
+          "latency_ms": 3.816706,
+          "node": "n2",
+          "params": [
+            1789882275434955,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:7"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789882276540138111,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882276548611812,
+          "kind": "read",
+          "latency_ms": 4.614696,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:7"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789882276543998186,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 15257955491872421872
+    },
+    "timestamps": [
+      1789882275435005,
+      1789882275434955
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:8",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:8",
+      "round": 8,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882277063011074,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882277024156145
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882277096331690,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882277063019200
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882277130638754,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882277096340231
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882277134437927,
+          "latency_ms": 3.728834,
+          "node": "n1",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:8",
+            1789882276621211
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "start_ns": 1789882277130709353,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 10690241238919799040
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882278153901224,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882277604051555
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882278187914568,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882278153911938
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882278221145347,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882278187926092
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882278224311452,
+          "kind": "write",
+          "latency_ms": 3.10997,
+          "node": "n3",
+          "params": [
+            1789882276621311,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:8"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n3"
+          },
+          "sequence": 0,
+          "start_ns": 1789882278221202157,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882278226614285,
+          "kind": "write",
+          "latency_ms": 2.276218,
+          "node": "n1",
+          "params": [
+            1789882276621261,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:8"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n1"
+          },
+          "sequence": 1,
+          "start_ns": 1789882278224338367,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882278229910286,
+          "kind": "read",
+          "latency_ms": 3.27463,
+          "node": "n3",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:8"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n3"
+          },
+          "sequence": 2,
+          "start_ns": 1789882278226636379,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 7944428165377528944
+    },
+    "timestamps": [
+      1789882276621311,
+      1789882276621261
+    ],
+    "verdict": "expected"
+  },
+  {
+    "case": {
+      "attempt_id": "timestamp:9",
+      "key": "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:9",
+      "round": 9,
+      "table": "blocking"
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882279416936648,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882279379290940
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882279450522028,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882279416948413
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882279486159039,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882279450530447
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882279489580358,
+          "latency_ms": 3.333687,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:9",
+            1789882278299712
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n2"
+          },
+          "start_ns": 1789882279486246786,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "seed": 15845145807456228052
+    },
+    "reason": null,
+    "result": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882280061113771,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789882280018929119
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882280099748605,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789882280061122884
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789882280136258748,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789882280099759598
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789882280139611927,
+          "kind": "write",
+          "latency_ms": 3.287112,
+          "node": "n1",
+          "params": [
+            1789882278299812,
+            1,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:9"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 0,
+            "selected_node": "n1"
+          },
+          "sequence": 0,
+          "start_ns": 1789882280136325375,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882280143621403,
+          "kind": "write",
+          "latency_ms": 3.979957,
+          "node": "n2",
+          "params": [
+            1789882278299762,
+            2,
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:9"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 1,
+            "selected_node": "n2"
+          },
+          "sequence": 1,
+          "start_ns": 1789882280139642371,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789882280147902046,
+          "kind": "read",
+          "latency_ms": 4.250391,
+          "node": "n2",
+          "params": [
+            "random-coordinator-v2:20260920T042616Z_b3e212c5ede5c29f:timestamp:9"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "candidates": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "draw": 2,
+            "selected_node": "n2"
+          },
+          "sequence": 2,
+          "start_ns": 1789882280143652793,
+          "status": "ok",
+          "value": {
+            "a": 1,
+            "b": 0
+          }
+        }
+      ],
+      "seed": 14658853708854038017
+    },
+    "timestamps": [
+      1789882278299812,
+      1789882278299762
+    ],
+    "verdict": "expected"
+  }
+]

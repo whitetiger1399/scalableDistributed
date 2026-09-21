@@ -107,10 +107,29 @@ def require_records(response, expected, label):
     return response
 
 
-def initialize(schedule, seed, timestamp, config, table="blocking"):
+def initialize(schedule, seed, timestamp, config, table="blocking", attempts=4):
+    """Establish fresh ALL-consistency setup rows.
+
+    Initialization is administration, not a measured application session, so a
+    transient setup-time WriteTimeout (a replica not yet servable after recovery)
+    is retried against a re-confirmed healthy cluster with a fresh timestamp and
+    seed. This never touches the measured trial batch.
+    """
     items = [{"key": case["key"], "table": case.get("table", table)} for case in schedule]
-    response = worker({"action": "init", "items": items, "ts": timestamp, "seed": seed}, config)
-    return require_records(response, len(items), "initialization")
+    last_error = None
+    for attempt in range(attempts):
+        response = worker({"action": "init", "items": items,
+                           "ts": timestamp + attempt, "seed": seed + attempt}, config)
+        try:
+            return require_records(response, len(items), "initialization")
+        except RuntimeError as exc:
+            last_error = exc
+            if attempt + 1 >= attempts:
+                break
+            # Re-confirm the cluster can serve ALL writes before retrying.
+            wait_healthy(config["faults"]["recovery_timeout_seconds"])
+            settle_after_recovery(config)
+    raise last_error
 
 
 def environment(config, seed, run_id):
@@ -138,6 +157,30 @@ def environment(config, seed, run_id):
         "source_manifest_sha256": manifest,
         "effective_config": config,
     }
+
+
+def settle_after_recovery(config):
+    """Pause after a cluster reports healthy so ALL-consistency writes are servable."""
+    seconds = config["faults"].get("post_recovery_settle_seconds", 0)
+    if seconds:
+        time.sleep(seconds)
+    return seconds
+
+
+def recover_with_retry(config, attempts=3):
+    """Clear project firewall rules and confirm health, tolerating a transient
+    nodetool/gossip hiccup during cleanup so a healed cluster is not mislabelled
+    as a recovery failure."""
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            clear_partition()
+            wait_healthy(config["faults"]["recovery_timeout_seconds"])
+            return
+        except BaseException as exc:
+            last_error = exc
+            time.sleep(3)
+    raise last_error
 
 
 def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
@@ -222,12 +265,14 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
                               f"restarting {cleanup[1]} and verifying recovery")
                 restart_node(cleanup[1])
                 record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                record["settled_seconds"] = settle_after_recovery(config)
             elif cleanup and cleanup[0] == "partition":
                 progress.show("session_guarantees",
                               f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
                               "removing partition and verifying recovery")
                 clear_partition()
                 record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                record["settled_seconds"] = settle_after_recovery(config)
         except BaseException as recovery_error:
             record["recovery_error"] = {"type": type(recovery_error).__name__,
                                         "message": str(recovery_error)}
@@ -307,8 +352,9 @@ def run_read_repair(config, evidence, run_id, rngs, progress):
                 raise
             finally:
                 try:
-                    clear_partition()
+                    recover_with_retry(config)
                     record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                    record["settled_seconds"] = settle_after_recovery(config)
                 except BaseException as exc:
                     record["recovery_error"] = {"type": type(exc).__name__, "message": str(exc)}
                 record["ended_ns"] = time.time_ns()
@@ -396,6 +442,10 @@ def run_plan(config, output, seed):
                                      "expected": record.get("expected")})
         raise RuntimeError("schema creation/inspection failed after 10 attempts: "
                            + json.dumps(failures[-12:], default=str))
+    settle_after_recovery(config)
+    schema = worker({"action": "schema"}, config)
+    if schema.get("status") != "ok" or not schema.get("records"):
+        raise RuntimeError("schema creation/inspection failed")
     initial = {"membership": ready_membership,
                "schema": schema, "schema_attempts": schema_attempts,
                "client_probe": worker({"action": "probe"}, config)}
