@@ -1,0 +1,1697 @@
+{
+  "ended_ns": 1789965234862770000,
+  "episode_id": "main:node_failure:7",
+  "error": {
+    "message": "docker compose -f /Users/whitetiger/Desktop/WhiteTiger/17_projects/19_ScalableDist/compose.yaml exec -T client python src/worker.py\n\nTraceback (most recent call last):\n  File \"/work/src/worker.py\", line 14, in <module>\n    from routing import RandomRouter\nImportError: cannot import name 'RandomRouter' from 'routing' (/work/src/routing.py)\n",
+    "type": "RuntimeError"
+  },
+  "fault": {
+    "action": "docker compose kill -s SIGKILL n3",
+    "after": {
+      "container_id": "5c999641b792703c96e12a2da1cfb5c11fe76ef5e84c07b22ca4c805ee26fb56",
+      "ip": "",
+      "node": "n3",
+      "running": false,
+      "status": "exited"
+    },
+    "detection": {
+      "observations": [
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965175049579000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965178919788000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965182604508000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965186467837000
+        },
+        {
+          "matching": false,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "UN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965190129671000
+        },
+        {
+          "matching": true,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965193932604000
+        },
+        {
+          "matching": true,
+          "parsed": {
+            "n1": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            },
+            "n2": {
+              "172.18.0.3": {
+                "address": "172.18.0.3",
+                "host_id": "9882067b-c3a9-4bae-835f-8ce5ff964181",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1",
+                "state": "UN"
+              },
+              "172.18.0.4": {
+                "address": "172.18.0.4",
+                "host_id": "90f05f1a-118b-454d-90e0-3dd9a5dd8703",
+                "rack": "rack1",
+                "raw": "UN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1",
+                "state": "UN"
+              },
+              "172.18.0.5": {
+                "address": "172.18.0.5",
+                "host_id": "799f8da8-9244-41e6-856c-e120278d5cb8",
+                "rack": "rack1",
+                "raw": "DN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+                "state": "DN"
+              }
+            }
+          },
+          "raw": {
+            "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+            "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nDN  172.18.0.5  2.67 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+          },
+          "time_ns": 1789965197583061000
+        }
+      ],
+      "required_consecutive": 2,
+      "victim": "n3",
+      "victim_ip": "172.18.0.5"
+    },
+    "end_ns": 1789965173362398000,
+    "identity": {
+      "container_id": "5c999641b792703c96e12a2da1cfb5c11fe76ef5e84c07b22ca4c805ee26fb56",
+      "ip": "172.18.0.5",
+      "node": "n3",
+      "running": true,
+      "status": "running"
+    },
+    "node": "n3",
+    "output": "",
+    "start_ns": 1789965172952611000
+  },
+  "initialization": {
+    "health": [
+      {
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172615630633,
+        "error": null,
+        "message": null,
+        "node": "n1",
+        "reachable": true,
+        "start_ns": 1789965172590493550
+      },
+      {
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172646333050,
+        "error": null,
+        "message": null,
+        "node": "n2",
+        "reachable": true,
+        "start_ns": 1789965172615636091
+      },
+      {
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172677241925,
+        "error": null,
+        "message": null,
+        "node": "n3",
+        "reachable": true,
+        "start_ns": 1789965172646339258
+      }
+    ],
+    "records": [
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172682602383,
+        "latency_ms": 5.31075,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 0,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172677292508,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172687218758,
+        "latency_ms": 4.596292,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 1,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172682623050,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172692634133,
+        "latency_ms": 5.396167,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 2,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172687239216,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172696113716,
+        "latency_ms": 3.457542,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 3,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172692656800,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172698939425,
+        "latency_ms": 2.801209,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 4,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172696138300,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172701228300,
+        "latency_ms": 2.272042,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 5,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172698956466,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172703380550,
+        "latency_ms": 2.138917,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 6,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172701241925,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172705802925,
+        "latency_ms": 2.383917,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 7,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172703419300,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172708769091,
+        "latency_ms": 2.924708,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 8,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172705844550,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172711787508,
+        "latency_ms": 3.004875,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 9,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172708783133,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172714776008,
+        "latency_ms": 2.949667,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 10,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172711826716,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172717658716,
+        "latency_ms": 2.866917,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 11,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172714792091,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172720456175,
+        "latency_ms": 2.77375,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 12,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172717682841,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172722959966,
+        "latency_ms": 2.490708,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 13,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172720469550,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172725728758,
+        "latency_ms": 2.757625,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 14,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172722971425,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172727991466,
+        "latency_ms": 2.250083,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 15,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172725741716,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172730239508,
+        "latency_ms": 2.234292,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 16,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172728005466,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172732251258,
+        "latency_ms": 2.002125,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 17,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172730249300,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172734322675,
+        "latency_ms": 2.060709,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 18,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172732262341,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172736535675,
+        "latency_ms": 2.200917,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 19,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172734334966,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172739397050,
+        "latency_ms": 2.849458,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 20,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172736547966,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172741665216,
+        "latency_ms": 2.256084,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 21,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172739409341,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172744137508,
+        "latency_ms": 2.463667,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 22,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172741674216,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172746974925,
+        "latency_ms": 2.82575,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 23,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172744149550,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172749686925,
+        "latency_ms": 2.701417,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 24,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172746985925,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172752640258,
+        "latency_ms": 2.941167,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 25,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172749699466,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172754685633,
+        "latency_ms": 2.033209,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 26,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172752652716,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172758388508,
+        "latency_ms": 3.692834,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:MW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 27,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172754695841,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172761123633,
+        "latency_ms": 2.707625,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 28,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172758416258,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172763695550,
+        "latency_ms": 2.561167,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 29,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172761134633,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172766996008,
+        "latency_ms": 3.2895,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 30,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172763706883,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.3:9042",
+        "end_ns": 1789965172769479925,
+        "latency_ms": 2.469584,
+        "node": "n1",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 31,
+          "selected_node": "n1"
+        },
+        "start_ns": 1789965172767010591,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172771420008,
+        "latency_ms": 1.930292,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 32,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172769489883,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.5:9042",
+        "end_ns": 1789965172772951258,
+        "latency_ms": 1.523166,
+        "node": "n3",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:RYW",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 33,
+          "selected_node": "n3"
+        },
+        "start_ns": 1789965172771428341,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172775276966,
+        "latency_ms": 2.31725,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:MR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 34,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172772959966,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.18.0.4:9042",
+        "end_ns": 1789965172777459008,
+        "latency_ms": 2.171834,
+        "node": "n2",
+        "params": [
+          "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:WFR",
+          1789965172356994
+        ],
+        "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+        "role": "initialization",
+        "routing": {
+          "candidates": [
+            "n1",
+            "n2",
+            "n3"
+          ],
+          "draw": 35,
+          "selected_node": "n2"
+        },
+        "start_ns": 1789965172775287466,
+        "status": "ok",
+        "value": null
+      }
+    ],
+    "seed": 17874898529379459948
+  },
+  "recovery": {
+    "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.91 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+    "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.91 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1",
+    "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.18.0.3  2.76 MiB  16      100.0%            9882067b-c3a9-4bae-835f-8ce5ff964181  rack1\nUN  172.18.0.4  2.8 MiB   16      100.0%            90f05f1a-118b-454d-90e0-3dd9a5dd8703  rack1\nUN  172.18.0.5  2.91 MiB  16      100.0%            799f8da8-9244-41e6-856c-e120278d5cb8  rack1"
+  },
+  "round": 7,
+  "scenario": "node_failure",
+  "schedule": [
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ONE:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ONE:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ALL:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ALL:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/QUORUM:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ALL:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/QUORUM:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ALL:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ONE:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:MW",
+      "model": "MW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/QUORUM:MW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ONE:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ALL:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/QUORUM:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "ONE/ALL",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ONE/ALL:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ONE/ALL:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/QUORUM:WFR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/QUORUM",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/QUORUM:RYW",
+      "model": "RYW",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/QUORUM:RYW"
+    },
+    {
+      "attempt": 1,
+      "config": "ALL/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:ALL/ONE:MR",
+      "model": "MR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:ALL/ONE:MR"
+    },
+    {
+      "attempt": 1,
+      "config": "QUORUM/ONE",
+      "key": "random-coordinator-v2:20260921T041419Z_000000000135283f:node_failure:r7:QUORUM/ONE:WFR",
+      "model": "WFR",
+      "round": 7,
+      "scenario": "node_failure",
+      "trial_id": "20260921T041419Z_000000000135283f:node_failure:7:QUORUM/ONE:WFR"
+    }
+  ],
+  "settled_seconds": 20,
+  "started_ns": 1789965172817616000
+}
