@@ -207,8 +207,7 @@ def windows_figure() -> str:
         rect(1495, 405, 150, 115, LIGHT_GREEN, GREEN, 15, 2, True), txt(1570, 441, "results/", "label", "middle"),
         txt(1570, 491, "JSON • logs", "small", "middle"), txt(1570, 516, "CSV • hashes", "small", "middle"),
         curved("M465,420 C760,345 1260,350 1477,455", GREEN, width=4),
-        rect(650, 342, 490, 36, "#F4FAFF", "#F4FAFF", 10, 0),
-        txt(895, 368, "Linux containers and named volumes run inside Docker Desktop", "small", "middle"),
+        txt(900, 316, "Linux containers and named volumes run inside Docker Desktop", "small", "middle"),
         legend(),
     ]
     return canvas("Windows deployment architecture", "Windows host → WSL2 → Docker Desktop → three-node Cassandra cluster", "".join(c))
