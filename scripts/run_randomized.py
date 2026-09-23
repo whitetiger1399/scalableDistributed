@@ -31,9 +31,9 @@ EVIDENCE_SCHEMA = "cassandra-driver-policy-evidence-v4"
 class Progress:
     """Print durable, line-oriented progress for long experiment runs."""
 
-    def __init__(self, total, stream=None):
+    def __init__(self, total, stream=None, completed=0):
         self.total = total
-        self.completed = 0
+        self.completed = completed
         self.stream = stream or sys.stdout
 
     def show(self, experiment, detail, advance=0):
@@ -63,10 +63,10 @@ def atomic_save(path, value):
     os.replace(temporary, path)
 
 
-def timing_fields(started_utc, started_monotonic):
+def timing_fields(started_utc, started_monotonic, previous_minutes=0.0):
     """Return one consistent set of wall-clock and elapsed run timestamps."""
     ended_utc = dt.datetime.now(dt.timezone.utc).isoformat()
-    elapsed_minutes = max(0.0, (time.monotonic() - started_monotonic) / 60.0)
+    elapsed_minutes = previous_minutes + max(0.0, (time.monotonic() - started_monotonic) / 60.0)
     return {
         "started_utc": started_utc,
         "ended_utc": ended_utc,
@@ -89,6 +89,40 @@ class Evidence:
 
     def save(self, name, value):
         atomic_save(self.directory / name, value)
+
+
+def load_json(path):
+    return json.loads(path.read_text())
+
+
+def valid_repair_checkpoint(record):
+    return (record.get("verdict") in {"regression", "no_regression_observed", "inconclusive"}
+            and "recovery_error" not in record
+            and isinstance(record.get("initialization"), dict)
+            and all(isinstance(record.get(field), dict)
+                    for field in ("write", "first", "second")))
+
+
+def valid_timestamp_checkpoint(record):
+    return (record.get("verdict") in {"expected", "unexpected", "inconclusive"}
+            and isinstance(record.get("initialization"), dict)
+            and isinstance(record.get("result"), dict))
+
+
+def checkpoint_prefix(records, expected_ids, validator, label):
+    """Return the valid ordered prefix and the tail that must be retried."""
+    if len(records) > len(expected_ids):
+        raise RuntimeError(f"{label} has more records than the saved plan")
+    for index, record in enumerate(records):
+        attempt_id = record.get("case", {}).get("attempt_id")
+        if attempt_id != expected_ids[index]:
+            raise RuntimeError(
+                f"{label} checkpoint order mismatch at {index}: "
+                f"{attempt_id!r} != {expected_ids[index]!r}"
+            )
+        if not validator(record):
+            return records[:index], records[index:]
+    return records, []
 
 
 def derived_seed(root, label):
@@ -305,15 +339,18 @@ def read_value(response, index, column):
         return None
 
 
-def run_read_repair(config, evidence, run_id, rngs, progress):
-    results = []
+def run_read_repair(config, evidence, run_id, rngs, progress, results=None):
+    results = list(results or [])
     if "read_repair" not in config["enabled_experiments"]:
         evidence.save("read_repair.json", results)
         return results
     full_cut = [("n1", "n2"), ("n1", "n3"), ("n2", "n3")]
+    completed_ids = {record["case"]["attempt_id"] for record in results}
     for round_no in range(config["rounds"]):
         for table, setting in read_repair.settings(config):
             attempt_id = f"repair:{round_no}:{table}"
+            if attempt_id in completed_ids:
+                continue
             key = f"{config['design']}:{run_id}:{attempt_id}"
             case = {"attempt_id": attempt_id, "round": round_no, "table": table,
                     "setting": setting, "key": key}
@@ -378,12 +415,15 @@ def run_read_repair(config, evidence, run_id, rngs, progress):
     return results
 
 
-def run_timestamp_controls(config, evidence, run_id, rngs, progress):
-    results = []
+def run_timestamp_controls(config, evidence, run_id, rngs, progress, results=None):
+    results = list(results or [])
     if "timestamp_control" not in config["enabled_experiments"]:
         evidence.save("timestamp_control.json", results)
         return results
+    completed_ids = {record["case"]["attempt_id"] for record in results}
     for round_no in range(config["rounds"]):
+        if f"timestamp:{round_no}" in completed_ids:
+            continue
         progress.show("timestamp_control",
                       f"starting round={round_no + 1}/{config['rounds']}")
         key = f"{config['design']}:{run_id}:timestamp:{round_no}"
@@ -527,6 +567,224 @@ def run_plan(config, output, seed):
         raise
 
 
+def expected_repair_ids(config):
+    if "read_repair" not in config["enabled_experiments"]:
+        return []
+    return [f"repair:{round_no}:{table}"
+            for round_no in range(config["rounds"])
+            for table, _ in read_repair.settings(config)]
+
+
+def expected_timestamp_ids(config):
+    if "timestamp_control" not in config["enabled_experiments"]:
+        return []
+    return [f"timestamp:{round_no}" for round_no in range(config["rounds"])]
+
+
+def validate_completed_main_phase(config, trials, faults):
+    expected = expected_main_trials(config)
+    if len(trials) != expected:
+        raise RuntimeError(
+            f"resume supports a completed main phase; found {len(trials)}/{expected} trials"
+        )
+    trial_ids = [trial.get("trial_id") for trial in trials]
+    if None in trial_ids or len(trial_ids) != len(set(trial_ids)):
+        raise RuntimeError("main trial checkpoint has missing or duplicate IDs")
+    expected_episodes = (len(config["scenarios"]) * config["rounds"]
+                         if "session_guarantees" in config["enabled_experiments"] else 0)
+    if len(faults) != expected_episodes:
+        raise RuntimeError(
+            f"resume supports a completed main phase; found {len(faults)}/{expected_episodes} episodes"
+        )
+    episode_ids = [record.get("episode_id") for record in faults]
+    if None in episode_ids or len(episode_ids) != len(set(episode_ids)):
+        raise RuntimeError("main episode checkpoint has missing or duplicate IDs")
+    trials_per_episode = len(config["consistency_configs"]) * len(config["models"])
+    for record in faults:
+        if len(record.get("trials", [])) != trials_per_episode:
+            raise RuntimeError(f"episode {record.get('episode_id')} is incomplete")
+        if "recovery_error" in record:
+            raise RuntimeError(f"episode {record.get('episode_id')} failed recovery")
+
+
+def replay_topology_choices(records, rng):
+    """Restore the topology RNG to the point after retained repair attempts."""
+    for record in records:
+        selected = record["write"]["records"][0]["routing"]["selected_node"]
+        expected = read_repair.topology_pairs(selected, NODES, rng)
+        observed = record.get("pair_sequence")
+        if observed != [list(expected[0]), list(expected[1])]:
+            raise RuntimeError(
+                f"saved topology choice does not match seed for {record['case']['attempt_id']}"
+            )
+
+
+def refresh_resume_environment(config, seed, run_id, evidence):
+    previous = load_json(evidence.directory / "environment.json")
+    current = environment(config, seed, run_id)
+    history = list(previous.get("execution_snapshots", []))
+    if not history:
+        history.append({
+            "phase": "initial",
+            "started_utc": previous.get("started_utc"),
+            "git_revision": previous.get("git_revision"),
+            "git_status": previous.get("git_status"),
+            "docker_compose": previous.get("docker_compose"),
+            "source_manifest_sha256": previous.get("source_manifest_sha256"),
+        })
+    history.append({
+        "phase": "resume",
+        "started_utc": current["started_utc"],
+        "git_revision": current["git_revision"],
+        "git_status": current["git_status"],
+        "docker_compose": current["docker_compose"],
+        "source_manifest_sha256": current["source_manifest_sha256"],
+    })
+    previous.update({
+        "git_revision": current["git_revision"],
+        "git_status": current["git_status"],
+        "docker_compose": current["docker_compose"],
+        "source_manifest_sha256": current["source_manifest_sha256"],
+        "effective_config": config,
+        "execution_snapshots": history,
+    })
+    evidence.save("environment.json", previous)
+
+
+def resume_plan(output):
+    """Continue controls in an incomplete run whose main phase is complete."""
+    evidence = Evidence(output)
+    completion_path = output / "completion.json"
+    completion = load_json(completion_path)
+    if completion.get("completed") is True:
+        raise RuntimeError("run is already complete")
+    if completion.get("evidence_schema") != EVIDENCE_SCHEMA:
+        raise RuntimeError("run uses an unsupported evidence schema")
+    raw_plan = load_json(output / "plan.json")
+    config = normalize(raw_plan, full=raw_plan.get("profile") != "smoke")
+    seeds = load_json(output / "seeds.json")
+    seed = seeds.get("root")
+    if not isinstance(seed, int):
+        raise RuntimeError("run does not contain a valid root seed")
+    expected_seeds = {name: derived_seed(seed, name) for name in ("order", "faults", "topology")}
+    if any(seeds.get(name) != value for name, value in expected_seeds.items()):
+        raise RuntimeError("saved derived seeds do not match the root seed")
+    run_id = output.name.removeprefix("cassandra_policy_")
+    if completion.get("run_id") != run_id:
+        raise RuntimeError("completion run ID does not match the result directory")
+
+    trials = load_json(output / "trials.json")
+    faults = load_json(output / "faults.json")
+    validate_completed_main_phase(config, trials, faults)
+
+    repairs_raw = load_json(output / "read_repair.json") if (output / "read_repair.json").exists() else []
+    repairs, discarded_repairs = checkpoint_prefix(
+        repairs_raw, expected_repair_ids(config), valid_repair_checkpoint, "read-repair"
+    )
+    timestamps_raw = (load_json(output / "timestamp_control.json")
+                      if (output / "timestamp_control.json").exists() else [])
+    timestamps, discarded_timestamps = checkpoint_prefix(
+        timestamps_raw, expected_timestamp_ids(config), valid_timestamp_checkpoint, "timestamp"
+    )
+
+    resume_started_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    resume_started_monotonic = time.monotonic()
+    previous_minutes = float(completion.get("completion_time_minutes", 0.0))
+    failures = list(completion.get("failure_history", []))
+    if completion.get("error"):
+        failures.append({
+            "ended_utc": completion.get("ended_utc"),
+            "completion_time_minutes": completion.get("completion_time_minutes"),
+            "error": completion["error"],
+        })
+    resume_count = int(completion.get("resume_count", 0)) + 1
+    completion.update({
+        "completed": False,
+        "resume_count": resume_count,
+        "last_resumed_utc": resume_started_utc,
+        "failure_history": failures,
+    })
+    for terminal_field in ("error", "ended_utc", "completed_utc"):
+        completion.pop(terminal_field, None)
+    evidence.save("completion.json", completion)
+    evidence.event("run_resumed", run_id=run_id, resume_count=resume_count,
+                   retained_main_trials=len(trials), retained_read_repair=len(repairs),
+                   retained_timestamps=len(timestamps))
+
+    archive_stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    discarded = {"read_repair": discarded_repairs, "timestamp_control": discarded_timestamps}
+    if discarded_repairs or discarded_timestamps:
+        evidence.save(f"resume_discarded_{archive_stamp}_{resume_count}.json", discarded)
+        evidence.save("read_repair.json", repairs)
+        evidence.save("timestamp_control.json", timestamps)
+        evidence.event("resume_invalid_tail_archived",
+                       read_repair=len(discarded_repairs),
+                       timestamp_control=len(discarded_timestamps))
+
+    total = (expected_main_trials(config) + read_repair.expected_trials(config)
+             + timestamp_control.expected_trials(config))
+    progress = Progress(total, completed=len(trials) + len(repairs) + len(timestamps))
+    rngs = {name: random.Random(value) for name, value in expected_seeds.items()}
+    replay_topology_choices(repairs, rngs["topology"])
+
+    try:
+        progress.show("resume", f"run={run_id}; restoring cluster health")
+        recovery = recover_all(config["faults"]["recovery_timeout_seconds"])
+        settle_after_recovery(config)
+        schema = worker({"action": "schema"}, config)
+        probe = worker({"action": "probe"}, config)
+        if schema.get("status") != "ok" or not schema.get("records"):
+            raise RuntimeError("resume schema creation/inspection failed")
+        if len(probe) != len(NODES) or not all(item.get("reachable") for item in probe):
+            raise RuntimeError("resume requires every CQL endpoint to be ready")
+        evidence.save(f"resume_cluster_{archive_stamp}_{resume_count}.json",
+                      {"resumed_utc": resume_started_utc, "recovery": recovery,
+                       "schema": schema, "client_probe": probe})
+        refresh_resume_environment(config, seed, run_id, evidence)
+        progress.show("resume", f"cluster healthy; continuing after {len(repairs)} repair "
+                      f"and {len(timestamps)} timestamp checkpoints")
+
+        repairs = run_read_repair(config, evidence, run_id, rngs, progress, repairs)
+        timestamps = run_timestamp_controls(config, evidence, run_id, rngs, progress, timestamps)
+        if len(repairs) != read_repair.expected_trials(config):
+            raise RuntimeError("read-repair attempt count mismatch after resume")
+        if len(timestamps) != timestamp_control.expected_trials(config):
+            raise RuntimeError("timestamp-control attempt count mismatch after resume")
+
+        timing = timing_fields(completion["started_utc"], resume_started_monotonic,
+                               previous_minutes)
+        final = {
+            "completed": True, "evidence_schema": EVIDENCE_SCHEMA, "run_id": run_id,
+            "profile": config["profile"], "main_trials": len(trials),
+            "expected_main_trials": expected_main_trials(config),
+            "read_repair_trials": len(repairs), "timestamp_trials": len(timestamps),
+            "verdicts": dict(Counter(trial["verdict"] for trial in trials)),
+            "completed_utc": timing["ended_utc"], "resume_count": resume_count,
+            "last_resumed_utc": resume_started_utc, "failure_history": failures,
+            **timing,
+        }
+        evidence.save("completion.json", final)
+        from scripts.verify_randomized import verify
+        validation = verify(output)
+        evidence.event("run_completed", **final, validation=validation)
+        progress.show("complete", f"resumed evidence verified and saved in {output}")
+        return output
+    except BaseException as exc:
+        timing = timing_fields(completion["started_utc"], resume_started_monotonic,
+                               previous_minutes)
+        completion.update({
+            "completed": False,
+            "error": {"type": type(exc).__name__, "message": str(exc)},
+            "resume_count": resume_count,
+            "last_resumed_utc": resume_started_utc,
+            **timing,
+        })
+        evidence.save("completion.json", completion)
+        evidence.event("run_resume_failed",
+                       error={"type": type(exc).__name__, "message": str(exc)})
+        raise
+
+
 def plan_summary(config, seed):
     main = expected_main_trials(config)
     repairs = read_repair.expected_trials(config)
@@ -545,10 +803,23 @@ def main():
     parser.add_argument("--smoke", action="store_true", help="allow fewer than ten attempts; never a submission run")
     parser.add_argument("--repetitions", type=int)
     parser.add_argument("--recover", action="store_true", help="restart all nodes and clear project firewall rules")
+    parser.add_argument("--resume", type=Path,
+                        help="continue controls in an incomplete result directory with a complete main phase")
     args = parser.parse_args()
-    config = load_config(args.config, full=not args.smoke, repetitions=args.repetitions)
-    seed = args.seed if args.seed is not None else config.get("seed")
-    seed = seed if seed is not None else secrets.randbits(64)
+    if args.resume and (args.plan_only or args.recover or args.seed is not None
+                        or args.repetitions is not None or args.smoke):
+        parser.error("--resume cannot be combined with --plan-only, --recover, --seed, "
+                     "--repetitions, or --smoke; the saved plan and seed are authoritative")
+    if args.resume:
+        output = args.resume.resolve()
+        if not output.is_dir():
+            parser.error(f"resume directory does not exist: {output}")
+        config = None
+        seed = None
+    else:
+        config = load_config(args.config, full=not args.smoke, repetitions=args.repetitions)
+        seed = args.seed if args.seed is not None else config.get("seed")
+        seed = seed if seed is not None else secrets.randbits(64)
     if args.plan_only:
         print(json.dumps(plan_summary(config, seed), indent=2))
         return
@@ -564,6 +835,17 @@ def main():
         print("[runner] Building and starting the Docker Compose environment...", flush=True)
         compose("up", "-d", "--build", timeout=1800)
         print("[runner] Docker Compose environment started; beginning experiment setup.", flush=True)
+        if args.resume:
+            try:
+                print(resume_plan(output))
+            except BaseException:
+                try:
+                    saved_plan = load_json(output / "plan.json")
+                    recover_all(saved_plan["faults"]["recovery_timeout_seconds"])
+                except BaseException as cleanup_error:
+                    print(f"automatic recovery failed: {cleanup_error}", file=sys.stderr)
+                raise
+            return
         stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         output = ROOT / "results" / f"cassandra_policy_{stamp}_{seed:016x}"
         try:

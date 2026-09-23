@@ -11,8 +11,10 @@ sys.path.insert(0, str(ROOT / 'src'))
 from experiments.common import cases, expected_main_trials
 from experiments.node_failure import choose_victim
 from experiments.network_partition import choose_isolated, crossing_edges
+from experiments.read_repair import topology_pairs
 from routing import DriverRoutingEvidence, POLICY_NAME
-from scripts.run_randomized import timing_fields
+from scripts.run_randomized import (checkpoint_prefix, replay_topology_choices,
+                                    timing_fields, valid_repair_checkpoint)
 
 
 class RandomizedSetupTests(unittest.TestCase):
@@ -59,6 +61,35 @@ class RandomizedSetupTests(unittest.TestCase):
         self.assertEqual(timing['started_utc'], started_utc)
         self.assertIn('ended_utc', timing)
         self.assertGreaterEqual(timing['completion_time_minutes'], 2.0)
+
+    def test_resume_discards_checkpoint_from_first_invalid_record(self):
+        def repair(attempt_id, valid=True):
+            record = {'case': {'attempt_id': attempt_id},
+                      'verdict': 'inconclusive', 'initialization': {},
+                      'write': {}, 'first': {}, 'second': {}}
+            if not valid:
+                record['recovery_error'] = {'type': 'TimeoutError'}
+            return record
+        records = [repair('repair:0:blocking'),
+                   repair('repair:0:no_repair', valid=False),
+                   repair('repair:1:blocking')]
+        retained, discarded = checkpoint_prefix(
+            records,
+            ['repair:0:blocking', 'repair:0:no_repair', 'repair:1:blocking'],
+            valid_repair_checkpoint,
+            'read-repair')
+        self.assertEqual([r['case']['attempt_id'] for r in retained],
+                         ['repair:0:blocking'])
+        self.assertEqual(len(discarded), 2)
+
+    def test_resume_replays_saved_topology_rng(self):
+        seed = 9182
+        original = random.Random(seed)
+        pair1, pair2 = topology_pairs('n2', ('n1', 'n2', 'n3'), original)
+        record = {'case': {'attempt_id': 'repair:0:blocking'},
+                  'write': {'records': [{'routing': {'selected_node': 'n2'}}]},
+                  'pair_sequence': [list(pair1), list(pair2)]}
+        replay_topology_choices([record], random.Random(seed))
 
 
 if __name__ == '__main__':

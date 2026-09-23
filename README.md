@@ -191,6 +191,15 @@ python3 scripts/run_randomized.py \
 
 Recovery starts all three Cassandra containers, removes only rules in the project `LAB_FAULT` chain, and waits for all three nodes to return to healthy membership. It does not change an incomplete run into a complete run and does not delete its partial evidence.
 
+If the incomplete run has a complete main phase, resume its remaining read-repair and timestamp controls with the saved plan and seed:
+
+```sh
+python3 scripts/run_randomized.py \
+  --resume results/cassandra_policy_<incomplete-run>
+```
+
+Resume performs project-scoped recovery, validates all main checkpoints, retains the ordered valid control prefix, archives any invalid tail, restores the topology RNG from the saved seed and retained choices, and continues at the first missing or invalid control attempt. It refuses an incomplete main phase, a completed run, mismatched IDs, duplicate checkpoints, or inconsistent seeds. Do not combine `--resume` with configuration, seed, repetition, smoke, plan, or recovery overrides.
+
 If `.cassandra-policy-run.lock` exists after a crash, it is not sufficient evidence that a controller is active: the operating-system lock, rather than the file's existence, controls concurrency.
 
 ## Validate evidence

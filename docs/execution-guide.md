@@ -147,7 +147,13 @@ python3 scripts/run_randomized.py --recover
 
 Recovery is idempotent and scoped to the project. It starts n1/n2/n3, removes project firewall rules, and waits for healthy membership. It does not delete volumes or evidence.
 
-Never continue an interrupted result directory by manually adding JSON records. Start a new run after recovery. Preserve the incomplete directory because it documents the failed attempt.
+When the main phase is complete, the runner can resume an incomplete control phase without repeating main histories:
+
+```sh
+python3 scripts/run_randomized.py --resume results/cassandra_policy_<incomplete-run>
+```
+
+Resume uses `plan.json` and `seeds.json` from the run. It validates complete main evidence, retains only the valid ordered prefix of repair and timestamp checkpoints, archives an invalid tail, reconstructs the topology RNG, restores cluster health, and continues from the first missing attempt. Each execution snapshot and failure is retained in the environment and completion metadata. Resume refuses incomplete main evidence; never add or delete evidence records manually.
 
 ## Verification and reporting boundary
 
@@ -165,7 +171,7 @@ Set both `DOCKER_BIN` and `COMPOSE_BIN` as shown in the README. The fault helper
 
 ### Cannot connect to Docker daemon
 
-Start Docker Desktop and wait for the engine. Then run `--recover` before starting a new experiment. A run interrupted by daemon loss remains incomplete.
+Start Docker Desktop and wait for the engine. Use `--recover` for cluster-only cleanup. If the main phase is complete, use `--resume <result-directory>` to recover and continue the controls; otherwise preserve the incomplete run and start a new experiment.
 
 ### Cluster does not become healthy
 
@@ -185,7 +191,7 @@ Check the saved victim IP and survivor `nodetool status` observations in the epi
 
 ### Recovery times out
 
-Run explicit recovery, inspect logs and membership, and start a new run. Recovery timeout means the next experiment block did not receive a valid healthy barrier.
+Run explicit recovery and inspect logs and membership. A recovery timeout means the next experiment block did not receive a valid healthy barrier. A run with a complete main phase may be continued with `--resume` after the cluster is healthy.
 
 ### Verifier reports invalid evidence
 
