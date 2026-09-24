@@ -1,37 +1,37 @@
 {
   "approved_evidence_families": [
     {
-      "design_id": "random-coordinator-v2",
-      "evidence_schema": "randomized-cassandra-evidence-v3",
-      "routing_policy": "harness_controlled_independent_random_coordinator",
-      "setup": "previous_randomized"
-    },
-    {
       "design_id": "cassandra-driver-policy-v3",
       "evidence_schema": "cassandra-driver-policy-evidence-v4",
       "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=dc1))",
       "setup": "cassandra_token_aware"
+    },
+    {
+      "design_id": "cassandra-driver-policy-expanded-v1",
+      "evidence_schema": "cassandra-driver-policy-evidence-v5",
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=dc1))",
+      "setup": "cassandra_token_aware_expanded"
     }
   ],
-  "eligible_runs": 19,
-  "excluded_runs": 14,
+  "eligible_runs": 7,
+  "excluded_runs": 6,
   "export_schema": "report-evidence-export-v1",
   "files": {
     "run_level_violation_matrix.csv": {
-      "rows": 33,
-      "sha256": "a916691eb54d0bfa9ba85a4d17b4d8d1566647ce7752d9d3b9d098367e759bbf"
+      "rows": 13,
+      "sha256": "a3605893a5ecc38e56b6c5cb5dfd6c3c682c729e1239d3070438f8786e0f4f89"
     },
     "trial_level_evidence.csv": {
-      "rows": 75692,
-      "sha256": "3701a3c65250ecd26de89c410192703f007218f691392938eeae474a94d9b5b5"
+      "rows": 54465,
+      "sha256": "26d0a9d7f0c6209e377632f5f61ec09ba7bf90d1d7ddcd97a1297183a83d4649"
     }
   },
-  "main_trial_rows": 74024,
-  "record_rows": 75692,
+  "main_trial_rows": 53172,
+  "record_rows": 54465,
   "record_type_counts": {
-    "main_trial": 74024,
-    "read_repair_control": 1132,
-    "timestamp_control": 536
+    "main_trial": 53172,
+    "read_repair_control": 822,
+    "timestamp_control": 471
   },
-  "run_rows": 33
+  "run_rows": 13
 }

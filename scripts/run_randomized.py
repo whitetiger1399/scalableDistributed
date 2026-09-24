@@ -813,7 +813,14 @@ def plan_summary(config, seed):
     main = expected_main_trials(config)
     repairs = read_repair.expected_trials(config)
     timestamps = timestamp_control.expected_trials(config)
-    return {"seed": seed, "profile": config["profile"], "main_trials": main,
+    return {"seed": seed, "profile": config["profile"],
+            "cluster_profile": config["cluster"]["profile"],
+            "compose_file": config["cluster"]["compose_file"],
+            "nodes": config["cluster"]["nodes"],
+            "replication_factor": config["database"]["replication_factor"],
+            "partition_strategy": config["faults"]["partition_strategy"],
+            "partition_group_sizes": config["faults"].get("partition_group_sizes"),
+            "main_trials": main,
             "read_repair_trials": repairs, "timestamp_trials": timestamps,
             "total_trials": main + repairs + timestamps,
             "per_case_repetitions": config["rounds"]}

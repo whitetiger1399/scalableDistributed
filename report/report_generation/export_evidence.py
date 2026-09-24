@@ -23,10 +23,6 @@ DEFAULT_OUTPUT = Path(__file__).resolve().parent
 EXPORT_SCHEMA = "report-evidence-export-v1"
 
 APPROVED = {
-    ("random-coordinator-v2", "randomized-cassandra-evidence-v3"): {
-        "setup": "previous_randomized",
-        "routing_policy": "harness_controlled_independent_random_coordinator",
-    },
     ("cassandra-driver-policy-v3", "cassandra-driver-policy-evidence-v4"): {
         "setup": "cassandra_token_aware",
         "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=dc1))",
@@ -203,6 +199,9 @@ def run_identity(directory: Path) -> dict[str, Any] | None:
         notes.append("duplicate_trial_key")
     if any(not isinstance(trial, dict) for trial in trials):
         notes.append("non_object_trial")
+    profile = completion.get("profile") or plan.get("profile")
+    if profile == "smoke":
+        notes.append("smoke_profile")
     eligible = completed and not notes
     return {
         "directory": directory,

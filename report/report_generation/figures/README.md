@@ -15,6 +15,7 @@ The DOCX was not modified. The PNG files are standalone report assets.
 | `png/05_experiment_evidence_pipeline.png` | Connects configuration, execution, Cassandra, raw logs, validation, trial CSV, run matrix, and academic report claims. |
 | `png/06_client_centric_models.png` | Defines RYW, MR, MW, and WFR as ordered histories and shows the violation witness used by each oracle. |
 | `png/07_token_aware_driver_policy_detail.png` | Shows the token-aware Python-driver path from routing key and Murmur3 token to replica ranking, local-DC query plan, coordinator selection, fallback order, replica contacts, and consistency-level boundary. |
+| `png/08_five_node_expanded_architecture.png` | Shows the expanded five-node/RF=3 deployment, token-aware replica selection, replica versus non-replica roles, balanced 2|3 fault cut, and V5 evidence fields. |
 
 All final PNGs are 2400 × 1467 pixels with a white background. Editable SVG sources are retained under `svg/`.
 
@@ -27,7 +28,7 @@ All final PNGs are 2400 × 1467 pixels with a white background. Editable SVG sou
 - Red: unavailable node or intentionally severed network path.
 - Blue coordinator badge: the Cassandra node serving as coordinator for the illustrated request.
 
-The coordinator is deliberately shown as a role on `n1`, `n2`, or `n3`. It is not drawn as a separate fourth Cassandra service.
+The coordinator is deliberately shown as a role on a Cassandra node. It is not a separate service. Figure 8 extends the node set through `n5` while retaining RF=3.
 
 ## Brand marks
 
@@ -59,5 +60,6 @@ The PNGs were rasterized on macOS with Quick Look at 2400 pixels, using a square
 - Data collection and reproducibility section: Figure 5.
 - Client-centric model definitions or methodology section: Figure 6.
 - Token-aware driver implementation subsection: Figure 7.
+- Expanded-cluster design and V5 comparison: Figure 8.
 
 Use the PNG files in the DOCX. Keep the SVG files as the editable source and for any future PDF-first workflow.

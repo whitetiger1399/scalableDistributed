@@ -433,6 +433,63 @@ def token_aware_detail_figure() -> str:
     return canvas("Cassandra token-aware coordinator selection", "How the Python driver turns a partition key into a stable, replica-aware local-DC query plan", "".join(c))
 
 
+def expanded_five_node_figure() -> str:
+    """Five-node/RF=3 deployment and one illustrative balanced partition."""
+    xs = {"n1": 85, "n2": 420, "n3": 755, "n4": 1090, "n5": 1425}
+    replicas = {"n1", "n3", "n5"}
+    c = [
+        rect(65, 155, 1670, 815, PANEL, "#8FA7B8", 26, 2),
+        txt(100, 198, "Docker Compose project: cassandra-consistency-lab-expanded", "section"),
+
+        # Control and application plane.
+        rect(100, 235, 350, 150, LIGHT_GREEN, GREEN, 18, 2, True),
+        icon("python", 128, 266, 54),
+        txt(205, 284, "Experiment controller", "label"),
+        lines(205, 316, ["parameterized config", "fault injection + recovery", "V5 evidence"], "small", "start", 23),
+        rect(710, 220, 380, 165, LIGHT_BLUE, BLUE, 18, 3, True),
+        icon("python", 740, 250, 58),
+        txt(820, 274, "Client container", "section"),
+        lines(900, 316, ["TokenAwarePolicy", "DCAwareRoundRobinPolicy(dc1)", "routing key on every statement"], "small", "middle", 23),
+        rect(1335, 235, 330, 150, LIGHT_PURPLE, PURPLE, 18, 2, True),
+        icon("apachecassandra", 1365, 266, 56),
+        txt(1440, 284, "Replica metadata", "label"),
+        lines(1500, 316, ["RF=3 replica set", "3 replicas of 5 nodes", "2 non-replica hosts"], "small", "middle", 23),
+        arrow(450, 310, 692, 310, MUTED, dash="10 8", width=3),
+        arrow(1090, 310, 1317, 310, BLUE, width=4),
+
+        # Cluster plane and routes. Curves are drawn before cards.
+        rect(85, 470, 1630, 330, "#FFFFFF", LINE, 22, 2),
+        txt(115, 510, "Cassandra cluster • five nodes • one datacenter • RF=3", "section"),
+        curved("M900,405 C900,445 880,465 880,540", BLUE, width=4),
+        curved("M880,570 C820,520 250,520 210,555", PURPLE, width=4),
+        curved("M880,570 C980,520 1500,520 1550,555", PURPLE, width=4),
+    ]
+    for name, x in xs.items():
+        selected = name == "n3"
+        c.append(node(x, 565, name, selected))
+        badge_fill = LIGHT_GREEN if name in replicas else "#EDF1F4"
+        badge_stroke = GREEN if name in replicas else MUTED
+        label = "REPLICA" if name in replicas else "NON-REPLICA"
+        c.extend([
+            rect(x+47, 710, 156, 38, badge_fill, badge_stroke, 12, 1),
+            txt(x+125, 735, label, "tiny", "middle",
+                fill=GREEN if name in replicas else MUTED, weight="700"),
+        ])
+    c += [
+        # Illustrative seeded 2|3 cut between n2 and n3.
+        f'<line x1="715" y1="535" x2="715" y2="770" stroke="{RED}" stroke-width="5" stroke-dasharray="12 9"/>',
+        rect(570, 785, 290, 55, LIGHT_RED, RED, 12, 2),
+        txt(715, 820, "Example seeded 2|3 cut", "label", "middle", fill=RED),
+        txt(365, 870, "group A: 2 nodes", "label", "middle"),
+        txt(1220, 870, "group B: 3 nodes", "label", "middle"),
+        txt(900, 905, "All six cross-group internode edges blocked • CQL 9042 remains reachable", "body", "middle"),
+        rect(390, 925, 1020, 75, LIGHT_GREEN, GREEN, 16, 2),
+        txt(900, 956, "Recorded per operation", "label", "middle"),
+        txt(900, 983, "replica_nodes • selected_node • selected_is_replica • attempted_nodes", "small", "middle"),
+    ]
+    return canvas("Expanded five-node Cassandra architecture", "RF=3 creates three replicas and two non-replica nodes per key; each fault episode samples a balanced 2|3 partition", "".join(c))
+
+
 FIGURES = {
     "01_windows_deployment_architecture.svg": windows_figure,
     "02_macos_deployment_architecture.svg": macos_figure,
@@ -441,6 +498,7 @@ FIGURES = {
     "05_experiment_evidence_pipeline.svg": pipeline_figure,
     "06_client_centric_models.svg": models_figure,
     "07_token_aware_driver_policy_detail.svg": token_aware_detail_figure,
+    "08_five_node_expanded_architecture.svg": expanded_five_node_figure,
 }
 
 

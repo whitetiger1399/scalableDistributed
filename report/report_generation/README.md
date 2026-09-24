@@ -1,11 +1,11 @@
 # Report evidence exports
 
-This folder contains the report-generation plan and normalized evidence for the two approved experiment families.
+This folder contains the report-generation plan and normalized evidence for the approved Cassandra driver-policy experiment families. Historical harness-randomized results are excluded from these exports.
 
 | Setup | Design ID | Evidence schema |
 |---|---|---|
-| Previous randomized coordinator | `random-coordinator-v2` | `randomized-cassandra-evidence-v3` |
-| Cassandra token-aware driver | `cassandra-driver-policy-v3` | `cassandra-driver-policy-evidence-v4` |
+| Three-node token-aware driver | `cassandra-driver-policy-v3` | `cassandra-driver-policy-evidence-v4` |
+| Five-node expanded token-aware driver | `cassandra-driver-policy-expanded-v1` | `cassandra-driver-policy-evidence-v5` |
 
 No other design or evidence schema is exported.
 
@@ -22,17 +22,16 @@ No other design or evidence schema is exported.
 
 ## Current export coverage
 
-- Matching runs: **33**
-- Total trial/control records: **75,692**
-- Main client-centric trials: **74,024**
-- Read-repair controls: **1,132**
-- Timestamp controls: **536**
-- Analysis-eligible completed runs: **19**
-- Excluded incomplete runs: **14**
-- Main trials in eligible runs: **57,168**
-- Controls in eligible runs: **1,608**
+- Matching V4/V5 runs: **13**
+- Total trial/control records in the frozen export: **54,465**
+- Main client-centric trials: **53,172**
+- Read-repair controls: **822**
+- Timestamp controls: **471**
+- Analysis-eligible completed full-profile runs: **7**
+- Excluded incomplete or smoke-profile runs: **6**
+- Main trials in the report aggregate: **50,760**
 
-Partial runs are intentionally retained for auditability. Use `included_in_analysis=true` when calculating report results.
+Partial and smoke-profile runs are intentionally retained for auditability. Report aggregates require `included_in_analysis=true`, `record_type=main_trial`, and `run_profile=full`.
 
 ## Trial-level schema
 
@@ -72,7 +71,7 @@ These fields provide a complete route from a CSV row back to the saved JSON evid
 - Operation success/error counts and error classes
 - Coordinator-node and endpoint sequence
 - Distinct coordinator count and whether the history changed coordinators
-- Whether a network-partition history crossed the 2|1 cut
+- Whether a network-partition history crossed the configured cut (1|2 for V4 and 2|3 for V5)
 - Whether a node-failure history routed to the failed node
 - Trial timestamps and duration
 
@@ -92,6 +91,7 @@ The maximum session history contains four operations. Columns prefixed with `op1
 - Error class/message, selected node, coordinator endpoint, and latency
 - Start/end timestamps, query, parameters, returned value, and routing key
 - Driver/harness routing policy and selected/candidate/eligible/attempted hosts
+- Replica-set evidence and whether the selected coordinator is a replica (V5)
 - An `extra_json` field for any unrecognized operation properties
 
 Empty `op4_` fields are expected for two-operation and three-operation models.
@@ -145,7 +145,7 @@ The exporter overwrites only its three generated artifacts: the two CSVs and `ex
 
 ## Filtering examples
 
-Completed evidence for report analysis:
+Completed full-profile evidence for report analysis:
 
 ```python
 import pandas as pd
@@ -154,6 +154,7 @@ trials = pd.read_csv("report/report_generation/trial_level_evidence.csv", low_me
 eligible = trials[
     (trials["included_in_analysis"] == True)
     & (trials["record_type"] == "main_trial")
+    & (trials["run_profile"] == "full")
 ]
 ```
 
