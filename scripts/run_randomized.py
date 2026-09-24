@@ -21,11 +21,21 @@ sys.path.insert(0, str(ROOT / "src"))
 from checks import evaluate
 from experiments import node_failure, network_partition, read_repair, session_guarantees, timestamp_control
 from experiments.configuration import expected_main_trials, normalize
-from experiments.faults import (NODES, clear_partition, compose, kill_node, membership,
+from experiments.faults import (clear_partition, compose, configure_cluster, kill_node, membership,
                                 partition_snapshot, recover_all, restart_node, set_graph,
-                                set_partition, wait_failure, wait_healthy)
+                                wait_failure, wait_healthy)
 
 EVIDENCE_SCHEMA = "cassandra-driver-policy-evidence-v4"
+EXPANDED_EVIDENCE_SCHEMA = "cassandra-driver-policy-evidence-v5"
+
+
+def cluster_nodes(config):
+    return tuple(config["cluster"]["nodes"])
+
+
+def evidence_schema(config):
+    return (EVIDENCE_SCHEMA if config["cluster"]["profile"] == "three_node"
+            else EXPANDED_EVIDENCE_SCHEMA)
 
 
 class Progress:
@@ -132,7 +142,7 @@ def derived_seed(root, label):
 
 def worker(request, config):
     payload = dict(request)
-    payload.update(nodes=list(NODES), cql_port=config["faults"]["cql_port"],
+    payload.update(nodes=list(cluster_nodes(config)), cql_port=config["faults"]["cql_port"],
                    routing=config["routing"])
     if payload.get("action") == "schema":
         payload["database"] = config["database"]
@@ -173,7 +183,7 @@ def initialize(schedule, timestamp, config, table="blocking", attempts=4):
             if attempt + 1 >= attempts:
                 break
             # Re-confirm the cluster can serve ALL writes before retrying.
-            wait_healthy(config["faults"]["recovery_timeout_seconds"])
+            wait_healthy(config["faults"]["recovery_timeout_seconds"], cluster_nodes(config))
             settle_after_recovery(config)
     raise last_error
 
@@ -184,7 +194,7 @@ def environment(config, seed, run_id):
         return {"command": args, "returncode": result.returncode,
                 "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
     source_files = [ROOT / name for name in ("README.md", "WORK_IN_PROGRESS.md",
-                    "Project_Assignment.md", "AGENT_ACTION_PLAN.md", "compose.yaml",
+                    "Project_Assignment.md", "AGENT_ACTION_PLAN.md", config["cluster"]["compose_file"],
                     "Dockerfile.cassandra", "Dockerfile.client", "requirements-report.txt",
                     "report/predictions.md", "report/authors.json")]
     for directory in ("config", "docs", "experiments", "src", "scripts", "tests"):
@@ -193,7 +203,7 @@ def environment(config, seed, run_id):
     manifest = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in sorted(set(source_files))}
     return {
-        "evidence_schema": EVIDENCE_SCHEMA, "design": config["design"], "run_id": run_id,
+        "evidence_schema": evidence_schema(config), "design": config["design"], "run_id": run_id,
         "started_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "root_seed": seed,
         "python": sys.version, "platform": sys.platform,
         "git_revision": output(["git", "rev-parse", "HEAD"]),
@@ -220,8 +230,8 @@ def recover_with_retry(config, attempts=3):
     last_error = None
     for attempt in range(attempts):
         try:
-            clear_partition()
-            wait_healthy(config["faults"]["recovery_timeout_seconds"])
+            clear_partition(cluster_nodes(config))
+            wait_healthy(config["faults"]["recovery_timeout_seconds"], cluster_nodes(config))
             return
         except BaseException as exc:
             last_error = exc
@@ -231,6 +241,7 @@ def recover_with_retry(config, attempts=3):
 
 def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
                  fault_records, progress):
+    nodes = cluster_nodes(config)
     schedule = session_guarantees.build_round(config, run_id, round_no, scenario, rngs["order"])
     progress.show("session_guarantees",
                   f"starting scenario={scenario}, round={round_no + 1}/{config['rounds']}, "
@@ -249,7 +260,7 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
     cleanup = None
     try:
         if scenario == "node_failure":
-            victim = node_failure.choose_victim(NODES, rngs["faults"])
+            victim = node_failure.choose_victim(nodes, rngs["faults"])
             progress.show("session_guarantees",
                           f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
                           f"stopping {victim} and waiting for failure detection")
@@ -257,27 +268,36 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
             cleanup = ("node", victim)
             record["fault"] = fault
             fault["detection"] = wait_failure(victim, fault["identity"]["ip"],
-                config["faults"]["failure_detection_timeout_seconds"])
+                config["faults"]["failure_detection_timeout_seconds"], nodes=nodes)
         elif scenario == "network_partition":
-            isolated = network_partition.choose_isolated(NODES, rngs["faults"])
+            strategy = config["faults"]["partition_strategy"]
+            groups = network_partition.choose_groups(
+                nodes, rngs["faults"], strategy,
+                config["faults"].get("partition_group_sizes"))
+            edges = network_partition.edges_between(groups)
             progress.show("session_guarantees",
                           f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
-                          f"installing partition with isolated_node={isolated}")
-            fault = set_partition(isolated, config["faults"]["internode_ports"])
-            cleanup = ("partition", isolated)
-            expected_peers = {node: (2 if node == isolated else 1) for node in NODES}
+                          f"installing {len(groups[0])}|{len(groups[1])} partition groups={groups}")
+            fault = set_graph(edges, config["faults"]["internode_ports"], nodes)
+            cleanup = ("partition", groups)
+            expected_peers = {
+                node: (len(groups[1]) if node in groups[0] else len(groups[0]))
+                for node in nodes
+            }
             for node, peer_count in expected_peers.items():
                 if len(fault["blocked"].get(node, [])) != peer_count:
-                    raise RuntimeError("installed partition graph differs from intended 2|1 cut")
+                    raise RuntimeError("installed partition graph differs from intended cut")
                 if fault["rules"].get(node, "").count("-j DROP") < peer_count * 2:
                     raise RuntimeError("partition DROP rules are incomplete")
             if config["faults"]["partition_stabilization_seconds"]:
                 time.sleep(config["faults"]["partition_stabilization_seconds"])
             probe = worker({"action": "probe"}, config)
-            if len(probe) != len(NODES) or not all(item.get("reachable") for item in probe):
+            if len(probe) != len(nodes) or not all(item.get("reachable") for item in probe):
                 raise RuntimeError("partition must retain CQL reachability to every node")
-            fault.update(isolated=isolated, client_probe=probe,
-                         established_ns=time.time_ns(), established_membership={n: membership(n) for n in NODES})
+            fault.update(partition_strategy=strategy, groups=groups,
+                         isolated=(groups[0][0] if len(groups[0]) == 1 else None),
+                         client_probe=probe, established_ns=time.time_ns(),
+                         established_membership={n: membership(n) for n in nodes})
             record["fault"] = fault
         progress.show("session_guarantees",
                       f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
@@ -291,7 +311,7 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
             trial.update(episode_id=episode_id, routing_policy=config["routing"]["policy"],
                          worker_health=batch.get("health", []))
         record["trials"] = trials
-        record["post_workload_partition"] = partition_snapshot() if scenario == "network_partition" else None
+        record["post_workload_partition"] = partition_snapshot(nodes) if scenario == "network_partition" else None
         all_trials.extend(trials)
         progress.show("session_guarantees",
                       f"finished scenario={scenario}, round={round_no + 1}/{config['rounds']}, "
@@ -308,14 +328,14 @@ def main_episode(config, evidence, run_id, scenario, round_no, rngs, all_trials,
                               f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
                               f"restarting {cleanup[1]} and verifying recovery")
                 restart_node(cleanup[1])
-                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"], nodes)
                 record["settled_seconds"] = settle_after_recovery(config)
             elif cleanup and cleanup[0] == "partition":
                 progress.show("session_guarantees",
                               f"scenario={scenario}, round={round_no + 1}/{config['rounds']}; "
                               "removing partition and verifying recovery")
-                clear_partition()
-                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                clear_partition(nodes)
+                record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"], nodes)
                 record["settled_seconds"] = settle_after_recovery(config)
         except BaseException as recovery_error:
             record["recovery_error"] = {"type": type(recovery_error).__name__,
@@ -344,7 +364,8 @@ def run_read_repair(config, evidence, run_id, rngs, progress, results=None):
     if "read_repair" not in config["enabled_experiments"]:
         evidence.save("read_repair.json", results)
         return results
-    full_cut = [("n1", "n2"), ("n1", "n3"), ("n2", "n3")]
+    nodes = cluster_nodes(config)
+    full_cut = [(nodes[0], nodes[1]), (nodes[0], nodes[2]), (nodes[1], nodes[2])]
     completed_ids = {record["case"]["attempt_id"] for record in results}
     for round_no in range(config["rounds"]):
         for table, setting in read_repair.settings(config):
@@ -360,7 +381,7 @@ def run_read_repair(config, evidence, run_id, rngs, progress, results=None):
             try:
                 record["initialization"] = initialize([case], time.time_ns() // 1000,
                                                        config, table)
-                record["full_cut"] = set_graph(full_cut, config["faults"]["internode_ports"])
+                record["full_cut"] = set_graph(full_cut, config["faults"]["internode_ports"], nodes)
                 if config["faults"]["partition_hold_seconds"]:
                     time.sleep(config["faults"]["partition_hold_seconds"])
                 write = worker({"action": "ops",
@@ -368,18 +389,18 @@ def run_read_repair(config, evidence, run_id, rngs, progress, results=None):
                         key, time.time_ns() // 1000, table)]}, config)
                 record["write"] = write
                 selected = write.get("records", [{}])[0].get("routing", {}).get("selected_node")
-                if selected not in NODES:
+                if selected not in nodes:
                     raise RuntimeError("minority write did not identify its driver-selected coordinator")
-                pair1, pair2 = read_repair.topology_pairs(selected, NODES, rngs["topology"])
+                pair1, pair2 = read_repair.topology_pairs(selected, nodes, rngs["topology"])
                 record["pair_sequence"] = [pair1, pair2]
                 record["pair1_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair1)],
-                                                   config["faults"]["internode_ports"])
+                                                   config["faults"]["internode_ports"], nodes)
                 time.sleep(config["faults"]["partition_stabilization_seconds"])
                 first = worker({"action": "ops",
                     "operations": [read_repair.quorum_read(key, table)]}, config)
                 record["first"] = first
                 record["pair2_graph"] = set_graph([edge for edge in full_cut if set(edge) != set(pair2)],
-                                                   config["faults"]["internode_ports"])
+                                                   config["faults"]["internode_ports"], nodes)
                 time.sleep(config["faults"]["partition_stabilization_seconds"])
                 second = worker({"action": "ops",
                     "operations": [read_repair.quorum_read(key, table)]}, config)
@@ -393,14 +414,14 @@ def run_read_repair(config, evidence, run_id, rngs, progress, results=None):
                 else:
                     record.update(verdict=("regression" if read_value(second, 0, "a") != 1 else "no_regression_observed"),
                                   reason=None)
-                record["post_workload_partition"] = partition_snapshot()
+                record["post_workload_partition"] = partition_snapshot(nodes)
             except BaseException as exc:
                 record.update(verdict="setup_failure", reason=type(exc).__name__, error=str(exc))
                 raise
             finally:
                 try:
                     recover_with_retry(config)
-                    record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+                    record["recovery"] = wait_healthy(config["faults"]["recovery_timeout_seconds"], nodes)
                     record["settled_seconds"] = settle_after_recovery(config)
                 except BaseException as exc:
                     record["recovery_error"] = {"type": type(exc).__name__, "message": str(exc)}
@@ -459,15 +480,16 @@ def _run_plan(config, output, seed, started_utc, started_monotonic):
     evidence.save("plan.json", config)
     evidence.save("seeds.json", {"root": seed, **seeds})
     evidence.save("environment.json", environment(config, seed, run_id))
-    evidence.save("completion.json", {"completed": False, "evidence_schema": EVIDENCE_SCHEMA,
+    evidence.save("completion.json", {"completed": False, "evidence_schema": evidence_schema(config),
                                        "run_id": run_id, "started_utc": started_utc})
     evidence.event("run_started", run_id=run_id, profile=config["profile"])
     total = (expected_main_trials(config) + read_repair.expected_trials(config)
              + timestamp_control.expected_trials(config))
     progress = Progress(total)
     progress.show("setup", f"run={run_id}, profile={config['profile']}, seed={seed}")
-    progress.show("setup", "waiting for three-node Cassandra membership")
-    ready_membership = wait_healthy(config["faults"]["recovery_timeout_seconds"])
+    progress.show("setup", f"waiting for {len(cluster_nodes(config))}-node Cassandra membership")
+    ready_membership = wait_healthy(config["faults"]["recovery_timeout_seconds"],
+                                    cluster_nodes(config))
     progress.show("setup", "cluster healthy; creating and checking schema")
     schema_attempts = []
     for attempt in range(1, 11):
@@ -521,7 +543,7 @@ def _run_plan(config, output, seed, started_utc, started_monotonic):
         if len(timestamps) != timestamp_control.expected_trials(config):
             raise RuntimeError("timestamp-control attempt count mismatch")
         timing = timing_fields(started_utc, started_monotonic)
-        completion = {"completed": True, "evidence_schema": EVIDENCE_SCHEMA, "run_id": run_id,
+        completion = {"completed": True, "evidence_schema": evidence_schema(config), "run_id": run_id,
                       "profile": config["profile"], "main_trials": len(all_trials),
                       "expected_main_trials": expected, "read_repair_trials": len(repairs),
                       "timestamp_trials": len(timestamps),
@@ -538,6 +560,7 @@ def _run_plan(config, output, seed, started_utc, started_monotonic):
 
 def run_plan(config, output, seed):
     """Run a plan and leave timing plus terminal status in completion.json."""
+    configure_cluster(config["cluster"]["nodes"], config["cluster"]["compose_file"])
     started_utc = dt.datetime.now(dt.timezone.utc).isoformat()
     started_monotonic = time.monotonic()
     try:
@@ -557,7 +580,7 @@ def run_plan(config, output, seed):
             if completion.get("completed") is not True:
                 completion.update({
                     "completed": False,
-                    "evidence_schema": EVIDENCE_SCHEMA,
+                    "evidence_schema": evidence_schema(config),
                     "run_id": output.name.removeprefix("cassandra_policy_"),
                     "profile": config.get("profile"),
                     "error": {"type": type(exc).__name__, "message": str(exc)},
@@ -607,11 +630,11 @@ def validate_completed_main_phase(config, trials, faults):
             raise RuntimeError(f"episode {record.get('episode_id')} failed recovery")
 
 
-def replay_topology_choices(records, rng):
+def replay_topology_choices(records, rng, config):
     """Restore the topology RNG to the point after retained repair attempts."""
     for record in records:
         selected = record["write"]["records"][0]["routing"]["selected_node"]
-        expected = read_repair.topology_pairs(selected, NODES, rng)
+        expected = read_repair.topology_pairs(selected, cluster_nodes(config), rng)
         observed = record.get("pair_sequence")
         if observed != [list(expected[0]), list(expected[1])]:
             raise RuntimeError(
@@ -658,10 +681,11 @@ def resume_plan(output):
     completion = load_json(completion_path)
     if completion.get("completed") is True:
         raise RuntimeError("run is already complete")
-    if completion.get("evidence_schema") != EVIDENCE_SCHEMA:
+    if completion.get("evidence_schema") not in {EVIDENCE_SCHEMA, EXPANDED_EVIDENCE_SCHEMA}:
         raise RuntimeError("run uses an unsupported evidence schema")
     raw_plan = load_json(output / "plan.json")
     config = normalize(raw_plan, full=raw_plan.get("profile") != "smoke")
+    configure_cluster(config["cluster"]["nodes"], config["cluster"]["compose_file"])
     seeds = load_json(output / "seeds.json")
     seed = seeds.get("root")
     if not isinstance(seed, int):
@@ -725,17 +749,17 @@ def resume_plan(output):
              + timestamp_control.expected_trials(config))
     progress = Progress(total, completed=len(trials) + len(repairs) + len(timestamps))
     rngs = {name: random.Random(value) for name, value in expected_seeds.items()}
-    replay_topology_choices(repairs, rngs["topology"])
+    replay_topology_choices(repairs, rngs["topology"], config)
 
     try:
         progress.show("resume", f"run={run_id}; restoring cluster health")
-        recovery = recover_all(config["faults"]["recovery_timeout_seconds"])
+        recovery = recover_all(config["faults"]["recovery_timeout_seconds"], cluster_nodes(config))
         settle_after_recovery(config)
         schema = worker({"action": "schema"}, config)
         probe = worker({"action": "probe"}, config)
         if schema.get("status") != "ok" or not schema.get("records"):
             raise RuntimeError("resume schema creation/inspection failed")
-        if len(probe) != len(NODES) or not all(item.get("reachable") for item in probe):
+        if len(probe) != len(cluster_nodes(config)) or not all(item.get("reachable") for item in probe):
             raise RuntimeError("resume requires every CQL endpoint to be ready")
         evidence.save(f"resume_cluster_{archive_stamp}_{resume_count}.json",
                       {"resumed_utc": resume_started_utc, "recovery": recovery,
@@ -754,7 +778,7 @@ def resume_plan(output):
         timing = timing_fields(completion["started_utc"], resume_started_monotonic,
                                previous_minutes)
         final = {
-            "completed": True, "evidence_schema": EVIDENCE_SCHEMA, "run_id": run_id,
+            "completed": True, "evidence_schema": evidence_schema(config), "run_id": run_id,
             "profile": config["profile"], "main_trials": len(trials),
             "expected_main_trials": expected_main_trials(config),
             "read_repair_trials": len(repairs), "timestamp_trials": len(timestamps),
@@ -814,17 +838,20 @@ def main():
         output = args.resume.resolve()
         if not output.is_dir():
             parser.error(f"resume directory does not exist: {output}")
-        config = None
+        raw_plan = load_json(output / "plan.json")
+        config = normalize(raw_plan, full=raw_plan.get("profile") != "smoke")
         seed = None
     else:
         config = load_config(args.config, full=not args.smoke, repetitions=args.repetitions)
         seed = args.seed if args.seed is not None else config.get("seed")
         seed = seed if seed is not None else secrets.randbits(64)
+    configure_cluster(config["cluster"]["nodes"], config["cluster"]["compose_file"])
     if args.plan_only:
         print(json.dumps(plan_summary(config, seed), indent=2))
         return
     if args.recover:
-        print(json.dumps(recover_all(config["faults"]["recovery_timeout_seconds"]), indent=2))
+        print(json.dumps(recover_all(config["faults"]["recovery_timeout_seconds"],
+                                     cluster_nodes(config)), indent=2))
         return
     lock_path = ROOT / ".cassandra-policy-run.lock"
     with lock_path.open("w") as lock:
@@ -840,8 +867,8 @@ def main():
                 print(resume_plan(output))
             except BaseException:
                 try:
-                    saved_plan = load_json(output / "plan.json")
-                    recover_all(saved_plan["faults"]["recovery_timeout_seconds"])
+                    recover_all(config["faults"]["recovery_timeout_seconds"],
+                                cluster_nodes(config))
                 except BaseException as cleanup_error:
                     print(f"automatic recovery failed: {cleanup_error}", file=sys.stderr)
                 raise
@@ -852,7 +879,8 @@ def main():
             print(run_plan(config, output, seed))
         except BaseException:
             try:
-                recover_all(config["faults"]["recovery_timeout_seconds"])
+                recover_all(config["faults"]["recovery_timeout_seconds"],
+                            cluster_nodes(config))
             except BaseException as cleanup_error:
                 print(f"automatic recovery failed: {cleanup_error}", file=sys.stderr)
             raise

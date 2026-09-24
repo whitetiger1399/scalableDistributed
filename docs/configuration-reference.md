@@ -1,19 +1,24 @@
 # Cassandra driver-policy experiment configuration reference
 
-The runner reads `config/cassandra_driver_experiments.json`, applies any command-line repetition override, and validates the complete effective configuration before starting Docker. Unknown routing policies, experiment/model/scenario values, duplicates, empty lists, unsupported deployment settings, and inconsistent options fail immediately.
+The runner reads the file passed with `--config`, applies any command-line repetition override, and validates the complete effective configuration before starting Docker. Use `config/cassandra_driver_experiments.json` for the retained three-node deployment or `config/cassandra_driver_expanded_experiments.json` for the five-node deployment. Unknown routing policies, experiment/model/scenario values, duplicates, empty lists, unsupported deployment settings, and inconsistent options fail immediately.
 
 ## Default configuration
 
 ```json
 {
   "design": "cassandra-driver-policy-v3",
+  "cluster": {
+    "profile": "three_node",
+    "compose_file": "compose.yaml",
+    "nodes": ["n1", "n2", "n3"]
+  },
   "routing": {
     "policy": "token_aware_dc_aware",
     "local_dc": "dc1"
   },
   "seed": null,
-  "repetitions": 50,
-  "rounds": 50,
+  "repetitions": 100,
+  "rounds": 100,
   "models": ["RYW", "MR", "MW", "WFR"],
   "consistency_configs": [
     "ONE/ONE", "ONE/QUORUM", "ONE/ALL",
@@ -33,8 +38,11 @@ The runner reads `config/cassandra_driver_experiments.json`, applies any command
     "recovery_timeout_seconds": 600,
     "partition_stabilization_seconds": 15,
     "partition_hold_seconds": 15,
+    "post_recovery_settle_seconds": 20,
     "cql_port": 9042,
-    "internode_ports": [7000, 7001]
+    "internode_ports": [7000, 7001],
+    "node_failure_count": 1,
+    "partition_strategy": "isolate_one"
   },
   "database": {
     "replication_factor": 3,
@@ -57,6 +65,18 @@ A nonempty design identifier saved in keys, evidence, and provenance. Letters, d
 
 Default: `cassandra-driver-policy-v3`.
 
+### `cluster`
+
+The cluster object selects the complete deployment profile:
+
+| Field | Three-node profile | Expanded profile |
+|---|---|---|
+| `profile` | `three_node` | `five_node` |
+| `compose_file` | `compose.yaml` | `compose.expanded.yaml` |
+| `nodes` | `n1`, `n2`, `n3` | `n1`, `n2`, `n3`, `n4`, `n5` |
+
+Old saved V4 plans without this object normalize to the three-node defaults. The Compose filename must identify a repository-root Compose YAML file, and node names must be unique safe service identifiers. The same node list controls client contact points, membership cardinality, fault rules, endpoint probes, and recovery.
+
 ### `routing`
 
 The routing object is fixed for this design:
@@ -70,7 +90,7 @@ The routing object is fixed for this design:
 
 - `TokenAwarePolicy` uses the statement keyspace and partition routing key to prefer replicas.
 - `DCAwareRoundRobinPolicy` orders hosts in the configured local datacenter and supplies fallback ordering.
-- With RF=3 on three nodes, every node is a replica; token awareness therefore preserves all three healthy nodes as local replica choices.
+- With RF=3 on three nodes, every node is a replica. With RF=3 on five nodes, each key has three replica nodes and two non-replica nodes; token-aware ordering therefore has a meaningful locality choice.
 - The driver excludes hosts it considers down. The experiment controller never supplies a preferred coordinator.
 - Retries and speculative execution remain disabled so one logical operation is not silently repeated elsewhere.
 
@@ -127,9 +147,9 @@ A nonempty, duplicate-free list chosen from:
 
 | Value | Behavior |
 |---|---|
-| `normal` | Three-node healthy cluster |
+| `normal` | All nodes in the selected cluster profile are healthy |
 | `node_failure` | Random Cassandra container is killed with SIGKILL and detected before measurement |
-| `network_partition` | Random node is isolated from the other two on internode ports; all CQL endpoints remain reachable |
+| `network_partition` | The configured partition strategy blocks all cross-group internode edges while retaining all CQL endpoints |
 
 If `node_failure` is listed, `enabled_experiments` must contain `node_failure`. The same rule applies to `network_partition`.
 
@@ -151,7 +171,7 @@ Disabling `session_guarantees` makes the expected main count zero. Scenario valu
 
 ### `failure_detection_timeout_seconds`
 
-Maximum time to wait after SIGKILL for both survivors to report the exact victim IP as down. The detector requires consecutive matching observations. A timeout is a setup failure; the block is not counted as a measured main attempt.
+Maximum time to wait after SIGKILL for every surviving node to report the exact victim IP as down. The detector requires consecutive matching observations. A timeout is a setup failure; the block is not counted as a measured main attempt.
 
 Default: 90 seconds.
 
@@ -159,7 +179,7 @@ Increase this on slow hosts. Reducing it can make valid Cassandra failure detect
 
 ### `recovery_timeout_seconds`
 
-Maximum time to wait for all three nodes to return to healthy membership after restarting a victim or clearing a partition.
+Maximum time to wait for all configured nodes to return to healthy membership after restarting a victim or clearing a partition.
 
 Default: 600 seconds.
 
@@ -193,11 +213,22 @@ Default: `[7000, 7001]`.
 
 The project creates bilateral rules matching source and destination ports for every cross-cut peer. Do not add CQL port 9042; the intended experiment keeps client access to both partition sides.
 
+### `node_failure_count`
+
+Must currently be `1`. A victim is sampled uniformly from the configured nodes. Supporting simultaneous node failures would require a separate detection and recovery oracle.
+
+### `partition_strategy` and `partition_group_sizes`
+
+- `isolate_one`: one seeded random node is isolated from all remaining nodes. This is the default for the retained three-node profile and produces a 1|2 cut.
+- `balanced_random`: all configured nodes are shuffled with the fault RNG and split according to `partition_group_sizes`. The expanded profile uses `[2, 3]`, producing six bilateral cross-group edges per episode.
+
+Both groups must be nonempty and their sizes must sum to the configured node count. The selected groups and exact rule graph are saved with each fault episode.
+
 ## `database` fields
 
 ### `replication_factor`
 
-The current fixed three-node deployment supports exactly `3`. All three nodes therefore store replicas for every experiment key. Changing this number requires coordinated changes to deployment, predictions, availability reasoning, schema checks, and verification; the current validator rejects other values.
+Both supplied profiles use exactly `3`. In the three-node profile every node stores every experiment key. In the five-node profile Cassandra places each key on three of the five nodes, allowing the experiment to observe replica-aware routing and partitions that split a key's replica set. The validator rejects other replication factors so the registered predictions remain tied to RF=3.
 
 ### `read_repair_tables`
 
@@ -210,7 +241,7 @@ The required mapping is:
 }
 ```
 
-The main matrix uses table `blocking`. The focused control compares both tables. Cassandra 5 stores `speculative_retry='NONE'` canonically as `NEVER`; schema inspection accounts for that representation.
+The main matrix uses table `blocking`. The focused control compares both tables. That specialized control currently requires the three-node profile, so it is omitted from the expanded configuration. Cassandra 5 stores `speculative_retry='NONE'` canonically as `NEVER`; schema inspection accounts for that representation.
 
 ### `hints_enabled`
 

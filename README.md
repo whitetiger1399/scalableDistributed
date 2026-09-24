@@ -4,11 +4,11 @@ This project studies client-centric consistency in a replicated Apache Cassandra
 
 The application never chooses a Cassandra node. It submits a read or write to a customer-facing client API, and the Cassandra Python driver's `TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc="dc1"))` selects the coordinator. Every measured statement supplies its partition routing key. Cassandra then chooses the replicas involved in the request. With three nodes and replication factor 3, every node stores a replica; `ONE`, `QUORUM`, and `ALL` control the number of required replica responses, not a specific storage node.
 
-The default full plan contains 5,550 attempts:
+The current three-node full plan contains 11,100 attempts:
 
-- 5,400 main histories: 50 rounds × 3 scenarios × 9 write/read consistency pairs × 4 models;
-- 100 read-repair attempts: 50 using `BLOCKING` and 50 using `NONE`; and
-- 50 decreasing-timestamp controls.
+- 10,800 main histories: 100 rounds × 3 scenarios × 9 write/read consistency pairs × 4 models;
+- 200 read-repair attempts: 100 using `BLOCKING` and 100 using `NONE`; and
+- 100 decreasing-timestamp controls.
 
 No result is accepted merely because the runner exits. A separate verifier checks exact coverage, initialization, operation order, driver-policy evidence, routing keys, actual coordinators, consistency levels, fault evidence, cleanup, controls, and recomputed verdicts. The report builder accepts only explicit, complete, verified evidence.
 
@@ -17,16 +17,18 @@ No result is accepted merely because the runner exits. A separate verifier check
 | Path | Purpose |
 |---|---|
 | `compose.yaml` | Three Cassandra services and one client service on a private Docker network |
+| `compose.expanded.yaml` | Separate five-node Cassandra deployment with its own Compose project and volumes |
 | `Dockerfile.cassandra` | Pinned Cassandra 5.0.9 image, `iptables`, and hints-disabled experiment setting |
 | `Dockerfile.client` | Pinned Python client and cassandra-driver 3.29.2 |
 | `config/cassandra_driver_experiments.json` | Main driver-policy experiment configuration |
+| `config/cassandra_driver_expanded_experiments.json` | Five-node/RF=3 exposure experiment with seeded 2|3 partitions |
 | `config/randomized_experiments.json` | Historical uniform-random-routing configuration; incompatible with the new evidence schema |
 | `experiments/configuration.py` | Shared configuration validation and count calculation |
 | `experiments/workloads/` | Separate RYW, MR, MW, and WFR operation schedules |
 | `experiments/faults.py` | SIGKILL, failure detection, partition rules, cleanup, and recovery |
 | `experiments/read_repair.py` | Read-repair control schedule and topology choices |
 | `experiments/timestamp_control.py` | Decreasing-timestamp control schedule |
-| `src/routing.py` | Evidence recorder for driver-eligible, attempted, and selected coordinator hosts |
+| `src/routing.py` | Evidence recorder for eligible, replica, attempted, and selected coordinator hosts |
 | `src/worker.py` | Customer API, CQL transport, schema checks, and operation recording |
 | `src/checks.py` | Finite-history verdicts, reason codes, and coverage fields |
 | `scripts/run_randomized.py` | Planner and experiment runner |
@@ -34,6 +36,7 @@ No result is accepted merely because the runner exits. A separate verifier check
 | `scripts/build_report.py` | Verified-evidence PDF/Markdown report and reproduction archive builder |
 | `tests/` | Classifier, configuration, routing, fault-parser, and verifier tests |
 | `docs/cassandra-driver-policy-plan.md` | Current driver-policy rationale and protocol |
+| `docs/expanded-cluster-experiment.md` | Five-node rationale, fault topology, evidence fields, commands, and interpretation rules |
 | `docs/randomized-experiment-plan.md` | Historical uniform-random-routing protocol |
 | `docs/configuration-reference.md` | Every configuration field, allowed value, and effect |
 | `docs/execution-guide.md` | Operational phases, fault injection, recovery, and troubleshooting |
@@ -46,7 +49,7 @@ The old fixed-coordinator and uniform-random artifacts are retained for provenan
 ## Prerequisites
 
 - Docker Engine or Docker Desktop with Compose v2;
-- approximately 8 GB memory and four CPU cores allocated to Docker;
+- approximately 8 GB memory for the three-node profile, or 10–12 GB for the five-node profile, and four CPU cores allocated to Docker;
 - internet access for the first image build;
 - Python 3.9 or newer on the host;
 - about 2 GB free disk space for images, raw evidence, rendered pages, and archives; and
@@ -103,7 +106,38 @@ python3 scripts/run_randomized.py \
   --plan-only
 ```
 
-Expected default planning counts are 5,400 main, 100 read-repair, 50 timestamp, and 5,550 total attempts. `--plan-only` validates only the plan; it does not build containers or contact Cassandra.
+Expected planning counts are 10,800 main, 200 read-repair, 100 timestamp, and 11,100 total attempts. `--plan-only` validates only the plan; it does not build containers or contact Cassandra.
+
+## Choose the cluster profile
+
+Cluster size is selected by the configuration file. The runner reads `cluster.nodes` and `cluster.compose_file`, then applies the same list to startup, client contact points, health checks, fault injection, recovery, and evidence.
+
+Use the retained three-node/RF=3 setup:
+
+```sh
+python3 scripts/run_randomized.py \
+  --config config/cassandra_driver_experiments.json \
+  --seed 20260927
+```
+
+Use the expanded five-node/RF=3 setup:
+
+```sh
+python3 scripts/run_randomized.py \
+  --config config/cassandra_driver_expanded_experiments.json \
+  --seed 20260927
+```
+
+The expanded Compose file has a separate project name and persistent volumes. Stop the other profile before starting a run to avoid consuming memory with both clusters:
+
+```sh
+docker compose -f compose.yaml down
+docker compose -f compose.expanded.yaml down
+```
+
+The expanded profile uses five Cassandra nodes but keeps RF=3. Each key therefore has three replicas and two non-replica nodes. Its seeded `balanced_random` fault divides the cluster into random groups of two and three nodes for each partition episode. All six cross-group internode edges are blocked bilaterally while CQL remains reachable. The operation evidence records `replica_nodes`, `selected_node`, and `selected_is_replica` so routing changes can be separated from replica placement.
+
+This profile increases opportunities to observe coordinator changes and split replica sets. It cannot guarantee violations: a violation still requires the right replica placement, coordinator sequence, successful operations, and timing. The expanded profile omits the specialized three-node read-repair control because that control's two-node quorum-component topology is defined only for three nodes.
 
 ## Optional integration smoke run
 

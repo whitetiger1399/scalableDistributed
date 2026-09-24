@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'src'))
 from experiments.common import cases, expected_main_trials
 from experiments.node_failure import choose_victim
-from experiments.network_partition import choose_isolated, crossing_edges
+from experiments.network_partition import choose_groups, choose_isolated, crossing_edges, edges_between
 from experiments.read_repair import topology_pairs
 from routing import DriverRoutingEvidence, POLICY_NAME
 from scripts.run_randomized import (checkpoint_prefix, replay_topology_choices,
@@ -33,13 +33,15 @@ class RandomizedSetupTests(unittest.TestCase):
                 self.address, self.is_up, self.datacenter = address, is_up, datacenter
         hosts = [Host('10.0.0.1'), Host('10.0.0.2'), Host('10.0.0.3', is_up=False)]
         evidence = DriverRoutingEvidence({'10.0.0.1':'n1','10.0.0.2':'n2','10.0.0.3':'n3'}, 'dc1')
-        route = evidence.begin(hosts)
+        route = evidence.begin(hosts, hosts[:2])
         evidence.finish(route, hosts[1], [hosts[1]])
         self.assertEqual(route['policy'], POLICY_NAME)
         self.assertEqual(route['operation_index'], 0)
         self.assertEqual(route['eligible_nodes'], ['n1', 'n2'])
         self.assertEqual(route['selected_node'], 'n2')
         self.assertEqual(route['attempted_nodes'], ['n2'])
+        self.assertEqual(route['replica_nodes'], ['n1', 'n2'])
+        self.assertTrue(route['selected_is_replica'])
 
     def test_case_order_is_randomized_without_losing_coverage(self):
         rows = cases(self.config, 'run-test', 0, 'normal', random.Random(12))
@@ -54,6 +56,13 @@ class RandomizedSetupTests(unittest.TestCase):
         self.assertIn(choose_victim(('n1','n2','n3'), rng), ('n1','n2','n3'))
         isolated = choose_isolated(('n1','n2','n3'), rng)
         self.assertEqual(len(crossing_edges(('n1','n2','n3'), isolated)), 2)
+
+    def test_expanded_partition_is_seeded_balanced_and_complete(self):
+        nodes = ('n1', 'n2', 'n3', 'n4', 'n5')
+        groups = choose_groups(nodes, random.Random(22), 'balanced_random', [2, 3])
+        self.assertEqual(sorted(map(len, groups)), [2, 3])
+        self.assertEqual(set(groups[0]) | set(groups[1]), set(nodes))
+        self.assertEqual(len(edges_between(groups)), 6)
 
     def test_completion_timing_has_start_end_and_elapsed_minutes(self):
         started_utc = '2026-09-21T08:00:00+00:00'
@@ -89,7 +98,8 @@ class RandomizedSetupTests(unittest.TestCase):
         record = {'case': {'attempt_id': 'repair:0:blocking'},
                   'write': {'records': [{'routing': {'selected_node': 'n2'}}]},
                   'pair_sequence': [list(pair1), list(pair2)]}
-        replay_topology_choices([record], random.Random(seed))
+        replay_topology_choices([record], random.Random(seed),
+                                {'cluster': {'nodes': ['n1', 'n2', 'n3']}})
 
 
 if __name__ == '__main__':

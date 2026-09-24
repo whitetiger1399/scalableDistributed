@@ -29,7 +29,7 @@ class DriverRoutingEvidence:
         address = host_address(host)
         return self.address_to_node.get(address, address)
 
-    def begin(self, hosts):
+    def begin(self, hosts, replicas=None):
         eligible = sorted(
             self.node_name(host)
             for host in hosts
@@ -42,10 +42,14 @@ class DriverRoutingEvidence:
             "operation_index": self.operation_index,
             "eligible_nodes": eligible,
         }
+        if replicas is not None:
+            route["replica_nodes"] = sorted(self.node_name(host) for host in replicas)
         self.operation_index += 1
         return route
 
     def finish(self, route, coordinator_host, attempted_hosts):
         route["selected_node"] = self.node_name(coordinator_host)
         route["attempted_nodes"] = [self.node_name(host) for host in attempted_hosts]
+        if "replica_nodes" in route:
+            route["selected_is_replica"] = route["selected_node"] in route["replica_nodes"]
         return route

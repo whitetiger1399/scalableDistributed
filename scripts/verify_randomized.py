@@ -13,7 +13,7 @@ from checks import evaluate
 from experiments.configuration import expected_main_trials, normalize
 from experiments import read_repair, timestamp_control
 
-SCHEMA = "cassandra-driver-policy-evidence-v4"
+SCHEMAS = {"cassandra-driver-policy-evidence-v4", "cassandra-driver-policy-evidence-v5"}
 ROUTING_POLICY = "TokenAwarePolicy(DCAwareRoundRobinPolicy)"
 
 
@@ -60,7 +60,7 @@ def verify_initialization(record, expected, keys=None):
         require(Counter(observed) == Counter(keys), "initialization key coverage mismatch")
 
 
-def verify_operation(operation, key, expected_cl, sequence):
+def verify_operation(operation, key, expected_cl, sequence, require_replica_evidence=False):
     require(operation.get("sequence") == sequence, "operation sequence is incorrect")
     require(operation.get("cl") == expected_cl, "operation consistency level is incorrect")
     require(key in operation.get("params", []), "operation does not reference its trial key")
@@ -79,6 +79,13 @@ def verify_operation(operation, key, expected_cl, sequence):
     require(selected is None or selected in eligible, "actual coordinator was not driver-eligible")
     attempted = route.get("attempted_nodes")
     require(isinstance(attempted, list), "attempted-host evidence is invalid")
+    if require_replica_evidence:
+        replicas = route.get("replica_nodes")
+        require(isinstance(replicas, list) and len(replicas) == 3 and
+                len(replicas) == len(set(replicas)),
+                "expanded operation lacks an RF=3 replica set")
+        require(route.get("selected_is_replica") == (selected in replicas),
+                "selected_is_replica differs from replica evidence")
     require(operation.get("routing_key") == key, "operation lacks the partition routing key")
     if operation.get("status") == "ok":
         require(operation.get("coordinator") and selected,
@@ -86,7 +93,7 @@ def verify_operation(operation, key, expected_cl, sequence):
     require(isinstance(operation.get("client_id"), str), "operation lacks logical client identity")
 
 
-def verify_trial(trial):
+def verify_trial(trial, require_replica_evidence=False):
     required = {"trial_id", "scenario", "round", "config", "model", "key",
                 "operations", "verdict", "reason", "coverage", "episode_id"}
     require(required <= set(trial), f"trial missing fields: {sorted(required - set(trial))}")
@@ -101,7 +108,7 @@ def verify_trial(trial):
     for index, (operation, kind) in enumerate(zip(operations, expected_kinds)):
         require(operation.get("kind") == kind, "history operation kind is incorrect")
         expected_cl = write_cl if kind == "write" else read_cl
-        verify_operation(operation, trial["key"], expected_cl, index)
+        verify_operation(operation, trial["key"], expected_cl, index, require_replica_evidence)
         if previous_end is not None:
             require(previous_end <= operation["start_ns"], "history operations overlap or are reordered")
         previous_end = operation["end_ns"]
@@ -112,6 +119,7 @@ def verify_trial(trial):
 
 
 def verify_faults(faults, plan, trials):
+    nodes = set(plan["cluster"]["nodes"])
     expected_episodes = len(plan["scenarios"]) * plan["rounds"] if "session_guarantees" in plan["enabled_experiments"] else 0
     require(len(faults) == expected_episodes, "fault/episode record count mismatch")
     trial_episodes = Counter(trial["episode_id"] for trial in trials)
@@ -137,15 +145,23 @@ def verify_faults(faults, plan, trials):
             require(record.get("recovery"), "node-failure episode lacks recovery evidence")
         elif scenario == "network_partition":
             fault = record.get("fault") or {}
-            require(fault.get("isolated") in {"n1", "n2", "n3"}, "partition lacks isolated node")
+            groups = fault.get("groups")
+            if groups is None:  # Backward-compatible V4 isolated-node evidence.
+                isolated = fault.get("isolated")
+                require(isolated in nodes, "partition lacks isolated node")
+                groups = [[isolated], sorted(nodes - {isolated})]
+            require(isinstance(groups, list) and len(groups) == 2,
+                    "partition must contain two node groups")
+            require(set(groups[0]).isdisjoint(groups[1]) and set(groups[0]) | set(groups[1]) == nodes,
+                    "partition groups do not cover the configured cluster")
             require(all(item.get("reachable") for item in fault.get("client_probe", [])) and
-                    len(fault.get("client_probe", [])) == 3,
+                    len(fault.get("client_probe", [])) == len(nodes),
                     "partition did not preserve all CQL endpoints")
             require(record.get("post_workload_partition"), "partition lacks post-workload counters")
             require(record.get("recovery"), "partition episode lacks recovery evidence")
 
 
-def verify_controls(run, plan, completion):
+def verify_controls(run, plan, completion, require_replica_evidence=False):
     repairs = load(run / "read_repair.json")
     timestamps = load(run / "timestamp_control.json")
     require(len(repairs) == read_repair.expected_trials(plan), "read-repair count mismatch")
@@ -169,7 +185,7 @@ def verify_controls(run, plan, completion):
                     f"read-repair {field} operation count mismatch")
             operation = records[0]
             require(operation.get("kind") == kind, f"read-repair {field} kind mismatch")
-            verify_operation(operation, key, cl, 0)
+            verify_operation(operation, key, cl, 0, require_replica_evidence)
     timestamp_ids = [item.get("case", {}).get("attempt_id") for item in timestamps]
     require(len(timestamp_ids) == len(set(timestamp_ids)), "duplicate timestamp attempt ID")
     for item in timestamps:
@@ -184,7 +200,7 @@ def verify_controls(run, plan, completion):
                 "timestamp control operation count mismatch")
         for sequence, (operation, kind) in enumerate(zip(records, ("write", "write", "read"))):
             require(operation.get("kind") == kind, "timestamp control operation kind mismatch")
-            verify_operation(operation, key, "ALL", sequence)
+            verify_operation(operation, key, "ALL", sequence, require_replica_evidence)
     require(completion.get("read_repair_trials") == len(repairs), "completion repair count mismatch")
     require(completion.get("timestamp_trials") == len(timestamps), "completion timestamp count mismatch")
     return repairs, timestamps
@@ -197,8 +213,10 @@ def verify(run):
     trials = load(run / "trials.json")
     faults = load(run / "faults.json")
     require(completion.get("completed") is True, "run is not complete")
-    require(completion.get("evidence_schema") == SCHEMA, "unsupported completion evidence schema")
-    require(environment.get("evidence_schema") == SCHEMA, "unsupported environment evidence schema")
+    require(completion.get("evidence_schema") in SCHEMAS, "unsupported completion evidence schema")
+    require(environment.get("evidence_schema") == completion.get("evidence_schema"),
+            "completion and environment evidence schemas differ")
+    require_replica_evidence = completion.get("evidence_schema") == "cassandra-driver-policy-evidence-v5"
     require(completion.get("run_id") == environment.get("run_id"), "run identity mismatch")
     expected = expected_main_trials(plan)
     require(len(trials) == expected == completion.get("main_trials"), "main trial count mismatch")
@@ -209,12 +227,12 @@ def verify(run):
     observed = Counter((trial.get("scenario"), trial.get("config"), trial.get("model")) for trial in trials)
     require(observed == expected_case_counter(plan), "main trial case coverage mismatch")
     for trial in trials:
-        verify_trial(trial)
+        verify_trial(trial, require_replica_evidence)
     verify_faults(faults, plan, trials)
-    repairs, timestamps = verify_controls(run, plan, completion)
+    repairs, timestamps = verify_controls(run, plan, completion, require_replica_evidence)
     case_rows = [{"scenario": scenario, "config": pair, "model": model, "attempts": count}
                  for (scenario, pair, model), count in sorted(observed.items())]
-    return {"valid": True, "evidence_schema": SCHEMA, "main_trials": len(trials),
+    return {"valid": True, "evidence_schema": completion["evidence_schema"], "main_trials": len(trials),
             "cases": case_rows, "verdicts": dict(Counter(t["verdict"] for t in trials)),
             "read_repair_trials": len(repairs), "timestamp_trials": len(timestamps)}
 

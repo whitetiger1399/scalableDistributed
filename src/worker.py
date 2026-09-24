@@ -106,7 +106,9 @@ class Transport:
             routing_key=(routing_key.encode('utf-8') if routing_key is not None else None))
         session = self.policy_session()
         hosts = list(self.application_cluster.metadata.all_hosts())
-        route = self.routing_evidence.begin(hosts)
+        replicas = (self.application_cluster.metadata.get_replicas(
+            'lab', routing_key.encode('utf-8')) if routing_key is not None else None)
+        route = self.routing_evidence.begin(hosts, replicas)
         record = dict(query=query, params=list(params), cl=cl, start_ns=start)
         future = None
         try:

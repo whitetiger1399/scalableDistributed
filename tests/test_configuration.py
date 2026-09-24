@@ -33,6 +33,24 @@ class ConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'duplicates'):
             normalize(self.raw)
 
+    def test_expanded_cluster_profile_is_valid(self):
+        expanded = json.loads((ROOT/'config/cassandra_driver_expanded_experiments.json').read_text())
+        normalized = normalize(expanded)
+        self.assertEqual(normalized['cluster']['nodes'], ['n1', 'n2', 'n3', 'n4', 'n5'])
+        self.assertEqual(normalized['faults']['partition_group_sizes'], [2, 3])
+
+    def test_expanded_partition_sizes_must_cover_cluster(self):
+        expanded = json.loads((ROOT/'config/cassandra_driver_expanded_experiments.json').read_text())
+        expanded['faults']['partition_group_sizes'] = [2, 2]
+        with self.assertRaisesRegex(ValueError, 'partition_group_sizes'):
+            normalize(expanded)
+
+    def test_read_repair_control_rejects_expanded_cluster(self):
+        expanded = json.loads((ROOT/'config/cassandra_driver_expanded_experiments.json').read_text())
+        expanded['enabled_experiments'].append('read_repair')
+        with self.assertRaisesRegex(ValueError, 'three-node'):
+            normalize(expanded)
+
 
 if __name__ == '__main__':
     unittest.main()

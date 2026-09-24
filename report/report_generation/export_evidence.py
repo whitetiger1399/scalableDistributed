@@ -31,6 +31,10 @@ APPROVED = {
         "setup": "cassandra_token_aware",
         "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=dc1))",
     },
+    ("cassandra-driver-policy-expanded-v1", "cassandra-driver-policy-evidence-v5"): {
+        "setup": "cassandra_token_aware_expanded",
+        "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy(local_dc=dc1))",
+    },
 }
 
 SCENARIOS = ("normal", "node_failure", "network_partition")
@@ -110,7 +114,8 @@ def extract_version(environment: dict[str, Any], key: str) -> str:
 def slim_fault(fault: Any) -> dict[str, Any]:
     if not isinstance(fault, dict):
         return {}
-    keep = ("action", "after", "blocked", "client_probe", "ips", "isolated", "established_ns")
+    keep = ("action", "after", "blocked", "client_probe", "ips", "isolated", "groups",
+            "partition_strategy", "established_ns")
     return {key: fault[key] for key in keep if key in fault}
 
 
@@ -126,7 +131,10 @@ def episode_index(directory: Path) -> tuple[dict[str, dict[str, Any]], str]:
         fault = record.get("fault") or {}
         after = fault.get("after") if isinstance(fault, dict) else {}
         isolated = fault.get("isolated") if isinstance(fault, dict) else None
-        majority = [node for node in ("n1", "n2", "n3") if node != isolated] if isolated else []
+        groups = fault.get("groups") if isinstance(fault, dict) else None
+        all_nodes = sorted((fault.get("blocked") or {}).keys()) if isinstance(fault, dict) else []
+        majority = ([node for node in all_nodes if node != isolated] if isolated else
+                    (max(groups, key=len) if isinstance(groups, list) and len(groups) == 2 else []))
         probes = fault.get("client_probe", []) if isinstance(fault, dict) else []
         indexed[str(record["episode_id"])] = {
             "episode_started_ns": record.get("started_ns"),
@@ -137,6 +145,7 @@ def episode_index(directory: Path) -> tuple[dict[str, dict[str, Any]], str]:
             "failed_node_running_after_fault": after.get("running") if isinstance(after, dict) else None,
             "isolated_node": isolated,
             "majority_nodes": majority,
+            "partition_groups": groups,
             "client_probe_total": len(probes) if isinstance(probes, list) else None,
             "client_probe_reachable": sum(bool(item.get("reachable")) for item in probes if isinstance(item, dict)) if isinstance(probes, list) else None,
             "post_workload_partition_recorded": bool(record.get("post_workload_partition")),
@@ -223,7 +232,8 @@ def operation_columns(index: int) -> list[str]:
         "query", "params_json", "value_json", "routing_key", "routing_policy",
         "routing_local_dc", "routing_draw", "routing_operation_index",
         "routing_selected_node", "routing_candidates", "routing_eligible_nodes",
-        "routing_attempted_nodes", "extra_json",
+        "routing_replica_nodes", "routing_selected_is_replica", "routing_attempted_nodes",
+        "extra_json",
     )]
 
 
@@ -235,7 +245,8 @@ TRIAL_FIELDS = [
     "included_in_main_violation_matrix",
     "run_validation_status", "run_validation_notes", "run_profile", "run_started_utc",
     "run_ended_utc", "run_duration_minutes", "root_seed", "git_revision", "platform",
-    "python_version", "configured_rounds", "configured_repetitions", "replication_factor",
+    "python_version", "configured_rounds", "configured_repetitions", "cluster_profile",
+    "configured_nodes", "replication_factor",
     "hints_enabled", "trial_id", "episode_id", "scenario", "round", "attempt", "model",
     "config_write_read", "write_cl", "read_cl", "key", "trial_verdict", "trial_reason", "outcome_class",
     "is_violation", "is_no_violation_observed", "is_inconclusive", "coverage_evaluable",
@@ -247,7 +258,7 @@ TRIAL_FIELDS = [
     "crossed_partition_cut", "routed_to_failed_node", "trial_start_ns", "trial_end_ns",
     "trial_duration_ms", "episode_started_ns", "episode_ended_ns", "fault_settled_seconds",
     "fault_action", "failed_node", "failed_node_running_after_fault", "isolated_node",
-    "majority_nodes", "client_probe_total", "client_probe_reachable",
+    "majority_nodes", "partition_groups_json", "client_probe_total", "client_probe_reachable",
     "post_workload_partition_recorded", "recovery_recorded", "recovery_error",
     "fault_summary_json", "worker_health_json", "trial_extra_json",
     "control_setting", "control_table", "control_timestamps_json", "control_metadata_json",
@@ -289,6 +300,8 @@ def flatten_operation(row: dict[str, Any], index: int, operation: dict[str, Any]
         "routing_selected_node": routing.get("selected_node"),
         "routing_candidates": join_values(routing.get("candidates", [])),
         "routing_eligible_nodes": join_values(routing.get("eligible_nodes", [])),
+        "routing_replica_nodes": join_values(routing.get("replica_nodes", [])),
+        "routing_selected_is_replica": truth(routing.get("selected_is_replica")),
         "routing_attempted_nodes": join_values(routing.get("attempted_nodes", [])),
         "extra_json": compact_json({key: value for key, value in operation.items() if key not in known}),
     }
@@ -313,9 +326,14 @@ def trial_row(run: dict[str, Any], trial: dict[str, Any], episode: dict[str, Any
     nodes = [node for node in nodes if node]
     endpoints = [operation.get("coordinator") for operation in operations if operation.get("coordinator")]
     isolated = episode.get("isolated_node")
+    groups = episode.get("partition_groups")
     crossed = ""
-    if trial.get("scenario") == "network_partition" and isolated:
-        crossed = truth(isolated in nodes and any(node != isolated for node in nodes))
+    if trial.get("scenario") == "network_partition":
+        if isinstance(groups, list) and len(groups) == 2:
+            sides = {index for index, group in enumerate(groups) if any(node in group for node in nodes)}
+            crossed = truth(len(sides) > 1)
+        elif isolated:
+            crossed = truth(isolated in nodes and any(node != isolated for node in nodes))
     failed = episode.get("failed_node")
     starts = [operation.get("start_ns") for operation in operations if isinstance(operation.get("start_ns"), int)]
     ends = [operation.get("end_ns") for operation in operations if isinstance(operation.get("end_ns"), int)]
@@ -330,6 +348,7 @@ def trial_row(run: dict[str, Any], trial: dict[str, Any], episode: dict[str, Any
         "round", "routing_seed", "routing_policy", "scenario", "trial_id", "verdict", "worker_health",
     }
     database = plan.get("database") or {}
+    cluster = plan.get("cluster") or {"profile": "three_node", "nodes": ["n1", "n2", "n3"]}
     verdict = trial.get("verdict")
     if record_type == "main_trial":
         outcome_class = verdict
@@ -368,6 +387,8 @@ def trial_row(run: dict[str, Any], trial: dict[str, Any], episode: dict[str, Any
         "python_version": environment.get("python"),
         "configured_rounds": plan.get("rounds"),
         "configured_repetitions": plan.get("repetitions"),
+        "cluster_profile": cluster.get("profile"),
+        "configured_nodes": join_values(cluster.get("nodes", [])),
         "replication_factor": database.get("replication_factor"),
         "hints_enabled": truth(database.get("hints_enabled")),
         "trial_id": trial.get("trial_id"),
@@ -415,6 +436,7 @@ def trial_row(run: dict[str, Any], trial: dict[str, Any], episode: dict[str, Any
         "failed_node_running_after_fault": truth(episode.get("failed_node_running_after_fault")),
         "isolated_node": isolated,
         "majority_nodes": join_values(episode.get("majority_nodes", [])),
+        "partition_groups_json": compact_json(groups),
         "client_probe_total": episode.get("client_probe_total"),
         "client_probe_reachable": episode.get("client_probe_reachable"),
         "post_workload_partition_recorded": truth(episode.get("post_workload_partition_recorded")),
@@ -514,7 +536,8 @@ RUN_FIELDS = [
     "source_result_directory", "run_completed", "included_in_analysis", "validation_status",
     "validation_notes", "profile", "started_utc", "ended_utc", "duration_minutes", "root_seed",
     "git_revision", "git_status", "platform", "python_version", "docker_compose_version",
-    "source_manifest_sha256", "configured_rounds", "configured_repetitions", "configured_scenarios",
+    "source_manifest_sha256", "configured_rounds", "configured_repetitions", "cluster_profile",
+    "configured_nodes", "configured_scenarios",
     "configured_models", "configured_consistency_levels", "replication_factor", "hints_enabled",
     "expected_trials_from_plan", "declared_main_trials", "saved_main_trials", "trial_count_matches_plan",
     "trial_count_matches_completion", "unique_trial_ids", "unique_trial_keys", "violation_count",
@@ -573,6 +596,7 @@ def run_row(run: dict[str, Any], trial_rows: list[dict[str, Any]], episodes: dic
     identifiers = [row.get("trial_id") for row in trial_rows]
     keys = [row.get("key") for row in trial_rows]
     database = plan.get("database") or {}
+    cluster = plan.get("cluster") or {"profile": "three_node", "nodes": ["n1", "n2", "n3"]}
     row = {
         "export_schema": EXPORT_SCHEMA,
         "setup": run["setup"],
@@ -598,6 +622,8 @@ def run_row(run: dict[str, Any], trial_rows: list[dict[str, Any]], episodes: dic
         "source_manifest_sha256": environment.get("source_manifest_sha256"),
         "configured_rounds": plan.get("rounds"),
         "configured_repetitions": plan.get("repetitions"),
+        "cluster_profile": cluster.get("profile"),
+        "configured_nodes": join_values(cluster.get("nodes", [])),
         "configured_scenarios": join_values(plan.get("scenarios", [])),
         "configured_models": join_values(plan.get("models", [])),
         "configured_consistency_levels": join_values(plan.get("consistency_configs", [])),
@@ -631,7 +657,9 @@ def run_row(run: dict[str, Any], trial_rows: list[dict[str, Any]], episodes: dic
         "trials_routed_to_failed_node": sum(row.get("routed_to_failed_node") == "true" for row in trial_rows),
         "fault_episode_count": len(episodes),
         "node_failure_episode_count": sum(ep.get("failed_node") is not None for ep in episodes.values()),
-        "network_partition_episode_count": sum(ep.get("isolated_node") is not None for ep in episodes.values()),
+        "network_partition_episode_count": sum(
+            ep.get("isolated_node") is not None or bool(ep.get("partition_groups"))
+            for ep in episodes.values()),
         "failed_node_counts_json": compact_json(dict(sorted(failed_nodes.items()))),
         "isolated_node_counts_json": compact_json(dict(sorted(isolated_nodes.items()))),
         "read_repair_trial_count": len(read_json(run["directory"] / "read_repair.json", [])),

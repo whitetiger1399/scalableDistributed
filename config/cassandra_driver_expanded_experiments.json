@@ -1,0 +1,51 @@
+{
+  "design": "cassandra-driver-policy-expanded-v1",
+  "cluster": {
+    "profile": "five_node",
+    "compose_file": "compose.expanded.yaml",
+    "nodes": ["n1", "n2", "n3", "n4", "n5"]
+  },
+  "routing": {
+    "policy": "token_aware_dc_aware",
+    "local_dc": "dc1"
+  },
+  "seed": null,
+  "repetitions": 10,
+  "rounds": 10,
+  "models": ["RYW", "MR", "MW", "WFR"],
+  "consistency_configs": [
+    "ONE/ONE",
+    "ONE/QUORUM",
+    "ONE/ALL",
+    "QUORUM/ONE",
+    "QUORUM/QUORUM",
+    "QUORUM/ALL",
+    "ALL/ONE",
+    "ALL/QUORUM",
+    "ALL/ALL"
+  ],
+  "scenarios": ["normal", "node_failure", "network_partition"],
+  "enabled_experiments": [
+    "session_guarantees",
+    "node_failure",
+    "network_partition",
+    "timestamp_control"
+  ],
+  "faults": {
+    "failure_detection_timeout_seconds": 120,
+    "recovery_timeout_seconds": 900,
+    "partition_stabilization_seconds": 20,
+    "partition_hold_seconds": 15,
+    "post_recovery_settle_seconds": 30,
+    "cql_port": 9042,
+    "internode_ports": [7000, 7001],
+    "node_failure_count": 1,
+    "partition_strategy": "balanced_random",
+    "partition_group_sizes": [2, 3]
+  },
+  "database": {
+    "replication_factor": 3,
+    "read_repair_tables": { "blocking": "BLOCKING", "no_repair": "NONE" },
+    "hints_enabled": false
+  }
+}

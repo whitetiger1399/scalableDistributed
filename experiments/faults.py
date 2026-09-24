@@ -8,6 +8,22 @@ import time
 NODES = ("n1", "n2", "n3")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCKER_BIN = os.environ.get("DOCKER_BIN", "docker")
+COMPOSE_FILE = os.path.join(ROOT, "compose.yaml")
+
+
+def configure_cluster(nodes, compose_file):
+    """Select the Compose deployment used by all subsequent fault helpers."""
+    global NODES, COMPOSE_FILE
+    candidate = os.path.abspath(os.path.join(ROOT, compose_file))
+    if os.path.dirname(candidate) != ROOT or not os.path.isfile(candidate):
+        raise ValueError(f"compose file does not exist in repository root: {compose_file}")
+    NODES = tuple(nodes)
+    COMPOSE_FILE = candidate
+    return {"nodes": list(NODES), "compose_file": os.path.basename(COMPOSE_FILE)}
+
+
+def _nodes(nodes=None):
+    return tuple(nodes) if nodes is not None else NODES
 
 
 def command(args, data=None, check=True, timeout=60):
@@ -20,7 +36,7 @@ def command(args, data=None, check=True, timeout=60):
 def compose(*args, data=None, check=True, timeout=60):
     executable = os.environ.get("COMPOSE_BIN")
     base = [executable] if executable else ["docker", "compose"]
-    return command(base + ["-f", os.path.join(ROOT, "compose.yaml")] + list(args),
+    return command(base + ["-f", COMPOSE_FILE] + list(args),
                    data=data, check=check, timeout=timeout)
 
 
@@ -71,20 +87,22 @@ def membership(observer="n1", attempts=3, timeout=30):
     return last
 
 
-def all_healthy():
-    states = {node: membership(node) for node in NODES}
-    return all(len(rows := parse_status(value)) == 3 and
+def all_healthy(nodes=None):
+    nodes = _nodes(nodes)
+    states = {node: membership(node) for node in nodes}
+    return all(len(rows := parse_status(value)) == len(nodes) and
                all(row["state"] == "UN" for row in rows.values())
                for value in states.values())
 
 
-def wait_healthy(timeout_seconds=600):
+def wait_healthy(timeout_seconds=600, nodes=None):
+    nodes = _nodes(nodes)
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
-        if all_healthy():
-            return {node: membership(node) for node in NODES}
+        if all_healthy(nodes):
+            return {node: membership(node) for node in nodes}
         time.sleep(5)
-    raise TimeoutError("cluster did not return to three UN nodes")
+    raise TimeoutError(f"cluster did not return to {len(nodes)} UN nodes")
 
 
 def kill_node(node):
@@ -99,16 +117,17 @@ def kill_node(node):
             "start_ns": started, "end_ns": time.time_ns(), "output": output}
 
 
-def wait_failure(victim, victim_ip=None, timeout_seconds=90, consecutive=2):
+def wait_failure(victim, victim_ip=None, timeout_seconds=90, consecutive=2, nodes=None):
+    nodes = _nodes(nodes)
     victim_ip = victim_ip or container_identity(victim)["ip"]
     deadline = time.monotonic() + timeout_seconds
     observations = []
     matching = 0
     while time.monotonic() < deadline:
-        states = {node: membership(node) for node in NODES if node != victim}
+        states = {node: membership(node) for node in nodes if node != victim}
         parsed = {node: parse_status(status) for node, status in states.items()}
         good = all(victim_ip in rows and rows[victim_ip]["state"] == "DN" and
-                   sum(row["state"] == "UN" for row in rows.values()) == 2
+                   sum(row["state"] == "UN" for row in rows.values()) == len(nodes) - 1
                    for rows in parsed.values())
         matching = matching + 1 if good else 0
         observations.append({"time_ns": time.time_ns(), "raw": states,
@@ -133,16 +152,17 @@ def _rules_for(node, blocked, ips, ports=(7000, 7001)):
     return rules
 
 
-def set_graph(blocked_edges, ports=(7000, 7001)):
-    ips = {node: container_ip(node) for node in NODES}
-    blocked = {node: [] for node in NODES}
+def set_graph(blocked_edges, ports=(7000, 7001), nodes=None):
+    nodes = _nodes(nodes)
+    ips = {node: container_ip(node) for node in nodes}
+    blocked = {node: [] for node in nodes}
     for left, right in blocked_edges:
-        if left not in NODES or right not in NODES or left == right:
+        if left not in nodes or right not in nodes or left == right:
             raise ValueError((left, right))
         blocked[left].append(right)
         blocked[right].append(left)
     current = {}
-    for node in NODES:
+    for node in nodes:
         node_exec(node, "iptables", "-N", "LAB_FAULT", check=False)
         output_rules = node_exec(node, "iptables", "-S", "OUTPUT", check=False)
         if "-A OUTPUT -j LAB_FAULT" not in output_rules:
@@ -150,28 +170,29 @@ def set_graph(blocked_edges, ports=(7000, 7001)):
         current[node] = [shlex.split(line)[2:] for line in
                          node_exec(node, "iptables", "-S", "LAB_FAULT", check=False).splitlines()
                          if line.startswith("-A ")]
-    desired = {node: _rules_for(node, blocked, ips, ports) for node in NODES}
-    for node in NODES:
+    desired = {node: _rules_for(node, blocked, ips, ports) for node in nodes}
+    for node in nodes:
         for rule in desired[node]:
             if rule not in current[node]:
                 node_exec(node, "iptables", "-A", "LAB_FAULT", *rule)
-    for node in NODES:
+    for node in nodes:
         for rule in current[node]:
             if rule not in desired[node]:
                 node_exec(node, "iptables", "-D", "LAB_FAULT", *rule)
     return {"ips": ips, "blocked": blocked,
-            "rules": {node: node_exec(node, "iptables", "-S", "LAB_FAULT") for node in NODES},
-            "counters": {node: node_exec(node, "iptables", "-L", "LAB_FAULT", "-v", "-n") for node in NODES}}
+            "rules": {node: node_exec(node, "iptables", "-S", "LAB_FAULT") for node in nodes},
+            "counters": {node: node_exec(node, "iptables", "-L", "LAB_FAULT", "-v", "-n") for node in nodes}}
 
 
-def set_partition(isolated, ports=(7000, 7001)):
-    return set_graph([(isolated, node) for node in NODES if node != isolated], ports)
+def set_partition(isolated, ports=(7000, 7001), nodes=None):
+    nodes = _nodes(nodes)
+    return set_graph([(isolated, node) for node in nodes if node != isolated], ports, nodes)
 
 
-def clear_partition():
+def clear_partition(nodes=None):
     # set_partition's empty graph is not usable because it needs all containers, so
     # remove only rules in the project chain and leave unrelated firewall state alone.
-    for node in NODES:
+    for node in _nodes(nodes):
         rules = [shlex.split(line)[2:] for line in node_exec(node, "iptables", "-S", "LAB_FAULT", check=False).splitlines()
                  if line.startswith("-A ")]
         for rule in rules:
@@ -179,17 +200,18 @@ def clear_partition():
         node_exec(node, "iptables", "-D", "OUTPUT", "-j", "LAB_FAULT", check=False)
 
 
-def partition_snapshot():
+def partition_snapshot(nodes=None):
     return {node: {"rules": node_exec(node, "iptables", "-S", "LAB_FAULT", check=False),
                    "counters": node_exec(node, "iptables", "-L", "LAB_FAULT", "-v", "-n", check=False)}
-            for node in NODES}
+            for node in _nodes(nodes)}
 
 
-def recover_all(timeout_seconds=600):
+def recover_all(timeout_seconds=600, nodes=None):
     """Idempotently restart every lab node, remove lab rules, and verify membership."""
+    nodes = _nodes(nodes)
     actions = []
-    for node in NODES:
+    for node in nodes:
         actions.append({"node": node, "start": compose("start", node, check=False)})
-    clear_partition()
-    return {"actions": actions, "membership": wait_healthy(timeout_seconds),
+    clear_partition(nodes)
+    return {"actions": actions, "membership": wait_healthy(timeout_seconds, nodes),
             "completed_ns": time.time_ns()}

@@ -1,0 +1,67 @@
+name: cassandra-consistency-lab-expanded
+
+x-node: &node
+  build:
+    context: .
+    dockerfile: Dockerfile.cassandra
+  image: consistency-lab-cassandra:5.0.9
+  cap_add: [NET_ADMIN]
+  environment: &env
+    CASSANDRA_CLUSTER_NAME: ConsistencyLabExpanded
+    CASSANDRA_SEEDS: n1
+    CASSANDRA_DC: dc1
+    CASSANDRA_RACK: rack1
+    CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    CASSANDRA_NUM_TOKENS: 16
+    MAX_HEAP_SIZE: 768M
+    HEAP_NEWSIZE: 192M
+  networks: [lab]
+  healthcheck:
+    test: [CMD-SHELL, "cqlsh -e 'SELECT release_version FROM system.local' >/dev/null 2>&1"]
+    interval: 15s
+    timeout: 10s
+    retries: 50
+    start_period: 40s
+
+services:
+  n1:
+    <<: *node
+    volumes: [n1-data:/var/lib/cassandra]
+  n2:
+    <<: *node
+    volumes: [n2-data:/var/lib/cassandra]
+    depends_on:
+      n1: {condition: service_healthy}
+  n3:
+    <<: *node
+    volumes: [n3-data:/var/lib/cassandra]
+    depends_on:
+      n2: {condition: service_healthy}
+  n4:
+    <<: *node
+    volumes: [n4-data:/var/lib/cassandra]
+    depends_on:
+      n3: {condition: service_healthy}
+  n5:
+    <<: *node
+    volumes: [n5-data:/var/lib/cassandra]
+    depends_on:
+      n4: {condition: service_healthy}
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    volumes: ["./:/work"]
+    networks: [lab]
+    depends_on:
+      n5: {condition: service_healthy}
+
+networks:
+  lab: {}
+
+volumes:
+  n1-data: {}
+  n2-data: {}
+  n3-data: {}
+  n4-data: {}
+  n5-data: {}
