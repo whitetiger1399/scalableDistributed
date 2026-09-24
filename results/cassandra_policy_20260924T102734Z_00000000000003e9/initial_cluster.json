@@ -1,0 +1,892 @@
+{
+  "client_probe": [
+    {
+      "coordinator": "172.19.0.2:9042",
+      "end_ns": 1790245701083162758,
+      "error": null,
+      "message": null,
+      "node": "n1",
+      "reachable": true,
+      "start_ns": 1790245701006855040
+    },
+    {
+      "coordinator": "172.19.0.4:9042",
+      "end_ns": 1790245701151897046,
+      "error": null,
+      "message": null,
+      "node": "n2",
+      "reachable": true,
+      "start_ns": 1790245701083174430
+    },
+    {
+      "coordinator": "172.19.0.5:9042",
+      "end_ns": 1790245701219614623,
+      "error": null,
+      "message": null,
+      "node": "n3",
+      "reachable": true,
+      "start_ns": 1790245701151909501
+    }
+  ],
+  "membership": {
+    "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  1.81 MiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  1.78 MiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.2  1.61 MiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+    "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  1.66 MiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  1.78 MiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.2  1.61 MiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+    "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load      Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  1.81 MiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  1.66 MiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.2  1.61 MiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1"
+  },
+  "schema": {
+    "records": [
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700239098982,
+        "latency_ms": 82.556606,
+        "node": "n1",
+        "params": [],
+        "query": "CREATE KEYSPACE IF NOT EXISTS lab WITH replication = {'class':'NetworkTopologyStrategy','dc1':3}",
+        "start_ns": 1790245700156540670,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700241545103,
+        "latency_ms": 2.435926,
+        "node": "n1",
+        "params": [],
+        "query": "CREATE TABLE IF NOT EXISTS lab.blocking (k text PRIMARY KEY, a int, b int) WITH read_repair='BLOCKING' AND speculative_retry='NONE'",
+        "start_ns": 1790245700239109733,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700244374111,
+        "latency_ms": 2.821907,
+        "node": "n1",
+        "params": [],
+        "query": "CREATE TABLE IF NOT EXISTS lab.no_repair (k text PRIMARY KEY, a int, b int) WITH read_repair='NONE' AND speculative_retry='NONE'",
+        "start_ns": 1790245700241553146,
+        "status": "ok",
+        "value": null
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700251038288,
+        "latency_ms": 6.65417,
+        "node": "n1",
+        "params": [],
+        "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+        "start_ns": 1790245700244384891,
+        "status": "ok",
+        "value": {
+          "data_center": "dc1",
+          "host_id": "4b7177a0-d548-4fda-b583-6cc63dae5ee2",
+          "rack": "rack1",
+          "release_version": "5.0.9"
+        }
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700328464255,
+        "latency_ms": 77.418291,
+        "node": "n2",
+        "params": [],
+        "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+        "start_ns": 1790245700251046837,
+        "status": "ok",
+        "value": {
+          "data_center": "dc1",
+          "host_id": "417067d5-e614-45f9-9bd3-2ea2c9058d63",
+          "rack": "rack1",
+          "release_version": "5.0.9"
+        }
+      },
+      {
+        "cl": "ALL",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700396355572,
+        "latency_ms": 67.886458,
+        "node": "n3",
+        "params": [],
+        "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+        "start_ns": 1790245700328470513,
+        "status": "ok",
+        "value": {
+          "data_center": "dc1",
+          "host_id": "f27aa3ef-d053-4f55-989f-44bb6eef3cbd",
+          "rack": "rack1",
+          "release_version": "5.0.9"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700403895997,
+        "latency_ms": 7.527334,
+        "node": "n1",
+        "params": [],
+        "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+        "start_ns": 1790245700396369626,
+        "status": "ok",
+        "value": {
+          "keyspace_name": "lab",
+          "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700411128958,
+        "latency_ms": 7.222865,
+        "node": "n2",
+        "params": [],
+        "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+        "start_ns": 1790245700403907224,
+        "status": "ok",
+        "value": {
+          "keyspace_name": "lab",
+          "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700418371757,
+        "latency_ms": 7.234905,
+        "node": "n3",
+        "params": [],
+        "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+        "start_ns": 1790245700411138171,
+        "status": "ok",
+        "value": {
+          "keyspace_name": "lab",
+          "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700424972749,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 6.588476,
+        "matches_expected": true,
+        "node": "n1",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700418385097,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700432004622,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 7.014369,
+        "matches_expected": true,
+        "node": "n1",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700424991215,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700439493613,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 7.466091,
+        "matches_expected": true,
+        "node": "n2",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700432028504,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700446394109,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 6.882615,
+        "matches_expected": true,
+        "node": "n2",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700439512536,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700452765233,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 6.352162,
+        "matches_expected": true,
+        "node": "n3",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700446413895,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700460098520,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 7.307501,
+        "matches_expected": true,
+        "node": "n3",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700452791951,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      }
+    ],
+    "status": "ok",
+    "table_checks": [
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700424972749,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 6.588476,
+        "matches_expected": true,
+        "node": "n1",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700418385097,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.2:9042",
+        "end_ns": 1790245700432004622,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 7.014369,
+        "matches_expected": true,
+        "node": "n1",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700424991215,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700439493613,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 7.466091,
+        "matches_expected": true,
+        "node": "n2",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700432028504,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.4:9042",
+        "end_ns": 1790245700446394109,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 6.882615,
+        "matches_expected": true,
+        "node": "n2",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700439512536,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700452765233,
+        "expected": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        },
+        "latency_ms": 6.352162,
+        "matches_expected": true,
+        "node": "n3",
+        "params": [
+          "blocking"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700446413895,
+        "status": "ok",
+        "value": {
+          "read_repair": "BLOCKING",
+          "speculative_retry": "NEVER",
+          "table_name": "blocking"
+        }
+      },
+      {
+        "cl": "ONE",
+        "coordinator": "172.19.0.5:9042",
+        "end_ns": 1790245700460098520,
+        "expected": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        },
+        "latency_ms": 7.307501,
+        "matches_expected": true,
+        "node": "n3",
+        "params": [
+          "no_repair"
+        ],
+        "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+        "start_ns": 1790245700452791951,
+        "status": "ok",
+        "value": {
+          "read_repair": "NONE",
+          "speculative_retry": "NEVER",
+          "table_name": "no_repair"
+        }
+      }
+    ]
+  },
+  "schema_attempts": [
+    {
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679184989766,
+          "latency_ms": 79.959319,
+          "node": "n1",
+          "params": [],
+          "query": "CREATE KEYSPACE IF NOT EXISTS lab WITH replication = {'class':'NetworkTopologyStrategy','dc1':3}",
+          "start_ns": 1790245679105026126,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679190260036,
+          "latency_ms": 5.262015,
+          "node": "n1",
+          "params": [],
+          "query": "CREATE TABLE IF NOT EXISTS lab.blocking (k text PRIMARY KEY, a int, b int) WITH read_repair='BLOCKING' AND speculative_retry='NONE'",
+          "start_ns": 1790245679184998998,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679193249500,
+          "latency_ms": 2.982362,
+          "node": "n1",
+          "params": [],
+          "query": "CREATE TABLE IF NOT EXISTS lab.no_repair (k text PRIMARY KEY, a int, b int) WITH read_repair='NONE' AND speculative_retry='NONE'",
+          "start_ns": 1790245679190268312,
+          "status": "ok",
+          "value": null
+        },
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679199874383,
+          "latency_ms": 6.613165,
+          "node": "n1",
+          "params": [],
+          "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+          "start_ns": 1790245679193262037,
+          "status": "ok",
+          "value": {
+            "data_center": "dc1",
+            "host_id": "4b7177a0-d548-4fda-b583-6cc63dae5ee2",
+            "rack": "rack1",
+            "release_version": "5.0.9"
+          }
+        },
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679272212705,
+          "latency_ms": 72.367322,
+          "node": "n2",
+          "params": [],
+          "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+          "start_ns": 1790245679199880400,
+          "status": "ok",
+          "value": {
+            "data_center": "dc1",
+            "host_id": "417067d5-e614-45f9-9bd3-2ea2c9058d63",
+            "rack": "rack1",
+            "release_version": "5.0.9"
+          }
+        },
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679378219589,
+          "latency_ms": 105.960276,
+          "node": "n3",
+          "params": [],
+          "query": "SELECT release_version, data_center, rack, host_id FROM system.local",
+          "start_ns": 1790245679272260309,
+          "status": "ok",
+          "value": {
+            "data_center": "dc1",
+            "host_id": "f27aa3ef-d053-4f55-989f-44bb6eef3cbd",
+            "rack": "rack1",
+            "release_version": "5.0.9"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679386046408,
+          "latency_ms": 7.813957,
+          "node": "n1",
+          "params": [],
+          "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+          "start_ns": 1790245679378233457,
+          "status": "ok",
+          "value": {
+            "keyspace_name": "lab",
+            "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679393391251,
+          "latency_ms": 7.335147,
+          "node": "n2",
+          "params": [],
+          "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+          "start_ns": 1790245679386057091,
+          "status": "ok",
+          "value": {
+            "keyspace_name": "lab",
+            "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679401261420,
+          "latency_ms": 7.861587,
+          "node": "n3",
+          "params": [],
+          "query": "SELECT keyspace_name, replication FROM system_schema.keyspaces WHERE keyspace_name='lab'",
+          "start_ns": 1790245679393400632,
+          "status": "ok",
+          "value": {
+            "keyspace_name": "lab",
+            "replication": "{'class': 'org.apache.cassandra.locator.NetworkTopologyStrategy', 'dc1': '3'}"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679408844088,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 7.557179,
+          "matches_expected": true,
+          "node": "n1",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679401287521,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679416459781,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 7.598618,
+          "matches_expected": true,
+          "node": "n1",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679408862051,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679424923778,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 8.444565,
+          "matches_expected": true,
+          "node": "n2",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679416480081,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679432560461,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 7.620151,
+          "matches_expected": true,
+          "node": "n2",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679424941168,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679440998417,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 8.416127,
+          "matches_expected": true,
+          "node": "n3",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679432583178,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679449695900,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 8.667999,
+          "matches_expected": true,
+          "node": "n3",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679441028473,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        }
+      ],
+      "status": "ok",
+      "table_checks": [
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679408844088,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 7.557179,
+          "matches_expected": true,
+          "node": "n1",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679401287521,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.2:9042",
+          "end_ns": 1790245679416459781,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 7.598618,
+          "matches_expected": true,
+          "node": "n1",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679408862051,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679424923778,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 8.444565,
+          "matches_expected": true,
+          "node": "n2",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679416480081,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1790245679432560461,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 7.620151,
+          "matches_expected": true,
+          "node": "n2",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679424941168,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679440998417,
+          "expected": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          },
+          "latency_ms": 8.416127,
+          "matches_expected": true,
+          "node": "n3",
+          "params": [
+            "blocking"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679432583178,
+          "status": "ok",
+          "value": {
+            "read_repair": "BLOCKING",
+            "speculative_retry": "NEVER",
+            "table_name": "blocking"
+          }
+        },
+        {
+          "cl": "ONE",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1790245679449695900,
+          "expected": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          },
+          "latency_ms": 8.667999,
+          "matches_expected": true,
+          "node": "n3",
+          "params": [
+            "no_repair"
+          ],
+          "query": "SELECT table_name, read_repair, speculative_retry FROM system_schema.tables WHERE keyspace_name='lab' AND table_name=%s",
+          "start_ns": 1790245679441028473,
+          "status": "ok",
+          "value": {
+            "read_repair": "NONE",
+            "speculative_retry": "NEVER",
+            "table_name": "no_repair"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -185,13 +185,15 @@ def environment(config, seed, run_id):
                 "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
     source_files = [ROOT / name for name in ("README.md", "WORK_IN_PROGRESS.md",
                     "Project_Assignment.md", "AGENT_ACTION_PLAN.md", "compose.yaml",
-                    "Dockerfile.cassandra", "Dockerfile.client", "requirements-report.txt",
+                    "Dockerfile.cassandra", "Dockerfile.client",
                     "report/predictions.md", "report/authors.json")]
-    for directory in ("config", "docs", "experiments", "src", "scripts", "tests"):
+    for directory in ("config", "experiments", "src", "scripts", "tests"):
         source_files.extend(path for path in (ROOT / directory).rglob("*")
                             if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc")
+    # Hash only files that exist so an optional provenance document that is
+    # absent from this checkout does not abort the run.
     manifest = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
-                for path in sorted(set(source_files))}
+                for path in sorted(set(source_files)) if path.is_file()}
     return {
         "evidence_schema": EVIDENCE_SCHEMA, "design": config["design"], "run_id": run_id,
         "started_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "root_seed": seed,

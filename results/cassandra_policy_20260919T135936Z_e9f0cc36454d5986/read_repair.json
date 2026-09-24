@@ -1,0 +1,814 @@
+[
+  {
+    "case": {
+      "attempt_id": "repair:0:blocking",
+      "key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+      "round": 0,
+      "setting": "BLOCKING",
+      "table": "blocking"
+    },
+    "ended_ns": 1789826622971993741,
+    "first": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826578508909512,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826578464427084
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826578575431159,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826578508918685
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826578625984397,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826578575443028
+        }
+      ],
+      "records": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789826578630248635,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 4.155937,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n3",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n3"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n3"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+          "sequence": 0,
+          "start_ns": 1789826578626093403,
+          "status": "error"
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 4289982267106904714
+    },
+    "full_cut": {
+      "blocked": {
+        "n1": [
+          "n2",
+          "n3"
+        ],
+        "n2": [
+          "n1",
+          "n3"
+        ],
+        "n3": [
+          "n1",
+          "n2"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    8  6874 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    3   180 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001\n    6  5283 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    3   180 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    7  2093 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n    4  3248 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    2   116 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    5  1324 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n    4   740 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826529418067025,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826529368117924
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826529478976795,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826529418077660
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826529524802895,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826529478989149
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826529537045325,
+          "latency_ms": 12.17397,
+          "node": "n2",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+            1789826528981999
+          ],
+          "query": "INSERT INTO lab.blocking (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+          "start_ns": 1789826529524872315,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 16652391966120162124
+    },
+    "pair1_graph": {
+      "blocked": {
+        "n1": [
+          "n3"
+        ],
+        "n2": [
+          "n3"
+        ],
+        "n3": [
+          "n1",
+          "n2"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   22 26235 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    3   180 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   33 24865 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    2   116 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   22 13500 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n   32 15585 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "pair2_graph": {
+      "blocked": {
+        "n1": [
+          "n2"
+        ],
+        "n2": [
+          "n1",
+          "n3"
+        ],
+        "n3": [
+          "n2"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    6  1642 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   55 27982 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    2   116 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001\n    6  1642 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   55 17042 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "pair_sequence": [
+      [
+        "n2",
+        "n1"
+      ],
+      [
+        "n1",
+        "n3"
+      ]
+    ],
+    "post_workload_partition": {
+      "n1": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   17 12189 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      },
+      "n2": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   67 28702 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    2   116 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001\n   27 26068 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      },
+      "n3": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   67 17762 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "reason": "operation_error",
+    "recovery": {
+      "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+      "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+      "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1"
+    },
+    "second": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826603401137866,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826603352007131
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826603449969249,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826603401146666
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826603495544023,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826603449981830
+        }
+      ],
+      "records": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826603513315980,
+          "kind": "read",
+          "latency_ms": 17.657888,
+          "node": "n1",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking"
+          ],
+          "query": "SELECT a,b FROM lab.blocking WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n1"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n1"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+          "sequence": 0,
+          "start_ns": 1789826603495659187,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 4707053329624259957
+    },
+    "started_ns": 1789826528981994484,
+    "verdict": "inconclusive",
+    "write": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826556180137535,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826556125803914
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826556242507054,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826556180149768
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826556296077559,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826556242516924
+        }
+      ],
+      "records": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826556303630546,
+          "kind": "write",
+          "latency_ms": 7.464317,
+          "node": "n2",
+          "params": [
+            1789826555657970,
+            1,
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking"
+          ],
+          "query": "UPDATE lab.blocking USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:blocking",
+          "sequence": 0,
+          "start_ns": 1789826556296166690,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 10810934316601599930
+    }
+  },
+  {
+    "case": {
+      "attempt_id": "repair:0:no_repair",
+      "key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+      "round": 0,
+      "setting": "NONE",
+      "table": "no_repair"
+    },
+    "ended_ns": 1789826716428457063,
+    "first": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826672201555437,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826672149874193
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826672261954748,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826672201567549
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826672308631474,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826672261966555
+        }
+      ],
+      "records": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "end_ns": 1789826672314052029,
+          "error": "Unavailable",
+          "kind": "read",
+          "latency_ms": 5.358245,
+          "message": "Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level QUORUM\" info={'consistency': 'QUORUM', 'required_replicas': 2, 'alive_replicas': 1}",
+          "node": "n2",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair"
+          ],
+          "query": "SELECT a,b FROM lab.no_repair WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+          "sequence": 0,
+          "start_ns": 1789826672308694546,
+          "status": "error"
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 1239700785270704736
+    },
+    "full_cut": {
+      "blocked": {
+        "n1": [
+          "n2",
+          "n3"
+        ],
+        "n2": [
+          "n1",
+          "n3"
+        ],
+        "n3": [
+          "n1",
+          "n2"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    5   925 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001\n    8  7975 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    4   244 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    6  1642 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n    6  5043 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    3   180 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    4   873 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n    4   873 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "initialization": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826623455310581,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826623395450498
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826623503631438,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826623455323783
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826623543512807,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826623503642067
+        }
+      ],
+      "records": [
+        {
+          "cl": "ALL",
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826623554559064,
+          "latency_ms": 10.934413,
+          "node": "n3",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+            1789826622980454
+          ],
+          "query": "INSERT INTO lab.no_repair (k,a,b) VALUES (%s,0,0) USING TIMESTAMP %s",
+          "role": "initialization",
+          "routing": {
+            "attempted_nodes": [
+              "n3"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n3"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+          "start_ns": 1789826623543625372,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 13913075143836145692
+    },
+    "pair1_graph": {
+      "blocked": {
+        "n1": [
+          "n2"
+        ],
+        "n2": [
+          "n1",
+          "n3"
+        ],
+        "n3": [
+          "n2"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   23 15193 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   24 16450 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001\n   28 22769 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    3   180 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   27 13760 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "pair2_graph": {
+      "blocked": {
+        "n1": [
+          "n2",
+          "n3"
+        ],
+        "n2": [
+          "n1"
+        ],
+        "n3": [
+          "n1"
+        ]
+      },
+      "counters": {
+        "n1": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   40 17653 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001\n    8  2810 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "n2": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   41 18910 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001",
+        "n3": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n    8  2810 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001"
+      },
+      "ips": {
+        "n1": "172.19.0.3",
+        "n2": "172.19.0.4",
+        "n3": "172.19.0.5"
+      },
+      "rules": {
+        "n1": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n2": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP",
+        "n3": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "pair_sequence": [
+      [
+        "n1",
+        "n3"
+      ],
+      [
+        "n3",
+        "n2"
+      ]
+    ],
+    "post_workload_partition": {
+      "n1": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   51 18313 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.4           multiport sports 7000,7001\n   27 27508 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.5           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.4/32 -p tcp -m multiport --sports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.5/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      },
+      "n2": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   52 19570 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      },
+      "n3": {
+        "counters": "Chain LAB_FAULT (1 references)\n pkts bytes target     prot opt in     out     source               destination         \n   23 18959 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport dports 7000,7001\n    0     0 DROP       tcp  --  *      *       0.0.0.0/0            172.19.0.3           multiport sports 7000,7001",
+        "rules": "-N LAB_FAULT\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --dports 7000,7001 -j DROP\n-A LAB_FAULT -d 172.19.0.3/32 -p tcp -m multiport --sports 7000,7001 -j DROP"
+      }
+    },
+    "reason": "operation_error",
+    "recovery": {
+      "n1": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+      "n2": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1",
+      "n3": "Datacenter: dc1\n===============\nStatus=Up/Down\n|/ State=Normal/Leaving/Joining/Moving\n--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack \nUN  172.19.0.4  197.75 KiB  16      100.0%            417067d5-e614-45f9-9bd3-2ea2c9058d63  rack1\nUN  172.19.0.5  157.24 KiB  16      100.0%            f27aa3ef-d053-4f55-989f-44bb6eef3cbd  rack1\nUN  172.19.0.3  185.45 KiB  16      100.0%            4b7177a0-d548-4fda-b583-6cc63dae5ee2  rack1"
+    },
+    "second": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826696917842462,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826696878696270
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826696956661409,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826696917859100
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826697005542785,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826696956670665
+        }
+      ],
+      "records": [
+        {
+          "cl": "QUORUM",
+          "client_id": "client-1",
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826697017053686,
+          "kind": "read",
+          "latency_ms": 11.442363,
+          "node": "n2",
+          "params": [
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair"
+          ],
+          "query": "SELECT a,b FROM lab.no_repair WHERE k=%s",
+          "role": "client",
+          "routing": {
+            "attempted_nodes": [
+              "n2"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n2"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+          "sequence": 0,
+          "start_ns": 1789826697005612025,
+          "status": "ok",
+          "value": {
+            "a": 0,
+            "b": 0
+          }
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 8118183387736974399
+    },
+    "started_ns": 1789826622980449168,
+    "verdict": "inconclusive",
+    "write": {
+      "health": [
+        {
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826650065081568,
+          "error": null,
+          "message": null,
+          "node": "n1",
+          "reachable": true,
+          "start_ns": 1789826650012743010
+        },
+        {
+          "coordinator": "172.19.0.4:9042",
+          "end_ns": 1789826650119152263,
+          "error": null,
+          "message": null,
+          "node": "n2",
+          "reachable": true,
+          "start_ns": 1789826650065090472
+        },
+        {
+          "coordinator": "172.19.0.5:9042",
+          "end_ns": 1789826650168340892,
+          "error": null,
+          "message": null,
+          "node": "n3",
+          "reachable": true,
+          "start_ns": 1789826650119163490
+        }
+      ],
+      "records": [
+        {
+          "cl": "ONE",
+          "client_id": "producer-1",
+          "coordinator": "172.19.0.3:9042",
+          "end_ns": 1789826650172352355,
+          "kind": "write",
+          "latency_ms": 3.897503,
+          "node": "n1",
+          "params": [
+            1789826648604760,
+            1,
+            "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair"
+          ],
+          "query": "UPDATE lab.no_repair USING TIMESTAMP %s SET a=%s WHERE k=%s",
+          "role": "producer",
+          "routing": {
+            "attempted_nodes": [
+              "n1"
+            ],
+            "eligible_nodes": [
+              "n1",
+              "n2",
+              "n3"
+            ],
+            "local_dc": "dc1",
+            "operation_index": 0,
+            "policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+            "selected_node": "n1"
+          },
+          "routing_key": "cassandra-driver-policy-v3:20260919T135936Z_e9f0cc36454d5986:repair:0:no_repair",
+          "sequence": 0,
+          "start_ns": 1789826650168455524,
+          "status": "ok",
+          "value": null
+        }
+      ],
+      "routing_policy": "TokenAwarePolicy(DCAwareRoundRobinPolicy)",
+      "seed": 2772399060682329887
+    }
+  }
+]
