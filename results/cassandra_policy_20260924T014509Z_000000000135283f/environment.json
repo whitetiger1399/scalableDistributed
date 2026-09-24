@@ -1,0 +1,165 @@
+{
+  "design": "cassandra-driver-policy-expanded-v1",
+  "docker_compose": {
+    "command": [
+      "docker",
+      "compose",
+      "version"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "Docker Compose version v5.5.1"
+  },
+  "effective_config": {
+    "cluster": {
+      "compose_file": "compose.expanded.yaml",
+      "nodes": [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "profile": "five_node"
+    },
+    "consistency_configs": [
+      "ONE/ONE",
+      "ONE/QUORUM",
+      "ONE/ALL",
+      "QUORUM/ONE",
+      "QUORUM/QUORUM",
+      "QUORUM/ALL",
+      "ALL/ONE",
+      "ALL/QUORUM",
+      "ALL/ALL"
+    ],
+    "database": {
+      "hints_enabled": false,
+      "read_repair_tables": {
+        "blocking": "BLOCKING",
+        "no_repair": "NONE"
+      },
+      "replication_factor": 3
+    },
+    "design": "cassandra-driver-policy-expanded-v1",
+    "enabled_experiments": [
+      "session_guarantees",
+      "node_failure",
+      "network_partition",
+      "timestamp_control"
+    ],
+    "faults": {
+      "cql_port": 9042,
+      "failure_detection_timeout_seconds": 120,
+      "internode_ports": [
+        7000,
+        7001
+      ],
+      "node_failure_count": 1,
+      "partition_group_sizes": [
+        2,
+        3
+      ],
+      "partition_hold_seconds": 15,
+      "partition_stabilization_seconds": 20,
+      "partition_strategy": "balanced_random",
+      "post_recovery_settle_seconds": 30,
+      "recovery_timeout_seconds": 900
+    },
+    "models": [
+      "RYW",
+      "MR",
+      "MW",
+      "WFR"
+    ],
+    "profile": "full",
+    "repetitions": 10,
+    "rounds": 10,
+    "routing": {
+      "local_dc": "dc1",
+      "policy": "token_aware_dc_aware"
+    },
+    "scenarios": [
+      "normal",
+      "node_failure",
+      "network_partition"
+    ],
+    "seed": null
+  },
+  "evidence_schema": "cassandra-driver-policy-evidence-v5",
+  "git_revision": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "d72539155024183ce87397bf4816217ab7781fa6"
+  },
+  "git_status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "?? results/cassandra_policy_20260924T014509Z_000000000135283f/"
+  },
+  "platform": "darwin",
+  "python": "3.9.12 (main, Apr  5 2022, 01:53:17) \n[Clang 12.0.0 ]",
+  "root_seed": 20260927,
+  "run_id": "20260924T014509Z_000000000135283f",
+  "source_manifest_sha256": {
+    "AGENT_ACTION_PLAN.md": "45ff57b4c9d689aba9721e89b3398b716abfff8614d98f19d898d860c22ce78e",
+    "Dockerfile.cassandra": "7a908e839d10efd2408b69d814a97a76910f03d614b03ae6714f277ac77b8f9e",
+    "Dockerfile.client": "ed1787acc4723683498f91a0aeccc1e383ed719de06059027ce3a5bbeec487e6",
+    "Project_Assignment.md": "8ec95fa0932d073e92d81d8fe4d452b97a4287b33f4a029a7881a40417bee84a",
+    "README.md": "ad2a9f1207d67ccdedb460a998ff90aaf6ce2485a02f50d88c10aad94fb60597",
+    "WORK_IN_PROGRESS.md": "7e20041b3de21c3363df86ac5127264381b6a0cd04afe3b43e023d11467f7659",
+    "compose.expanded.yaml": "0f74bb0608fd82e2bfbe6810cc1f3fa176a8563e81c79261e32e2cc12870b7a2",
+    "config/cassandra_driver_expanded_experiments.json": "d2b756905d10df45fff5a369f189a6b5f0ca6d26a0b9e60597b588a5ef04e056",
+    "config/cassandra_driver_experiments.json": "3e93b73a7d36c905658d1428dae013df4f51610acd6d258303dc27adb53b62ce",
+    "config/randomized_experiments.json": "08aa4a61c638d5197fa6af8af4fd85fa9fbfad85a5ea43a7edf6a39650907566",
+    "config/v2randomized_experiments.json": "4de52a00df44ad12c6e95818f1da41bbb9376f83c250fb3d219f3110aa7f357f",
+    "docs/cassandra-driver-policy-plan.md": "ed182045d5836d065c9e4ab4826d4175ad3fb6ca21fe489bf7bb74b9e274aa20",
+    "docs/configuration-reference.md": "28621e80372387d12a38da54de03d0714b8f0c8433fef50f96ef428118570730",
+    "docs/execution-guide.md": "9a23e3d06fb956153ec8696817d01d716b6df72f1be779dd59e324c470131650",
+    "docs/expanded-cluster-experiment.md": "9d28d133b36b01a51748905ed690ef14b24b51d5e8f469f336b4b36c62d187ab",
+    "docs/randomized-experiment-plan.md": "a6867ecea54c2202b343a718213015c267b68383cb3a95a52938f3a69a2dd9e5",
+    "experiments/__init__.py": "6728b7a135d5b2cd73dab0800343db8d621c534e72273940214c457ea4eaf523",
+    "experiments/common.py": "c52abc2b94575cb419e63b94feb64303e862744318ad1e000845d6c51aa45370",
+    "experiments/configuration.py": "2a1111a609b0de49644691c735ee5194ca98f84b3f48e0cd81a4de0ef175b4c3",
+    "experiments/faults.py": "2b5e5c5b4463d32257731786c1ea8f58f90a80c057a0e5ba0bf6c2ba3dd8a5e7",
+    "experiments/network_partition.py": "a23d235a818fe56b4256dc62b8dbfbd99530660353b6d15820008ee4518f715d",
+    "experiments/node_failure.py": "67e60891e4110c277ff94e5c735d9349d43b89f4f68e46eb7548c47f234e9a9a",
+    "experiments/read_repair.py": "4b6499d81d876d2fa90d8542db4509e36e922ef71bc3bbeeab443dc0c8e5c2c7",
+    "experiments/session_guarantees.py": "a58c35418e6968e64aa427fe4050e276b1e0d7a681ae6b690fea502b0f13344c",
+    "experiments/timestamp_control.py": "073ba277f20adb9546b249363f092d36665f9c8162bfe9053279ae335c052559",
+    "experiments/workloads/__init__.py": "370d5912decf3da9871c5f3a980a522e970ed423cf365a60a70593e2b8a481ba",
+    "experiments/workloads/mr.py": "f99ace4f227efcac4b7fe943cc941fc3163f0dbec414aed739116fd197b81322",
+    "experiments/workloads/mw.py": "da03853751b1a20c402730c276d09081a3672d4943c8ccf17fd41f835cfca5dc",
+    "experiments/workloads/ryw.py": "8968538d331f847fe7b61c589feb3fb04c679071fcddf4b80b22dc28d27d60fa",
+    "experiments/workloads/wfr.py": "d4c2ea7fce6d91aef1739f45955a732b30dd54acba6e14c623320a58233b80c3",
+    "report/authors.json": "5c5a982383cda3642bb86065fa1061b37dfed464258098af72892d76e52dffbb",
+    "report/predictions.md": "36d2e5129c9ba480a2957a85eef44a7cfd215a151a9f9e2a2077f1be58be2bc8",
+    "requirements-report.txt": "f4a0b84527c1ae7e54c3a1b7c165007eee39ce7aae9ebb5be17142067c2e9749",
+    "scripts/build_plan_pdf.py": "5eea65120c30f2457149ddf664a3ebac2c538dc0a287b5ffc6d7ecb8cb3b2573",
+    "scripts/build_report.py": "c46f8ba01ce79a56cfca04686842dadfecea2bbda1e0dff8acd791a80d33ad4b",
+    "scripts/lab.py": "5f16e76a8c8c35948ecfb9ec4f0c3ed306de8946956b39cc00728e3a13460e21",
+    "scripts/run_blocks.sh": "1e3a62b83e7ab1cc57710bb52df6446ff72cb4ab937b80224b4fd671dc0bfba7",
+    "scripts/run_randomized.py": "8731a51f751e9c688425d3b30e2d2965b3916752acf9299540b7ca59a658eee6",
+    "scripts/verify_randomized.py": "efe85d65b446ceb1ea07f2aca2f70a7fdaaae26244f0a403f29d52acc7e00f88",
+    "scripts/verify_results.py": "3a35171aec7d8fa25aa91c160304a44bc66acd97069fde02bc33f276d3dfc033",
+    "src/checks.py": "03defd729db0d23ac3882c5cd2408d724c7ddd10c8138662af2bfad70defc32a",
+    "src/routing.py": "65d8d42e18a81cbb69fba75d5446b698fb32946548fcb152fff1a1733adf6cfa",
+    "src/worker.py": "0cfbe8d0bca3b30b903fe5441f99d9d0675695898b469387dd6eeb8d86d9cdb0",
+    "tests/test_checks.py": "6f79158baf75610b7db3bcbbc1958c540b26cee5ee2f7616a04959bc84b0aa17",
+    "tests/test_configuration.py": "26b92839878568585a147c74956e5952906e242e200121863988b99e1f7f1d93",
+    "tests/test_faults.py": "d796337e9735064141f75f4b9403d37905c3906b4869d9f3aacd41a7e17f9985",
+    "tests/test_randomized_setup.py": "987bcb20d0e4e78b9a468d336d68e50e4f9923b002ff888e9b53378c740053c5",
+    "tests/test_verifier.py": "cadebc3859022e688f8f91a64862e1c92e70661767943499195756355a5c9bab"
+  },
+  "started_utc": "2026-09-24T01:45:10.018078+00:00"
+}
